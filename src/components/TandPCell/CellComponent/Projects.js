@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Projects = () => {
     const [projects, setProjects] = useState([]);
@@ -7,24 +6,18 @@ const Projects = () => {
     const [supervisorFilter, setSupervisorFilter] = useState('');
     const [branchFilter, setBranchFilter] = useState('');
     const [filteredProjects, setFilteredProjects] = useState([]);
-    const [sortBy, setSortBy] = useState(''); // 'package' or ''
-    const [sortOrder, setSortOrder] = useState(''); // 'asc' or 'desc'
-
+    const [sortBy, setSortBy] = useState('');
+    const [sortOrder, setSortOrder] = useState('');
 
     useEffect(() => {
         fetch("https://project-iet-tnp-bk.vercel.app/api/projects/projects-list-approved/")
             .then(res => res.json())
-            .then(
-                (result) => {
-                    setProjects(result);
-                    setFilteredProjects(result);
-                },
-                (error) => {
-                    console.log(error);
-                }
-            )
-    }, [])
-
+            .then(result => {
+                setProjects(result);
+                setFilteredProjects(result);
+            })
+            .catch(error => console.log(error));
+    }, []);
 
     const handleFilter = () => {
         const filteredData = projects.filter(project => {
@@ -37,12 +30,11 @@ const Projects = () => {
         setFilteredProjects(filteredData);
     };
 
-    const batchOptions = [...new Set(projects.map(project => project.fields.student_batch))];
-    const supervisorOptions = [...new Set(projects.map(project => project.fields.supervisor))];
-    const branchOptions = [...new Set(projects.map(project => project.fields.student_branch))];
+    const batchOptions = [...new Set(projects.map(p => p.fields.student_batch))];
+    const supervisorOptions = [...new Set(projects.map(p => p.fields.supervisor))];
+    const branchOptions = [...new Set(projects.map(p => p.fields.student_branch))];
 
-
-    const handleSort = (column) => {
+    const handleSort = column => {
         if (column === 'package') {
             if (sortBy === 'package') {
                 setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -54,211 +46,208 @@ const Projects = () => {
     };
 
     const sortedProjects = [...filteredProjects];
-
-
     if (sortBy === 'package') {
         sortedProjects.sort((a, b) => {
             const aValue = parseFloat(a.fields.student_salary);
             const bValue = parseFloat(b.fields.student_salary);
-
-            if (sortOrder === 'asc') {
-                return aValue - bValue;
-            } else {
-                return bValue - aValue;
-            }
+            return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
         });
     }
 
     return (
-        <div className="flex flex-wrap items-center justify-center">
-            <div className='p-8'>
-                <h3 className="text-3xl mb-2 font-semibold leading-normal">
-                    Project Statistics
-                </h3>
-                <br />
-                <br />
-                <div className="flex flex-col mb-4">
-                    <div className="flex items-center mb-4">
-                        <div className="w-1/2">
-                            <a href="https://63034a7373d24551811fa3e3--shiny-fox-46fa01.netlify.app/" className="font-bold text-blueGray-700">1. Computer Science & Engineering Virtual Lab</a>
-                        </div>
-                        {/* Project detail */}
-                        <br />
-                        <p className="w-1/2 text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600">
-                            This project is a web-based application that allows students to perform experiments in a virtual environment. This project is developed by students of the Computer Science and Engineering Department.
-                        </p>
+        <div className="w-full px-8 py-12 min-h-screen">
+            <div className="max-w-7xl mx-auto">
 
-                    </div>
+                {/* Header */}
+                <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
+                    🚀 Project Statistics
+                </h1>
 
-                    <br />
-                    <div className="flex items-center mb-4">
-                        <div className="w-1/2">
-                            <a href="https://majorprojectdetails.netlify.app/" className="font-bold text-blueGray-700">2. Major Project of Batch 2019-2023</a>
-                        </div>
-                        {/* Project detail */}
-                        <br />
-                        <p className="w-1/2 text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600">
-                            This project is a web-based application that allows students to perform experiments in a virtual environment. This project is developed by students of the Computer Science and Engineering Department.
-                        </p>
-                    </div>
+                {/* Filters */}
+                <div className="flex flex-col gap-6 mb-10  shadow-lg rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
 
-                    <br />
-
-                    <div className="flex items-center mb-4">
-                        <div className="w-1/2">
-                            <a href="https://ietagra-vlab.netlify.app/ctypesimulators" className="font-bold text-blueGray-700">3. Project by 3rd Year Students</a>
-                        </div>
-                        {/* Project detail */}
-                        <br />
-                        <p className="w-1/2 text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600">
-
-
-                            This type of simulators are having mostly C programming codes and they are self explanatory e.g code are executing line by line and you can understand them easily . these are the mock examples which will make you learn about programming concepts and by this website you will have an idea that how simulator is created and how code runs.
-                        </p>
-
-
-
-                    </div>
-                </div>
-                <br />
-                <br />
-                <br />
-                <br />
-                <div className="flex flex-col mb-4">
-                    <div className="flex items-center mb-4">
-                        <label className="px-6 py-3 block whitespace-nowrap">Batch:</label>
+                    {/* Batch */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Batch
+                        </label>
                         <select
                             value={batchFilter}
-                            onChange={(e) => setBatchFilter(e.target.value)}
-                            className="border p-1"
+                            onChange={e => setBatchFilter(e.target.value)}
+                            className="w-full border border-gray-300 dark:border-gray-600 
+        rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-900 text-gray-800 
+        dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">All</option>
-                            {batchOptions.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
+                            {batchOptions.map((option, i) => (
+                                <option key={i} value={option}>{option}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="flex items-center mb-4">
-                        <label className="px-6 py-3 block whitespace-nowrap">Supervisor:</label>
+                    {/* Supervisor */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Supervisor
+                        </label>
                         <select
                             value={supervisorFilter}
-                            onChange={(e) => setSupervisorFilter(e.target.value)}
-                            className="border p-1"
+                            onChange={e => setSupervisorFilter(e.target.value)}
+                            className="w-full border border-gray-300 dark:border-gray-600 
+        rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-900 text-gray-800 
+        dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">All</option>
-                            {supervisorOptions.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
+                            {supervisorOptions.map((option, i) => (
+                                <option key={i} value={option}>{option}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="flex items-center mb-4">
-                        <label className="px-6 py-3 block whitespace-nowrap">Branch:</label>
+                    {/* Branch */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Branch
+                        </label>
                         <select
                             value={branchFilter}
-                            onChange={(e) => setBranchFilter(e.target.value)}
-                            className="border p-1"
+                            onChange={e => setBranchFilter(e.target.value)}
+                            className="w-full border border-gray-300 dark:border-gray-600 
+        rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-900 text-gray-800 
+        dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">All</option>
-                            {branchOptions.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
+                            {branchOptions.map((option, i) => (
+                                <option key={i} value={option}>{option}</option>
                             ))}
                         </select>
+                    </div>
 
-                        <button onClick={handleFilter} className="bg-blue-500 text-white px-4 py-2 rounded ml-4">
-                            Apply Filters
+                    {/* Button */}
+                    <div>
+                        <button
+                            onClick={handleFilter}
+                            className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 
+        rounded-lg shadow-md hover:bg-blue-500 active:bg-blue-700 
+        transition-all duration-200"
+                        >
+                            Apply
                         </button>
                     </div>
+
                 </div>
 
 
 
-                <table className="w-full">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" className="px-6 py-3 block whitespace-nowrap">
-                                Batch
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Student Name
-                            </th>
-                            <th>
-                                Project name
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Technology
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Branch
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Supervisor
-                            </th>
-                            <th scope="col" classname="px-6 py-3">
-                                GitHub link
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Ppt Link 
-                            </th>
 
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedProjects.map((project, index) => (
-                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={index}>
-                                <th scope="row">
-                                    {project.fields.student_batch}
-                                </th>
-                                <td scope="row" className="px-6 py-4">
-                                    {project.fields.student_name}
-                                </td>
-                                <td>
-                                    {project.fields.project_name}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {project.fields.technology}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {project.fields.student_branch}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {project.fields.supervisor}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {project.fields.github_link ? (
-                                        <a href={project.fields.github_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">
-                                            View Project
-                                        </a>
-                                    ) :
-                                        (
-                                            <p>Not Available</p>
-                                        )}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {project.fields.ppt_link ? (
-                                        <a href={project.fields.ppt_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">
-                                            View PPT
-                                        </a>
-                                    ) :
-                                        (
-                                            <p>Not Available</p>
-                                        )}
-                                </td>
-                                
-                                
-
+                {/* Projects Table */}
+                <div className="overflow-x-auto bg-white dark:bg-gray-800 shadow-md rounded-xl">
+                    <table className="hidden md:table w-full text-left">
+                        <thead className="text-sm text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
+                            <tr>
+                                <th className="px-6 py-3">Batch</th>
+                                <th className="px-6 py-3">Student</th>
+                                <th className="px-6 py-3">Project</th>
+                                <th className="px-6 py-3">Technology</th>
+                                <th className="px-6 py-3">Branch</th>
+                                <th className="px-6 py-3">Supervisor</th>
+                                <th className="px-6 py-3">GitHub</th>
+                                <th className="px-6 py-3">PPT</th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            {sortedProjects.map((project, i) => (
+                                <tr key={i} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                                    <td className="px-6 py-4 font-medium">{project.fields.student_batch}</td>
+                                    <td className="px-6 py-4">{project.fields.student_name}</td>
+                                    <td className="px-6 py-4">{project.fields.project_name}</td>
+                                    <td className="px-6 py-4">{project.fields.technology}</td>
+                                    <td className="px-6 py-4">{project.fields.student_branch}</td>
+                                    <td className="px-6 py-4">{project.fields.supervisor}</td>
+                                    <td className="px-6 py-4">
+                                        {project.fields.github_link ? (
+                                            <a
+                                                href={project.fields.github_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 underline"
+                                            >
+                                                View
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-400">N/A</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {project.fields.ppt_link ? (
+                                            <a
+                                                href={project.fields.ppt_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 underline"
+                                            >
+                                                View
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-400">N/A</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden space-y-4 p-4">
+                        {sortedProjects.map((project, i) => (
+                            <div
+                                key={i}
+                                className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-600"
+                            >
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                    <span className="font-medium text-gray-800 dark:text-white">{project.fields.student_name}</span>
+                                    ({project.fields.student_batch}, {project.fields.student_branch})
+                                </p>
+                                <p className="font-semibold text-gray-900 dark:text-white">
+                                    {project.fields.project_name}
+                                </p>
+                                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                    Tech: {project.fields.technology}
+                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    Supervisor: {project.fields.supervisor}
+                                </p>
+                                <div className="flex items-center gap-4 mt-3 text-sm">
+                                    {project.fields.github_link ? (
+                                        <a
+                                            href={project.fields.github_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                            GitHub
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-400">GitHub: N/A</span>
+                                    )}
+                                    {project.fields.ppt_link ? (
+                                        <a
+                                            href={project.fields.ppt_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                            PPT
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-400">PPT: N/A</span>
+                                    )}
+                                </div>
+                            </div>
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     );

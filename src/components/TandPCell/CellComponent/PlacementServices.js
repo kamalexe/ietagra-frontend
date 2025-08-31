@@ -2,43 +2,47 @@ import React from 'react';
 
 const PlacementServices = () => {
   return (
+    <div className="w-full px-8 py-12 bg-white dark:bg-gray-900">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
 
-    <div class="flex flex-wrap items-center">
-      <div class="w-full md:w-5/12 px-4 mr-auto ml-auto">
-
-        <h3 class="text-3xl mb-2 font-semibold leading-normal">
-          Working with us is a pleasure
-        </h3>
-        <p class="text-lg font-light leading-relaxed mt-4 mb-4 text-blueGray-600">
-          Don't let your uses guess by attaching tooltips and popoves to
-          any element. Just make sure you enable them first via
-          JavaScript.
-        </p>
-        <p class="text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600">
-          The kit comes with three pre-built pages to help you get started
-          faster. You can change the text and images and you're good to
-          go. Just make sure you enable them first via JavaScript.
-        </p>
-        <a href="/" class="font-bold text-blueGray-700 mt-8">Check Notus JS!</a>
-      </div>
-      <div class="w-full md:w-4/12 px-4 mr-auto ml-auto">
-        <div class="relative flex flex-col min-w-0 break-words w-full mb-2 shadow-lg rounded-lg bg-pink-500" >
-          <img alt="..." src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1051&amp;q=80" class="w-full align-middle rounded-t-lg" />
-          <blockquote class="relative p-8 mb-4">
-            <svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 583 95" class="absolute left-0 w-full block h-95-px -top-94-px">
-              <polygon points="-30,95 583,95 583,65" class="text-pink-500 fill-current"></polygon>
-            </svg>
-
-            <h4 class="text-xl font-bold text-white">
-              Top Notch Services
-            </h4>
-            <p class="text-md font-light mt-2 text-white">
-              The Arctic Ocean freezes every winter and much of the
-              sea-ice then thaws every summer, and that process will
-              continue whatever happens.
-            </p>
-          </blockquote>
+        {/* Text Section */}
+        <div className="md:w-5/12">
+          <h3 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-6">
+            Working with us is a pleasure
+          </h3>
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+            Don't let your users guess by attaching tooltips and popovers to any element. Just make sure you enable them first via JavaScript.
+          </p>
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+            The kit comes with three pre-built pages to help you get started faster. You can change the text and images and you're good to go. Just make sure you enable them first via JavaScript.
+          </p>
+          <a
+            href="/"
+            className="inline-block font-semibold text-blue-600 dark:text-blue-400 hover:underline mt-2"
+          >
+            Check Notus JS!
+          </a>
         </div>
+
+        {/* Card Section */}
+        <div className="md:w-5/12">
+          <div className="relative flex flex-col w-full bg-pink-500 rounded-2xl shadow-lg overflow-hidden">
+            <img
+              alt="Service"
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1051&q=80"
+              className="w-full h-64 object-cover rounded-t-2xl"
+            />
+            <blockquote className="p-6 md:p-8 text-white">
+              <h4 className="text-xl md:text-2xl font-bold mb-2">
+                Top Notch Services
+              </h4>
+              <p className="text-md md:text-lg font-light">
+                The Arctic Ocean freezes every winter and much of the sea-ice then thaws every summer, and that process will continue whatever happens.
+              </p>
+            </blockquote>
+          </div>
+        </div>
+
       </div>
     </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SideNavItemTandP from "./SideNavItemTandP"; // Import the new component
+// import SideNavItemTandP from "./SideNavItemTandP"; 
 import PlacementServices from "./CellComponent/PlacementServices";
 import TrainingServices from "./CellComponent/TrainingServices"; // Import other components
 import Placements from "./CellComponent/Placements";
@@ -9,7 +9,7 @@ import GateQualified from "./CellComponent/GateQualified"
 import Projects from "./CellComponent/Projects";
 
 const SideNavTandP = () => {
-    const [selectedComponent, setSelectedComponent] = useState(null);
+    const [activeIndex, setActiveIndex] = useState(0);
 
     const sidebarData = [
         {
@@ -64,8 +64,8 @@ const SideNavTandP = () => {
             title: "Mooc Courses",
             icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-</svg>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
 
             ),
             component: <MoocCourse />,
@@ -83,25 +83,31 @@ const SideNavTandP = () => {
         }
     ];
 
-    const handleItemClick = (component) => {
-        setSelectedComponent(component);
-    };
-
     return (
-        <section className="bg-white dark:bg-gray-900">
-            <div class="container mx-auto p-8">
-                <div className="flex">
-                    <div>
-                        {/* Pass all SidebarData to the SideNavItemTandP component */}
-                        <SideNavItemTandP
-                            sidebarData={sidebarData}
-                            onItemClick={handleItemClick}
-                        />
-                    </div>
-                    <div>
-                        {/* Display the selected component */}
-                        {selectedComponent}
-                    </div>
+        <section className="mt-12 bg-white dark:bg-gray-900">
+            <div className="container mx-auto p-8">
+                {/* Chips Row */}
+                <div className="flex flex-wrap justify-center gap-3 pb-2">
+                    {sidebarData.map((item, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setActiveIndex(index)}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-200
+        ${activeIndex === index
+                                    ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md scale-105"
+                                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                }`}
+                        >
+                            <span className="w-5 h-5">{item.icon}</span>
+                            <span>{item.title}</span>
+                        </button>
+                    ))}
+                </div>
+
+
+                {/* Selected Content */}
+                <div className="mt-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                    {sidebarData[activeIndex].component}
                 </div>
             </div>
         </section>

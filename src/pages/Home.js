@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import AdmissionModal from '../utils/AdmissionModel';
+// import AdmissionModal from '../utils/AdmissionModel';
 
 const Home = () => {
   // Carousel state and logic
@@ -101,40 +101,71 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="mt-12 min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Hero Section (using the Hero component) */}
       {/* <Hero /> */}
-      <AdmissionModal />
+      {/*<AdmissionModal /> */}
 
       {/* Carousel Section */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-2xl shadow-xl mb-4">
+      <section className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="relative h-[400px] md:h-[550px] overflow-hidden rounded-2xl shadow-2xl">
           {carouselImages.map((image, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
-              }`}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"
+                }`}
             >
-              <img src={image.url} alt={image.alt} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                <div className="p-8 text-white">
-                  <h3 className="text-2xl font-bold mb-2">{image.alt}</h3>
-                  <p className="text-lg">{image.des}</p>
+              <img
+                src={image.url}
+                alt={image.alt}
+                className="w-full h-full object-cover scale-105 hover:scale-110 transition-transform duration-1000"
+              />
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end">
+                <div className="p-8 sm:p-12 max-w-2xl">
+                  <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3 drop-shadow-lg">
+                    {image.alt}
+                  </h3>
+                  <p className="text-lg md:text-xl text-gray-200 leading-relaxed">
+                    {image.des}
+                  </p>
                 </div>
               </div>
             </div>
           ))}
 
-          {/* Carousel Navigation Dots */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {/* Navigation Arrows */}
+          <button
+            onClick={() =>
+              setCurrentSlide((prev) =>
+                prev === 0 ? carouselImages.length - 1 : prev - 1
+              )
+            }
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-3 transition"
+          >
+            ◀
+          </button>
+          <button
+            onClick={() =>
+              setCurrentSlide((prev) =>
+                prev === carouselImages.length - 1 ? 0 : prev + 1
+              )
+            }
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-3 transition"
+          >
+            ▶
+          </button>
+
+          {/* Carousel Dots */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3">
             {carouselImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full ${
-                  index === currentSlide ? 'bg-white' : 'bg-white/50'
-                }`}
+                className={`w-4 h-4 rounded-full border-2 transition ${index === currentSlide
+                    ? "bg-white border-white scale-110"
+                    : "bg-white/40 border-white/60"
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -181,8 +212,10 @@ const Home = () => {
       </section>
 
       {/* Departments Section - 3 Column Grid */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12 relative">
+      <section
+  className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+  id="our-department"
+>        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12 relative">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
             Our Departments
           </span>

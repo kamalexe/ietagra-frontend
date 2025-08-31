@@ -70,162 +70,213 @@ const Placements = () => {
     }
 
     return (
-        <div className="flex flex-wrap items-center justify-center">
-            <div className='p-8'>
-                <h3 className="text-3xl mb-2 font-semibold leading-normal">
-                    Placement Statistics
-                </h3>
+        <div className="w-full px-8 py-12 min-h-screen">
+            <div className="max-w-7xl mx-auto">
 
-                <div className="flex flex-col mb-4">
-                    <div className="flex items-center mb-4">
-                        <label className="px-6 py-3 block whitespace-nowrap">Batch:</label>
+                {/* Header */}
+                <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
+                    🎓 Placement Statistics
+                </h1>
+
+                {/* Filters */}
+                <div className="flex flex-col gap-6 mb-10 shadow-lg rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
+
+                    {/* Batch */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Batch
+                        </label>
                         <select
                             value={batchFilter}
-                            onChange={(e) => setBatchFilter(e.target.value)}
-                            className="border p-1"
+                            onChange={e => setBatchFilter(e.target.value)}
+                            className="w-full border border-gray-300 dark:border-gray-600 
+      rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-900 text-gray-800 
+      dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">All</option>
-                            {batchOptions.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
+                            {batchOptions.map((option, i) => (
+                                <option key={i} value={option}>{option}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="flex items-center mb-4">
-                        <label className="px-6 py-3 block whitespace-nowrap">Company:</label>
+                    {/* Company */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Company
+                        </label>
                         <select
                             value={companyFilter}
-                            onChange={(e) => setCompanyFilter(e.target.value)}
-                            className="border p-1"
+                            onChange={e => setCompanyFilter(e.target.value)}
+                            className="w-full border border-gray-300 dark:border-gray-600 
+      rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-900 text-gray-800 
+      dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">All</option>
-                            {companyOptions.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
+                            {companyOptions.map((option, i) => (
+                                <option key={i} value={option}>{option}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="flex items-center mb-4">
-                        <label className="px-6 py-3 block whitespace-nowrap">Branch:</label>
+                    {/* Branch */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Branch
+                        </label>
                         <select
                             value={branchFilter}
-                            onChange={(e) => setBranchFilter(e.target.value)}
-                            className="border p-1"
+                            onChange={e => setBranchFilter(e.target.value)}
+                            className="w-full border border-gray-300 dark:border-gray-600 
+      rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-900 text-gray-800 
+      dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">All</option>
-                            {branchOptions.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
+                            {branchOptions.map((option, i) => (
+                                <option key={i} value={option}>{option}</option>
                             ))}
                         </select>
+                    </div>
 
-                        <button onClick={handleFilter} className="bg-blue-500 text-white px-4 py-2 rounded ml-4">
-                            Apply Filters
+                    {/* Button */}
+                    <div>
+                        <button
+                            onClick={handleFilter}
+                            className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md 
+      hover:bg-blue-500 active:bg-blue-700 transition-all duration-200"
+                        >
+                            Apply
                         </button>
                     </div>
+
                 </div>
 
 
-
-                <table className="w-full">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" className="px-6 py-3 block whitespace-nowrap">
-                                Batch
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Student Name
-                            </th>
-                            <th>
-                                Profile Picture
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Company Name
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Branch
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Position
-                            </th>
-                            <th scope="col"
-                                className="px-6 py-3"
-                                onClick={() => handleSort('package')}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <span>Package (LPA)</span>
-                                {sortBy === 'package' && sortOrder === 'asc' && <span>▲</span>}
-                                {sortBy === 'package' && sortOrder === 'desc' && <span>▼</span>}
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Offer Letter
-                            </th>
-
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedPlacements.map((placement, index) => (
-                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={index}>
-                                <th scope="row">
-                                    {placement.fields.student_batch}
+                {/* Table */}
+                <div className="overflow-x-auto bg-white dark:bg-gray-800 shadow-md rounded-xl">
+                    <table className="hidden md:table w-full text-left">
+                        <thead className="text-sm text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
+                            <tr>
+                                <th className="px-6 py-3">Batch</th>
+                                <th className="px-6 py-3">Student</th>
+                                <th className="px-6 py-3">Profile</th>
+                                <th className="px-6 py-3">Company</th>
+                                <th className="px-6 py-3">Branch</th>
+                                <th className="px-6 py-3">Position</th>
+                                <th
+                                    className="px-6 py-3 cursor-pointer"
+                                    onClick={() => handleSort("package")}
+                                >
+                                    Package (LPA){" "}
+                                    {sortBy === "package" && sortOrder === "asc" && "▲"}
+                                    {sortBy === "package" && sortOrder === "desc" && "▼"}
                                 </th>
-                                <td scope="row" className="px-6 py-4">
-                                    {placement.fields.student_name}
-                                </td>
-                                <td>
-                                    <div className="flex items-center">
-                                        {placement.fields.profile_picture && <img
-                                            src={(placement.fields.profile_picture && placement.fields.profile_picture[0].url)}
-                                            alt="student_image"
-                                            className="w-12 h-12 rounded-md mr-4"
-
-
-                                        />}
-                                        {!placement.fields.profile_picture &&
+                                <th className="px-6 py-3">Offer Letter</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortedPlacements.map((placement, i) => (
+                                <tr
+                                    key={i}
+                                    className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                                >
+                                    <td className="px-6 py-4">{placement.fields.student_batch}</td>
+                                    <td className="px-6 py-4">{placement.fields.student_name}</td>
+                                    <td className="px-6 py-4">
+                                        {placement.fields.profile_picture ? (
+                                            <img
+                                                src={placement.fields.profile_picture[0].url}
+                                                alt="student"
+                                                className="w-12 h-12 rounded-md"
+                                            />
+                                        ) : (
                                             <img
                                                 src="./images/smile_emoji.jpg"
-                                                alt="student_image"
-                                                className="w-10 h-10 rounded-md mr-4"
+                                                alt="default"
+                                                className="w-12 h-12 rounded-md"
                                             />
-                                        }
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    {placement.fields.company_name}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {placement.fields.student_branch}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {placement.fields.position_offered}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {placement.fields.student_salary}
-                                </td>
-                                <td className="px-6 py-4">
-
-                                    {placement.fields.offer_letter ? (
-                                        <a href={placement.fields.offer_letter && placement.fields.offer_letter[0].url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">
-                                            View Offer Letter
-                                        </a>
-                                    ) :
-                                        (
-                                            <p>Not Available</p>
                                         )}
+                                    </td>
+                                    <td className="px-6 py-4">{placement.fields.company_name}</td>
+                                    <td className="px-6 py-4">{placement.fields.student_branch}</td>
+                                    <td className="px-6 py-4">{placement.fields.position_offered}</td>
+                                    <td className="px-6 py-4">{placement.fields.student_salary}</td>
+                                    <td className="px-6 py-4">
+                                        {placement.fields.offer_letter ? (
+                                            <a
+                                                href={placement.fields.offer_letter[0].url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 underline"
+                                            >
+                                                View
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-400">N/A</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
 
-
-                                </td>
-
-                            </tr>
+                    {/* Mobile Card View */}
+                    <div className="md:hidden space-y-4 p-4">
+                        {sortedPlacements.map((placement, i) => (
+                            <div
+                                key={i}
+                                className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-600"
+                            >
+                                <div className="flex items-center gap-3 mb-2">
+                                    {placement.fields.profile_picture ? (
+                                        <img
+                                            src={placement.fields.profile_picture[0].url}
+                                            alt="student"
+                                            className="w-12 h-12 rounded-md"
+                                        />
+                                    ) : (
+                                        <img
+                                            src="./images/smile_emoji.jpg"
+                                            alt="default"
+                                            className="w-12 h-12 rounded-md"
+                                        />
+                                    )}
+                                    <div>
+                                        <p className="font-semibold text-gray-900 dark:text-white">
+                                            {placement.fields.student_name}
+                                        </p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {placement.fields.student_batch} • {placement.fields.student_branch}
+                                        </p>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    Company: {placement.fields.company_name}
+                                </p>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    Position: {placement.fields.position_offered}
+                                </p>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    Package: {placement.fields.student_salary} LPA
+                                </p>
+                                <div className="mt-2">
+                                    {placement.fields.offer_letter ? (
+                                        <a
+                                            href={placement.fields.offer_letter[0].url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                            Offer Letter
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-400">Offer Letter: N/A</span>
+                                    )}
+                                </div>
+                            </div>
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
             </div>
         </div>
     );
