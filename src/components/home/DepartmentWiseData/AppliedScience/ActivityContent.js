@@ -12,8 +12,8 @@ import {
   MdSports,
   MdClose,
   MdZoomOutMap,
-  MdNavigateNext,
-  MdNavigateBefore,
+  // MdNavigateNext,
+  // MdNavigateBefore,
 } from 'react-icons/md';
 import { FaQuoteLeft } from 'react-icons/fa';
 

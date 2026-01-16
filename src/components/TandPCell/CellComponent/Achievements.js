@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TrainingServices = () => {
+const Achievements = () => {
     const achievements = [
         "9 students (8 from the fourth year and 1 from the third year) of the Computer Science and Engineering department qualified for GATE 2021-2022.",
         "The highest package offered during IET placements 2022 till now stood at INR 12LPA and the average package offered during IET placements till now stood at INR 6.5LPA.",
@@ -12,34 +12,52 @@ const TrainingServices = () => {
     ];
 
     return (
-        <div className="w-full px-8 py-12 bg-white dark:bg-gray-900">
-            <div className="max-w-4xl mx-auto shadow-lg rounded-2xl p-8 border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-6 text-center">
+        <div className="w-full">
+            {/* Header */}
+            <div className="text-center mb-10">
+                <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
                     🏆 Achievements
                 </h1>
+                <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                    Celebrating the excellence and dedication of our students and faculty.
+                </p>
+            </div>
 
-                <div className="space-y-4">
-                    {achievements.map((item, idx) => (
-                        <p key={idx} className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                            ⋄ {item}
-                        </p>
-                    ))}
-                </div>
-
-                <div className="mt-6 text-center">
-                    <a
-                        href="https://63034a7373d24551811fa3e3--shiny-fox-46fa01.netlify.app/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+            {/* Achievements Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                {achievements.map((item, idx) => (
+                    <div
+                        key={idx}
+                        className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow flex gap-4 items-start"
                     >
-                        Projects Completed by Students
-                    </a>
-                </div>
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 text-xl shadow-sm">
+                            ★
+                        </div>
+                        <div>
+                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm md:text-base">
+                                {item}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* CTA */}
+            <div className="mt-8 text-center">
+                <a
+                    href="https://63034a7373d24551811fa3e3--shiny-fox-46fa01.netlify.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all duration-300"
+                >
+                    <span>View Student Projects</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                </a>
             </div>
         </div>
     );
 };
 
-export default TrainingServices;
+export default Achievements;

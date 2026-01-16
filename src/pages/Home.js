@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // import AdmissionModal from '../utils/AdmissionModel';
+// import HomeHero from '../components/home/HomeHero';
+import Hero from '../components/home/Hero';
 
 const Home = () => {
   // Carousel state and logic
@@ -101,9 +103,11 @@ const Home = () => {
   ];
 
   return (
-    <div className="mt-12 min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="pt-[80px] min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Hero Section (using the Hero component) */}
-      {/* <Hero /> */}
+      {/* <HomeHero /> */}
+      <Hero />
+
       {/*<AdmissionModal /> */}
 
       {/* Carousel Section */}
@@ -163,8 +167,8 @@ const Home = () => {
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 className={`w-4 h-4 rounded-full border-2 transition ${index === currentSlide
-                    ? "bg-white border-white scale-110"
-                    : "bg-white/40 border-white/60"
+                  ? "bg-white border-white scale-110"
+                  : "bg-white/40 border-white/60"
                   }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -213,9 +217,9 @@ const Home = () => {
 
       {/* Departments Section - 3 Column Grid */}
       <section
-  className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
-  id="our-department"
->        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12 relative">
+        className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+        id="our-department"
+      >        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12 relative">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
             Our Departments
           </span>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getToken } from '../../services/LocalStorageService';
+import { HashLink } from 'react-router-hash-link';
 
 const Navbar = () => {
   const { access_token } = getToken();
@@ -27,9 +28,10 @@ const Navbar = () => {
         <div className="hidden md:flex md:items-center md:gap-8">
           <NavLink to="/" exact>Home</NavLink>
 
-          <NavLink smooth to="/#our-department">
-            Our department
-          </NavLink> <NavLink to="/tandpcell">Career Excellence Hub</NavLink>
+          <HashLink smooth to="/#our-department" className="px-3 py-1 text-sm font-medium">
+            Our Department
+          </HashLink>
+          <NavLink to="/tandpcell">Career Excellence Hub</NavLink>
           <NavLink to="/gallery">Gallery</NavLink>
         </div>
 
