@@ -22,6 +22,7 @@ import PagesList from './pages/admin/PagesList';
 import DepartmentsList from './pages/admin/DepartmentsList';
 import FacultyList from './pages/admin/FacultyList';
 import PageBuilder from './pages/admin/PageBuilder';
+import HomeConfig from './pages/admin/HomeConfig';
 
 function App() {
   const { access_token } = useSelector((state) => state.auth);
@@ -33,6 +34,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="home" element={<HomeConfig />} />
             <Route path="pages" element={<PagesList />} />
             <Route path="departments" element={<DepartmentsList />} />
             <Route path="faculty" element={<FacultyList />} />

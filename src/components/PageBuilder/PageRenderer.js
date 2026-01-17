@@ -3,17 +3,23 @@ import React, { useEffect, useState } from 'react';
 import PageService from '../../services/PageService';
 import SectionRegistry from './SectionRegistry';
 
-const PageRenderer = ({ slug }) => {
-  const [pageData, setPageData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const PageRenderer = ({ slug, data }) => {
+  const [pageData, setPageData] = useState(data || null);
+  const [loading, setLoading] = useState(!data);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (data) {
+      setPageData(data);
+      setLoading(false);
+      return;
+    }
+
     const fetchPageData = async () => {
       try {
         setLoading(true);
-        const data = await PageService.getPageBySlug(slug);
-        setPageData(data);
+        const fetchedData = await PageService.getPageBySlug(slug);
+        setPageData(fetchedData);
       } catch (err) {
         console.error('Error fetching page data:', err);
         setError(err.message);
@@ -25,7 +31,7 @@ const PageRenderer = ({ slug }) => {
     if (slug) {
       fetchPageData();
     }
-  }, [slug]);
+  }, [slug, data]);
 
   if (loading) {
     return <div className="p-10 text-center">Loading page...</div>;

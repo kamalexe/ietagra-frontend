@@ -9,6 +9,12 @@ import DesignSix from './sections/DesignSix';
 import DesignSeven from './sections/DesignSeven';
 import DesignEight from './sections/DesignEight';
 import DesignNine from './sections/DesignNine';
+import DesignTen from './sections/DesignTen';
+import DesignEleven from './sections/DesignEleven';
+import DesignTwelve from './sections/DesignTwelve';
+import DesignThirteen from './sections/DesignThirteen';
+import DesignFourteen from './sections/DesignFourteen';
+import DesignFifteen from './sections/DesignFifteen';
 
 // Adapters for new documentation-based templates
 const HeroSection = (props) => <DesignOne {...props} />;
@@ -52,6 +58,12 @@ const SectionRegistry = {
     design_seven: DesignSeven,
     design_eight: DesignEight,
     design_nine: DesignNine,
+    design_ten: DesignTen,
+    design_eleven: DesignEleven,
+    design_twelve: DesignTwelve,
+    design_thirteen: DesignThirteen,
+    design_fourteen: DesignFourteen,
+    design_fifteen: DesignFifteen,
 
     // New Aliases
     hero_section: HeroSection,

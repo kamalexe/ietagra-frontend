@@ -2,17 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 
-const AdmissionModal = () => {
+const AdmissionModal = ({ config }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentPoster, setCurrentPoster] = useState(0);
 
-  // Array of admission poster images
-  const posterImages = [
-    '/images/admissionPoster.jpg', // Front side of brochure
-    '/images/admissionPosterI.jpg', // Back side of brochure
+  // Default images if not provided in config
+  const defaultImages = [
+    '/images/admissionPoster.jpg',
+    '/images/admissionPosterI.jpg',
   ];
 
+  const posterImages = config?.posters?.length > 0 ? config.posters : defaultImages;
+  const applyLink = config?.link || 'https://dbrauadm.samarth.edu.in/';
+
   useEffect(() => {
+    // If explicitly disabled in config, don't show
+    if (config?.enabled === false) {
+      setIsVisible(false);
+      return;
+    }
     // Check if the modal should be shown based on expiration date
     const shouldShowModal = () => {
       // Get expiration timestamp from localStorage
@@ -184,7 +192,7 @@ const AdmissionModal = () => {
               transition={{ delay: 0.4 }}
             >
               <motion.a
-                href="https://dbrauadm.samarth.edu.in/"
+                href={applyLink}
                 className="bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-3 px-8 rounded-lg inline-block shadow-lg"
                 target="_blank"
                 rel="noopener noreferrer" // Security best practice

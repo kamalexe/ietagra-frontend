@@ -5,7 +5,8 @@ import {
   DocumentTextIcon,
   AcademicCapIcon,
   UserGroupIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
 
@@ -18,7 +19,9 @@ const AdminLayout = () => {
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+    { name: 'Dashboard', href: '/admin/dashboard', icon: Squares2X2Icon },
+    { name: 'Home', href: '/admin/home', icon: HomeIcon },
+    { name: 'Training and Placement', href: '/admin/training-placement', icon: AcademicCapIcon },
     { name: 'Pages', href: '/admin/pages', icon: DocumentTextIcon },
     { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon },
     { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon },

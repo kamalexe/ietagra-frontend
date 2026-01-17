@@ -43,6 +43,17 @@ const TemplatePicker = ({ onClose, onSelect }) => {
             }
         },
         {
+            key: 'design_three',
+            name: 'Colored Cards Grid',
+            description: 'Two-column colored cards with icons.',
+            demoData: {
+                items: [
+                    { title: "Vision", content: "To be a center of excellence...", icon: "FaEye", colorTheme: "green" },
+                    { title: "Mission", content: "To provide quality education...", icon: "FaBullseye", colorTheme: "teal" }
+                ]
+            }
+        },
+        {
             key: 'design_four',
             name: 'Faculty / Team Grid',
             description: 'Cards with circular photos for team members.',
@@ -51,6 +62,61 @@ const TemplatePicker = ({ onClose, onSelect }) => {
                 items: [
                     { name: "Dr. Smith", position: "Professor", image: "https://via.placeholder.com/150" },
                     { name: "Prof. Doe", position: "HOD", image: "https://via.placeholder.com/150" }
+                ]
+            }
+        },
+        {
+            key: 'design_five',
+            name: 'SWOT Analysis',
+            description: 'Strengths, Weaknesses, Opportunities, Threats display.',
+            demoData: {
+                title: "Department SWOT",
+                description: "Analysis of our current standing.",
+                swotData: {
+                    strengths: ["Experienced Faculty", "Modern Labs"],
+                    weaknesses: ["Limited Space"],
+                    opportunities: ["Industry Collaboration"],
+                    threats: ["Growing Competition"]
+                }
+            }
+        },
+        {
+            key: 'design_six',
+            name: 'Gradient Feature Grid',
+            description: 'Dark gradient background with white transparent cards.',
+            demoData: {
+                title: "Why Choose Us?",
+                items: [
+                    { title: "Excellence", description: "Top notch quality.", icon: "FaAward" },
+                    { title: "Innovation", description: "Cutting edge tech.", icon: "FaLightbulb" },
+                    { title: "Community", description: "Strong alumni network.", icon: "FaUsers" }
+                ]
+            }
+        },
+        {
+            key: 'design_seven',
+            name: 'Tabs Component',
+            description: 'Tabbed interface for organizing content.',
+            demoData: {
+                tabs: [
+                    {
+                        id: "tab1",
+                        label: "Overview",
+                        icon: "FaInfoCircle",
+                        sections: [
+                            {
+                                id: "inner-1",
+                                templateKey: "design_one",
+                                data: { title: "Overview Content", variant: "simple", description: "This is inside a tab." }
+                            }
+                        ]
+                    },
+                    {
+                        id: "tab2",
+                        label: "Details",
+                        icon: "FaList",
+                        sections: []
+                    }
                 ]
             }
         },
@@ -76,6 +142,173 @@ const TemplatePicker = ({ onClose, onSelect }) => {
                 ]
             }
         },
+        {
+            key: 'design_ten',
+            name: 'Icon Features (Top)',
+            description: 'Clean grid with icons on top of cards.',
+            demoData: {
+                title: "Our Core Values",
+                description: "What drives us forward.",
+                features: [
+                    { title: "Integrity", description: "Honesty in all we do.", icon: "🛡️" },
+                    { title: "Quality", description: "Pursuit of excellence.", icon: "⭐" },
+                    { title: "Growth", description: "Continuous improvement.", icon: "📈" }
+                ]
+            }
+        },
+        {
+            key: 'design_eleven',
+            name: 'Split Feature (Text/Image)',
+            description: 'Side-by-side text and image section.',
+            demoData: {
+                title: "About The Department",
+                description: "Detailed description of the department's history and achievements.",
+                image: "https://via.placeholder.com/600x400",
+                buttonText: "Learn More",
+                buttonLink: "#",
+                reverse: false
+            }
+        },
+        {
+            key: 'design_twelve',
+            name: 'Faculty Grid (Detailed)',
+            description: 'Detailed cards for faculty or team members with achievements.',
+            demoData: {
+                title: "Our Faculty",
+                items: [
+                    {
+                        name: "Er. Subodh Sharma",
+                        designation: "Assistant Professor",
+                        specialization: "Data Structures, JAVA",
+                        email: "faculty@ietagra.ac.in",
+                        image: "/images/subodh.jpg",
+                        achievements: ["M.Tech. qualified faculty"],
+                        totalAchievements: 1
+                    },
+                    {
+                        name: "Er. Saurabh Garg",
+                        designation: "Assistant Professor",
+                        specialization: "Digital Electronics",
+                        email: "faculty@ietagra.ac.in",
+                        image: "/images/saurabh.png",
+                        achievements: ["Has qualified GATE five times"],
+                        totalAchievements: 1
+                    },
+                    {
+                        name: "Er. Prashant Maharishi",
+                        designation: "Assistant Professor",
+                        specialization: "DBMS",
+                        email: "faculty@ietagra.ac.in",
+                        image: "/images/Prashant.png",
+                        achievements: ["Participated in EBOOTATHAN (2021)"],
+                        totalAchievements: 3
+                    }
+                ]
+            }
+        },
+        {
+            key: 'design_thirteen',
+            name: 'Departments Grid',
+            description: 'Grid of departmental cards with icons and gradients.',
+            demoData: {
+                title: "Our Departments",
+                items: [
+                    {
+                        title: "Computer Science & Engineering",
+                        description: "Master programming, algorithms, AI and software development with modern computing infrastructure.",
+                        link: "/departments/cse",
+                        icon: "💻",
+                        gradient: "from-green-500 to-emerald-400"
+                    },
+                    {
+                        title: "Electronics Engineering",
+                        description: "Learn about circuits, devices, and communication systems with cutting-edge technology.",
+                        link: "/departments/ece",
+                        icon: "🔌",
+                        gradient: "from-red-500 to-pink-500"
+                    },
+                    {
+                        title: "Electrical Engineering",
+                        description: "Dive into the study of electricity, power systems, and electronics with hands-on projects.",
+                        link: "/departments/ee",
+                        icon: "⚡",
+                        gradient: "from-purple-500 to-indigo-500"
+                    },
+                    {
+                        title: "Civil Engineering",
+                        description: "Design and build the infrastructure of tomorrow with sustainable practices.",
+                        link: "/departments/civil",
+                        icon: "🏗️",
+                        gradient: "from-teal-500 to-cyan-400"
+                    },
+                    {
+                        title: "Mechanical Engineering",
+                        description: "Explore the world of machines, thermodynamics, and manufacturing.",
+                        link: "/departments/me",
+                        icon: "🔧",
+                        gradient: "from-blue-500 to-cyan-400"
+                    },
+                    {
+                        title: "Applied Science and Mathematics",
+                        description: "Strengthen your foundation in mathematics and science.",
+                        link: "/departments/asm",
+                        icon: "📐",
+                        gradient: "from-yellow-500 to-orange-400"
+                    }
+                ]
+            }
+        },
+        {
+            key: 'design_fourteen',
+            name: 'Feature Grid (2 Cols)',
+            description: 'Two column features with icons and gradients, supports external links.',
+            demoData: {
+                title: "Training & Placement and Clubs",
+                items: [
+                    {
+                        title: "Training & Placement Cell",
+                        description: "Enhance your employability with our dedicated training programs, workshops, and placement assistance.",
+                        link: "/tnpcell",
+                        icon: "📈",
+                        gradient: "from-yellow-500 to-orange-400",
+                        target: "_blank"
+                    },
+                    {
+                        title: "IET Club Nest",
+                        description: "Join our vibrant student clubs to explore your interests, develop skills, and make lasting friendships.",
+                        link: "https://ietclubnest.vercel.app/",
+                        icon: "🎉",
+                        gradient: "from-pink-500 to-red-400",
+                        target: "_blank"
+                    }
+                ]
+            }
+        },
+        {
+            key: 'design_fifteen',
+            name: 'Image Carousel',
+            description: 'Full-width auto-playing image slider with captions.',
+            demoData: {
+                title: "Campus Tour",
+                items: [
+                    {
+                        image: "/images/building2.jpg",
+                        title: "IET Agra Campus",
+                        description: "Explore our beautiful campus"
+                    },
+                    {
+                        image: "/images/college_tour.jpg",
+                        title: "College Tour",
+                        description: "Students on a college tour"
+                    },
+                    {
+                        image: "/images/college_teachers.png",
+                        title: "Faculty Members",
+                        description: "Dedicated faculty members"
+                    }
+                ]
+            }
+        }
     ];
 
     const handleNext = () => {

@@ -40,8 +40,6 @@ const PagesList = () => {
             };
 
             await PageService.createPage(pageData);
-
-            await PageService.createPage(pageData);
             await loadPages(); // Reload list
 
             setIsModalOpen(false);
