@@ -40,7 +40,7 @@ const Registration = () => {
 
     const res = await registerUser(actualData)
     if (res.error) {
-      setServerError(res.error.data?.errors || {})
+      setServerError(res.error.data.errors)
     }
     if (res.data) {
       console.log(typeof (res.data))

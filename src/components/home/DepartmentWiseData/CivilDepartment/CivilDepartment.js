@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import PageRenderer from '../../../PageBuilder/PageRenderer';
+import CivilAbout from './CivilAbout';
+import CivilAcademics from './CivilAcademics';
+import CivilInfrastructure from './CivilInfrastructure';
+import CivilNews from './CivilNews';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowUp } from 'react-icons/fa';
 
@@ -38,11 +41,18 @@ const CivilDepartment = () => {
 
   return (
     <div className="civil-department">
-      {/* 
-         The entire content is now driven by PageRenderer using the 'departments/civil' slug.
-         This replaces the hardcoded components CivilAbout, CivilAcademics, and CivilInfrastructure.
-      */}
-      <PageRenderer slug="departments/civil" />
+      {/* Header component if needed */}
+
+      {/* About Section - First component to show department introduction */}
+      <CivilAbout />
+
+      {/* Academics Section - Information about courses and research */}
+      <CivilAcademics />
+
+      {/* Infrastructure Section - Labs, facilities and placements */}
+      <CivilInfrastructure />
+
+      {/* <CivilNews /> */}
 
       <AnimatePresence>
         {showScrollButton && (

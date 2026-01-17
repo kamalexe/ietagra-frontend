@@ -3,7 +3,8 @@ import LoginReg from './pages/auth/LoginReg';
 import ResetPassword from './pages/auth/ResetPassword';
 import ChangePassword from './pages/auth/ChangePassword';
 import SendPasswordResetEmail from './pages/auth/SendPasswordResetEmail';
-
+import Profile from './components/dashboard/DashboardComponent/Profile';
+import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Gallery from './components/gallery/Gallery';
 import SideNavTandP from './components/TandPCell/SideNavTandP';
@@ -16,12 +17,6 @@ import CseDepartment from './components/home/DepartmentWiseData/CSEDepartment/in
 import EeDepartment from './components/home/DepartmentWiseData/EeDepartment';
 import CivilDepartment from './components/home/DepartmentWiseData/CivilDepartment/CivilDepartment';
 import AppliedScience from './components/home/DepartmentWiseData/AppliedScience';
-import AdminLayout from './layouts/AdminLayout';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import PagesList from './pages/admin/PagesList';
-import DepartmentsList from './pages/admin/DepartmentsList';
-import FacultyList from './pages/admin/FacultyList';
-import PageBuilder from './pages/admin/PageBuilder';
 
 function App() {
   const { access_token } = useSelector((state) => state.auth);
@@ -29,29 +24,23 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="pages" element={<PagesList />} />
-            <Route path="departments" element={<DepartmentsList />} />
-            <Route path="faculty" element={<FacultyList />} />
-            <Route path="pages/:slug" element={<PageBuilder />} />
-          </Route>
-
-          {/* Main Site Routes */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route
               path="login"
-              element={!access_token ? <LoginReg /> : <Navigate to="/admin/dashboard" />}
+              element={!access_token ? <LoginReg /> : <Navigate to="/dashboard" />}
             />
             <Route path="changepassword" element={<ChangePassword />} />
             <Route path="sendpasswordresetemail" element={<SendPasswordResetEmail />} />
             <Route path="api/account/reset/:id/:token" element={<ResetPassword />} />
-            {/* Redirect old dashboard/profile attempts to admin */}
-            <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
-            <Route path="/profile" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route
+              path="/dashboard"
+              element={access_token ? <Dashboard /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/profile"
+              element={access_token ? <Profile /> : <Navigate to="/login" />}
+            />
             <Route path="/tnpcell" element={<TNPCell />} />
             <Route path="/departments/cse" element={<CseDepartment />} />
             <Route path="/departments/me" element={<MeDepartment />} />
