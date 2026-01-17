@@ -1,9 +1,13 @@
 const storeToken = (value) => {
   if (value) {
-    // console.log("Store Token")
-    const { access, refresh } = value
-    localStorage.setItem('access_token', access)
-    localStorage.setItem('refresh_token', refresh)
+    // console.log("Store Token", value)
+    if (typeof value === 'string') {
+      localStorage.setItem('access_token', value)
+    } else {
+      const { access, refresh } = value
+      localStorage.setItem('access_token', access)
+      localStorage.setItem('refresh_token', refresh)
+    }
   }
 }
 
