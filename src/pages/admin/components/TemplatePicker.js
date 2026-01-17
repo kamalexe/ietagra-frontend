@@ -407,6 +407,25 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     { value: "8+", label: "Research Areas" }
                 ]
             }
+        },
+        {
+            key: 'design_nineteen',
+            name: "Chairman's Message",
+            description: "Dedicated section for leadership message with image and quote.",
+            demoData: {
+                title: "Chairman's Message",
+                image: "https://d3ahzzdje1trpm.cloudfront.net/uploads/topics/16527634095335.webp",
+                name: "Mr. Satish Kumar Singh",
+                designation: "Chairman - SMS Group of Institution",
+                quote: "We are here to bring out the best in you. If you are also as committed to learn and develop, we ensure that a bright future is awaiting you!!",
+                content: `<p>The current scenario of higher education in India needs substantial improvement. Every year, thousands of fresh graduates are produced and are consequently being exposed to a fierce competition to grab employment. Besides, traditional pedagogy with a focus on rote learning creating a lack of analytical and critical thinking, appropriate skills to be readily absorbed by the industry and above all life skills, has further aggravated the problem.</p>
+                <br/>
+                <p>We, at SMS Lucknow, are passionate about solving this growing problem of employability gap and providing ample opportunities to our students to develop themselves holistically and also to become industry ready professionals and responsible citizens of tomorrow. We believe in training our students enough to face challenges at work and in life. SMS has rapidly grown from a newcomer, in technology and management education, to a noted name in Uttar Pradesh, today, ten years since its foundation was laid, back in 2008.</p>
+                <br/>
+                <p>We take pride in being the youngest and the only institution to have received a <b>A+</b> grade from NAAC amongst engineering and management institutions in the state. Our strong emphasis on providing skill based education has made us the first and the only institute in Lucknow, to provide a B.Voc. (Bachelor of Vocation) course in Software Development.</p>
+                <br/>
+                <p>Everyday, we are striving to improve and become better and aspire to emerge as a leading university with a world class infrastructure, capable of contributing to the society through education, employment, research and innovation.</p>`
+            }
         }
     ];
 
