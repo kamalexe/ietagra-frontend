@@ -25,6 +25,7 @@ const AdminLayout = () => {
     { name: 'Pages', href: '/admin/pages', icon: DocumentTextIcon },
     { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon },
     { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon },
+    { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon }, // Reusing icon for now
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
   ];
 

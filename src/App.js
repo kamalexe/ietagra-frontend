@@ -23,6 +23,7 @@ import DepartmentsList from './pages/admin/DepartmentsList';
 import FacultyList from './pages/admin/FacultyList';
 import PageBuilder from './pages/admin/PageBuilder';
 import HomeConfig from './pages/admin/HomeConfig';
+import StudentDataManager from './pages/admin/StudentDataManager';
 
 function App() {
   const { access_token } = useSelector((state) => state.auth);
@@ -35,6 +36,8 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="home" element={<HomeConfig />} />
+            <Route path="training-placement" element={<PageBuilder slug="tandpcell" />} />
+            <Route path="student-data" element={<StudentDataManager />} />
             <Route path="pages" element={<PagesList />} />
             <Route path="departments" element={<DepartmentsList />} />
             <Route path="faculty" element={<FacultyList />} />

@@ -136,6 +136,21 @@ const SectionForm = ({ section, onClose, onSave }) => {
     'vision_mission': [
       { name: 'vision', label: 'Vision Statement', type: 'textarea' },
       { name: 'mission', label: 'Mission Points (JSON)', type: 'json' }
+    ],
+    'design_sixteen': [
+      { name: 'title', label: 'Section Title', type: 'text' },
+      { name: 'description', label: 'Description', type: 'textarea' },
+      {
+        name: 'dataSource',
+        label: 'Data Source (Optional - For Dynamic Data)',
+        type: 'select',
+        options: ['', 'project', 'gate', 'placement', 'mooc', 'achievement']
+      },
+      { name: 'projects', label: 'Manual Data (JSON Array - Fallback)', type: 'json' }
+    ],
+    'design_seventeen': [
+      { name: 'title', label: 'Section Title', type: 'text' },
+      { name: 'description', label: 'Description', type: 'textarea' }
     ]
   };
 
@@ -288,6 +303,38 @@ const SectionForm = ({ section, onClose, onSave }) => {
               </div>
               <div className="relative flex-1 py-6 px-4 sm:px-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-900 mb-4">Sidebar Configuration (Optional)</h3>
+                    <div className="grid grid-cols-6 gap-6">
+                      <div className="col-span-6 sm:col-span-3">
+                        <label htmlFor="sidebarTitle" className="block text-sm font-medium text-gray-700">Sidebar Title</label>
+                        <input
+                          type="text"
+                          name="sidebarTitle"
+                          id="sidebarTitle"
+                          value={formData.sidebarTitle || ''}
+                          onChange={handleChange}
+                          placeholder="e.g., Placement Services"
+                          className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">Overrides the section title in the sidebar.</p>
+                      </div>
+                      <div className="col-span-6 sm:col-span-3">
+                        <label htmlFor="sidebarIcon" className="block text-sm font-medium text-gray-700">Sidebar Icon</label>
+                        <input
+                          type="text"
+                          name="sidebarIcon"
+                          id="sidebarIcon"
+                          value={formData.sidebarIcon || ''}
+                          onChange={handleChange}
+                          placeholder="e.g., FaGraduationCap"
+                          className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">React Icon name (e.g., FaHome, FaInfoCircle)</p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-6 gap-6">
                     {currentSchema.map((field, index) => renderField(field, index))}
                   </div>

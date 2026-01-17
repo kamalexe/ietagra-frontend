@@ -16,8 +16,9 @@ import TemplatePicker from './components/TemplatePicker';
 import SectionForm from './components/SectionForm';
 
 // Mock initial data
-const PageBuilder = () => {
-    const { slug } = useParams();
+const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
+    const params = useParams();
+    const slug = propSlug || params.slug; // Use prop if available, else param
     const [sections, setSections] = useState([]);
     const [pageTitle, setPageTitle] = useState('');
     const [isPickerOpen, setIsPickerOpen] = useState(false);

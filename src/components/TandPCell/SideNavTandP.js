@@ -1,109 +1,126 @@
-import React, { useState } from "react";
-import SideNavItemTandP from "./SideNavItemTandP"; // Import the new component
-import PlacementServices from "./CellComponent/PlacementServices";
-import TrainingServices from "./CellComponent/TrainingServices"; // Import other components
-import Placements from "./CellComponent/Placements";
-import MoocCourse from "./CellComponent/MoocCourse";
-import Achievements from "./CellComponent/Achievements";
-import GateQualified from "./CellComponent/GateQualified"
-import Projects from "./CellComponent/Projects";
+import React, { useState, useEffect } from "react";
+import PageService from "../../services/PageService";
+import SectionRegistry from "../PageBuilder/SectionRegistry";
+import * as FaIcons from 'react-icons/fa';
 
 const SideNavTandP = () => {
     const [selectedComponent, setSelectedComponent] = useState(null);
+    const [sidebarData, setSidebarData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [activeIndex, setActiveIndex] = useState(0);
 
-    const sidebarData = [
-        {
-            title: "Placement Services",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
-                </svg>
+    useEffect(() => {
+        const fetchPageData = async () => {
+            try {
+                const pageData = await PageService.getPageBySlug('tandpcell');
+                if (pageData && pageData.sections) {
+                    const mappedData = pageData.sections
+                        .filter(section => section.visible) // Only show visible sections
+                        .sort((a, b) => a.order - b.order)
+                        .map(section => {
+                            // Resolve icon
+                            let IconComponent = null;
+                            if (section.data.sidebarIcon && FaIcons[section.data.sidebarIcon]) {
+                                IconComponent = FaIcons[section.data.sidebarIcon];
+                            } else {
+                                IconComponent = FaIcons['FaInfoCircle']; // Default icon
+                            }
 
-            ),
-            component: <PlacementServices />,
-        },
-        {
-            title: "Placement Training",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512">
-                    <path d="M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z" /></svg>
-            ),
-            component: <TrainingServices />,
-        },
-        {
-            title: "Some Achievements",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
-                </svg>
+                            // Resolve Component
+                            const SectionComponent = SectionRegistry[section.templateKey];
 
-            ),
-            component: <Achievements />,
-        },
-        {
-            title: "Gate Qualified",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
-                </svg>
+                            return {
+                                title: section.data.sidebarTitle || section.title,
+                                icon: <IconComponent className="w-5 h-5" />,
+                                component: SectionComponent ? <SectionComponent {...section.data} /> : <div>Component Not Found</div>
+                            };
+                        });
 
-            ),
-            component: <GateQualified />,
-        },
-        {
-            title: "Placements",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512">
-                    <path d="M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z" /></svg>
-            ),
-            component: <Placements />,
+                    setSidebarData(mappedData);
+                    if (mappedData.length > 0) {
+                        setSelectedComponent(mappedData[0].component);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch T&P cell data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
+        fetchPageData();
+    }, []);
 
-        },
-        {
-            title: "Mooc Courses",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-</svg>
-
-            ),
-            component: <MoocCourse />,
-        },
-        {
-            title: "Project",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
-                </svg>
-
-            ),
-            component: <Projects />,
-
+    const handleItemClick = (index) => {
+        if (sidebarData[index]) {
+            setSelectedComponent(sidebarData[index].component);
+            setActiveIndex(index);
         }
-    ];
-
-    const handleItemClick = (component) => {
-        setSelectedComponent(component);
     };
 
+    if (loading) {
+        return <div className="p-8 text-center text-gray-500">Loading Training & Placement Cell...</div>;
+    }
+
     return (
-        <section className="bg-white dark:bg-gray-900">
-            <div class="container mx-auto p-8">
-                <div className="flex">
-                    <div>
-                        {/* Pass all SidebarData to the SideNavItemTandP component */}
-                        <SideNavItemTandP
-                            sidebarData={sidebarData}
-                            onItemClick={handleItemClick}
-                        />
+        <section className="bg-white dark:bg-gray-900 min-h-screen">
+            <div className="container mx-auto p-4 md:p-8">
+                <div className="flex flex-col md:flex-row gap-6">
+                    {/* Sidebar */}
+                    <div className="w-full md:w-64 flex-shrink-0">
+                        <div className="bg-gray-50 rounded-lg p-2 sticky top-4 border border-gray-100">
+                            {sidebarData.length > 0 ? (
+                                <ul className="space-y-1">
+                                    {sidebarData.map((item, index) => (
+                                        <li
+                                            key={index}
+                                            onClick={() => handleItemClick(index)}
+                                            className={`cursor-pointer px-4 py-3 rounded-md transition-all duration-200 flex items-center ${activeIndex === index
+                                                    ? "bg-blue-600 text-white shadow-md"
+                                                    : "text-gray-700 hover:bg-white hover:shadow-sm hover:text-blue-600"
+                                                }`}
+                                        >
+                                            <div className="mr-3 flex-shrink-0">
+                                                {item.icon}
+                                            </div>
+                                            <span className="font-medium">{item.title}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="p-4 bg-gray-100 rounded text-sm text-gray-500 text-center">
+                                    No sections found.<br />
+                                    <span className="text-xs">Configure "tandpcell" in Admin.</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    <div>
-                        {/* Display the selected component */}
-                        {selectedComponent}
+
+                    {/* Main Content */}
+                    <div className="flex-1 bg-white rounded-xl shadow-lg border border-gray-100 p-0 overflow-hidden min-h-[500px]">
+                        {/* We wrapped it in a nice container style */}
+                        {selectedComponent ? (
+                            <div className="animate-fadeIn">
+                                {selectedComponent}
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-gray-400">
+                                Select a tab to view details
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+            {/* Simple inline animation */}
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fadeIn {
+                    animation: fadeIn 0.4s ease-out forwards;
+                }
+            `}</style>
         </section>
     );
 };

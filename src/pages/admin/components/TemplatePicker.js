@@ -307,6 +307,46 @@ const TemplatePicker = ({ onClose, onSelect }) => {
                         description: "Dedicated faculty members"
                     }
                 ]
+            },
+        },
+        {
+            key: 'design_sixteen',
+            name: 'Student Projects Table',
+            description: 'Table listing student projects with details and links.',
+            demoData: {
+                title: "Student Projects",
+                description: "List of major projects by final year students.",
+                projects: [
+                    {
+                        batch: "2024",
+                        studentName: "John Doe",
+                        projectName: "AI Chatbot",
+                        technology: "Python, NLP",
+                        branch: "CSE",
+                        supervisor: "Dr. Smith",
+                        githubLink: "https://github.com",
+                        pptLink: "https://google.com"
+                    },
+                    {
+                        batch: "2024",
+                        studentName: "Jane Smith",
+                        projectName: "Smart Grid",
+                        technology: "IoT, Arduino",
+                        branch: "EE",
+                        supervisor: "Prof. Johnson",
+                        githubLink: "#",
+                        pptLink: "#"
+                    }
+                ]
+            }
+        },
+        {
+            key: 'design_seventeen',
+            name: 'GATE Qualified Table',
+            description: 'Dedicated table for GATE Qualified student records.',
+            demoData: {
+                title: "GATE Qualifiers",
+                description: "List of students who qualified GATE."
             }
         }
     ];
