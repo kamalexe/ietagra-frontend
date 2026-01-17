@@ -10,10 +10,17 @@ const DesignNineteen = ({
 }) => {
     return (
         <section className="py-12 bg-white" id="chairman-speak">
-            <div className="container mx-auto px-4">
-                <div className="mb-10 text-center">
-                    <h2 className="text-3xl font-bold text-gray-900 border-b-2 border-orange-500 inline-block pb-2">{title}</h2>
+            <div className="relative min-h-[250px] bg-[#b9292f] flex items-center justify-center mb-10 overflow-hidden">
+                {/* Background Overlay */}
+                <div className="absolute inset-0 bg-[url('https://smslucknow.ac.in/assets/images/bg/bg-do2.png')] bg-cover bg-center opacity-30"></div>
+
+                {/* Content */}
+                <div className="relative z-10 container mx-auto px-4 text-center">
+                    <h2 className="text-4xl font-bold text-white inline-block pb-2 border-b-2 border-white">{title}</h2>
                 </div>
+            </div>
+
+            <div className="container mx-auto px-4">
                 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Sidebar: Image & Quote */}
