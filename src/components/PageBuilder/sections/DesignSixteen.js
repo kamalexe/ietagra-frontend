@@ -7,15 +7,15 @@ const COLUMN_CONFIG = {
     project: [
         { key: 'batch', label: 'Batch', render: (val) => <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-400">{val}</span> },
         { key: 'studentName', label: 'Student Name', className: 'font-medium text-gray-900' },
-        { key: 'projectName', label: 'Project Name', className: 'text-gray-800' },
+        { key: 'projectName', label: 'Project Name', className: 'text-gray-800 font-medium' },
         { key: 'technology', label: 'Technology', render: (val) => <div className="flex flex-wrap gap-1">{val?.split(',').map((t, i) => <span key={i} className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">{t.trim()}</span>)}</div> },
         { key: 'branch', label: 'Branch' },
         { key: 'supervisor', label: 'Supervisor' },
         {
             key: 'links', label: 'Links', align: 'center', render: (_, row) => (
                 <div className="flex items-center justify-center space-x-3">
-                    {row.githubLink && <a href={row.githubLink} target="_blank" rel="noreferrer" className="text-gray-600 hover:text-black"><FaGithub className="w-5 h-5" /></a>}
-                    {row.pptLink && <a href={row.pptLink} target="_blank" rel="noreferrer" className="text-red-500 hover:text-red-700"><FaFilePowerpoint className="w-5 h-5" /></a>}
+                    {row.githubLink && <a href={row.githubLink} target="_blank" rel="noreferrer" title="GitHub" className="text-gray-600 hover:text-black transition-colors"><FaGithub className="w-5 h-5" /></a>}
+                    {row.pptLink && <a href={row.pptLink} target="_blank" rel="noreferrer" title="Presentation" className="text-red-500 hover:text-red-700 transition-colors"><FaFilePowerpoint className="w-5 h-5" /></a>}
                 </div>
             )
         }
@@ -91,14 +91,21 @@ const DesignSixteen = ({ title, description, projects, dataSource }) => {
     }, [dataSource, projects]);
 
     // Derived Data (Filtering)
+    // Derived Data (Filtering)
     const filteredData = useMemo(() => {
         return fetchedData.filter(item => {
+            // Global Search (across all fields)
             const matchesSearch = searchTerm === '' ||
-                Object.values(item).some(val =>
+                Object.values(item).some(val => 
                     String(val).toLowerCase().includes(searchTerm.toLowerCase())
                 );
+
+            // Branch Filter
             const matchesBranch = branchFilter === '' || item.branch === branchFilter;
+
+            // Batch Filter (Robust string comparison)
             const matchesBatch = batchFilter === '' || String(item.batch) === String(batchFilter);
+
             return matchesSearch && matchesBranch && matchesBatch;
         });
     }, [fetchedData, searchTerm, branchFilter, batchFilter]);

@@ -230,8 +230,18 @@ const StudentDataManager = () => {
                                 value={formData.designation || ''} onChange={e => setFormData({ ...formData, designation: e.target.value })} />
                         </div>
                     )}
+                    {activeTab === 'achievement' && (
+                        <div className="grid grid-cols-1 gap-4">
+                            <input placeholder="Achievement Title" className="border p-2 rounded"
+                                value={formData.title || ''} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+                            <textarea placeholder="Description" className="border p-2 rounded h-24"
+                                value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                            <input type="date" placeholder="Date" className="border p-2 rounded"
+                                value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                        </div>
+                    )}
                     {/* Fallback for other metadata */}
-                    {!['project', 'gate', 'placement'].includes(activeTab) && (
+                    {!['project', 'gate', 'placement', 'achievement'].includes(activeTab) && (
                         <p className="text-xs text-gray-500">For this category, upload via Excel or ensure Excel columns match required metadata.</p>
                     )}
                 </div>

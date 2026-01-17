@@ -1,23 +1,47 @@
 import React, { useState } from 'react';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import SectionRegistry from '../../../components/PageBuilder/SectionRegistry';
+import DepartmentService from '../../../services/DepartmentService';
+import FacultyService from '../../../services/FacultyService';
 
-const TemplatePicker = ({ onClose, onSelect }) => {
+const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [departments, setDepartments] = useState([]);
+    const [faculty, setFaculty] = useState([]);
+
+    React.useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [deptData, facultyData] = await Promise.all([
+                    DepartmentService.getAllDepartments(),
+                    FacultyService.getAllFaculty()
+                ]);
+                setDepartments(deptData);
+                setFaculty(facultyData);
+            } catch (error) {
+                console.error("Failed to fetch data", error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const departmentStyleMap = {
+        'cse': { icon: "💻", gradient: "from-green-500 to-emerald-400" },
+        'ece': { icon: "🔌", gradient: "from-red-500 to-pink-500" },
+        'ee': { icon: "⚡", gradient: "from-purple-500 to-indigo-500" },
+        'civil': { icon: "🏗️", gradient: "from-teal-500 to-cyan-400" },
+        'me': { icon: "🔧", gradient: "from-blue-500 to-cyan-400" },
+        'asm': { icon: "📐", gradient: "from-yellow-500 to-orange-400" }
+    };
+
+    const currentDept = departments.find(d => d.slug === currentSlug);
+    const filteredFaculty = faculty.filter(f => {
+        if (!currentDept) return true; // Show all if no dept context
+        return f.department === currentDept.name || f.department.includes(currentDept.name) || currentDept.name.includes(f.department);
+    });
 
     const templates = [
-        {
-            key: 'design_one',
-            variant: 'hero',
-            name: 'Hero Banner',
-            description: 'Full-width banner with background image, title, and buttons.',
-            demoData: {
-                title: "Institute of Engineering & Technology",
-                description: "Dr. B. R. Ambedkar University, Agra",
-                variant: "hero",
-                buttons: [{ text: "Explore", link: "#", primary: true }]
-            }
-        },
+
         {
             key: 'design_one',
             variant: 'simple',
@@ -169,13 +193,22 @@ const TemplatePicker = ({ onClose, onSelect }) => {
                 reverse: false
             }
         },
+        // Here I want fetch faculty data with department slug and display it in faculty grid
         {
             key: 'design_twelve',
             name: 'Faculty Grid (Detailed)',
             description: 'Detailed cards for faculty or team members with achievements.',
             demoData: {
                 title: "Our Faculty",
-                items: [
+                items: filteredFaculty.length > 0 ? filteredFaculty.map(f => ({
+                    name: f.name,
+                    designation: f.designation,
+                    specialization: f.specialization,
+                    email: f.email,
+                    image: f.image,
+                    achievements: f.achievements || [],
+                    totalAchievements: f.achievements ? f.achievements.length : 0
+                })) : [
                     {
                         name: "Er. Subodh Sharma",
                         designation: "Assistant Professor",
@@ -205,14 +238,26 @@ const TemplatePicker = ({ onClose, onSelect }) => {
                     }
                 ]
             }
-        },
+        }, 
         {
             key: 'design_thirteen',
             name: 'Departments Grid',
             description: 'Grid of departmental cards with icons and gradients.',
             demoData: {
                 title: "Our Departments",
-                items: [
+                items: departments.length > 0 ? departments.map(dept => {
+                    const style = departmentStyleMap[dept.slug] || {
+                        icon: "🏛️",
+                        gradient: "from-gray-500 to-gray-400"
+                    };
+                    return {
+                        title: dept.name,
+                        description: dept.description,
+                        link: dept.slug,
+                        icon: style.icon,
+                        gradient: style.gradient
+                    };
+                }) : [
                     {
                         title: "Computer Science & Engineering",
                         description: "Master programming, algorithms, AI and software development with modern computing infrastructure.",
@@ -347,6 +392,20 @@ const TemplatePicker = ({ onClose, onSelect }) => {
             demoData: {
                 title: "GATE Qualifiers",
                 description: "List of students who qualified GATE."
+            }
+        },
+        {
+            key: 'design_eighteen',
+            name: 'Modern Department Hero',
+            description: 'Gradient hero section with floating icons and stats.',
+            demoData: {
+                title: "Computer Science & Engineering",
+                subtitle: "Institute of Engineering and Technology, Swami Vivekanand Campus, Dr. Bhimrao Ambedkar University, Agra",
+                stats: [
+                    { value: "12+", label: "Modern Labs" },
+                    { value: "95%", label: "Placement Rate" },
+                    { value: "8+", label: "Research Areas" }
+                ]
             }
         }
     ];

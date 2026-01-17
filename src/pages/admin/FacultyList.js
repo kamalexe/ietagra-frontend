@@ -27,19 +27,34 @@ const FacultyList = () => {
         }
     };
 
+    const downloadSample = () => {
+        const headers = ['Name', 'Designation', 'Department', 'Email', 'Specialization', 'Achievements', 'Image'];
+        const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + "Dr. John Doe,Professor,Computer Science,john.doe@example.com,AI & ML,\"Best Researcher 2024, Gold Medalist\",https://example.com/image.jpg";
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "faculty_upload_template.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMember, setEditingMember] = useState(null);
-    const [formData, setFormData] = useState({ name: '', designation: '', department: '', email: '', image: '' });
+    const [formData, setFormData] = useState({ name: '', designation: '', department: '', email: '', image: '', specialization: '', achievements: '' });
 
     const departments = ['Computer Science', 'Civil Engineering', 'Mechanical Engineering', 'Electronics & Comm.', 'Electrical Engineering', 'Applied Science'];
 
     const handleOpenModal = (member = null) => {
         if (member) {
             setEditingMember(member);
-            setFormData(member);
+            setFormData({
+                ...member,
+                achievements: member.achievements ? member.achievements.join('\n') : ''
+            });
         } else {
             setEditingMember(null);
-            setFormData({ name: '', designation: '', department: departments[0], email: '', image: '' });
+            setFormData({ name: '', designation: '', department: departments[0], email: '', image: '', specialization: '', achievements: '' });
         }
         setIsModalOpen(true);
     };
@@ -55,16 +70,40 @@ const FacultyList = () => {
         }
     };
 
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            await FacultyService.bulkUpload(formData);
+            alert("Upload Successful!");
+            loadFaculty(); // Reload list
+        } catch (error) {
+            console.error("Upload failed:", error);
+            alert("Upload Failed: " + error.message);
+        } finally {
+            e.target.value = null; // Reset input
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const payload = {
+                ...formData,
+                achievements: formData.achievements.split('\n').filter(line => line.trim() !== '')
+            };
+
             if (editingMember) {
                 // Update
-                const updated = await FacultyService.updateFaculty(editingMember._id, formData);
+                const updated = await FacultyService.updateFaculty(editingMember._id, payload);
                 setFaculty(faculty.map(f => f._id === editingMember._id ? updated : f));
             } else {
                 // Create
-                const created = await FacultyService.createFaculty(formData);
+                const created = await FacultyService.createFaculty(payload);
                 setFaculty([...faculty, created]);
             }
             setIsModalOpen(false);
@@ -90,12 +129,23 @@ const FacultyList = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Faculty Management</h1>
                     <p className="mt-1 text-sm text-gray-500">Manage faculty directory and details.</p>
                 </div>
-                <button
-                    onClick={() => handleOpenModal()}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                    Add Faculty
-                </button>
+                <div className="flex gap-2">
+                    <button onClick={downloadSample} className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg className="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Download Template
+                    </button>
+                    <label className="inline-flex items-center px-4 py-2 border border-blue-600 text-sm font-medium rounded-md shadow-sm text-blue-600 bg-white hover:bg-blue-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        Import Excel
+                        <input type="file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileUpload} />
+                    </label>
+                    <button
+                        onClick={() => handleOpenModal()}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                        Add Faculty
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
@@ -175,6 +225,14 @@ const FacultyList = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Email Address</label>
                                         <input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Specialization</label>
+                                        <input type="text" value={formData.specialization} onChange={e => setFormData({ ...formData, specialization: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Achievements (one per line)</label>
+                                        <textarea rows={3} value={formData.achievements} onChange={e => setFormData({ ...formData, achievements: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Image URL</label>

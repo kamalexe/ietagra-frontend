@@ -245,7 +245,7 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
 
             {/* Modals/Drawers */}
             {isPickerOpen && (
-                <TemplatePicker onClose={() => setIsPickerOpen(false)} onSelect={handleAddSection} />
+                <TemplatePicker currentSlug={slug} onClose={() => setIsPickerOpen(false)} onSelect={handleAddSection} />
             )}
 
             {editingSection && (

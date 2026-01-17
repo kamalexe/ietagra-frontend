@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, AcademicCapIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, AcademicCapIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import PageService from '../../services/PageService';
 import DepartmentService from '../../services/DepartmentService';
 
@@ -9,6 +9,7 @@ const DepartmentsList = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   React.useEffect(() => {
     loadDepartments();
@@ -28,39 +29,75 @@ const DepartmentsList = () => {
   };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newDept, setNewDept] = useState({ name: '', slug: '', head: '' });
+  const [newDept, setNewDept] = useState({ name: '', slug: '', head: '', description: '' });
 
-  const handleCreateDepartment = async (e) => {
+  const openCreateModal = () => {
+    setEditingId(null);
+    setNewDept({ name: '', slug: '', head: '', description: '' });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (dept) => {
+    setEditingId(dept._id);
+    // Remove 'departments/' prefix from slug for display if needed, but the input adds it back.
+    // The current input has a prefix span "departments/", so we should extract just the unique part.
+    const slugPart = dept.slug.replace('departments/', '');
+    setNewDept({
+      name: dept.name,
+      slug: slugPart,
+      head: dept.head || '',
+      description: dept.description || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const slug = `departments/${newDept.slug.toLowerCase().replace(/\s+/g, '-')}`;
 
     try {
-      // 1. Create the Page first (content)
-      const pageData = {
-        title: newDept.name,
-        slug: slug,
-        sections: []
-      };
-      await PageService.createPage(pageData);
+      if (editingId) {
+        // UPDATE EXISTING
+        const updateData = {
+          name: newDept.name,
+          slug: slug,
+          head: newDept.head,
+          description: newDept.description
+        };
+        const updatedDept = await DepartmentService.updateDepartment(editingId, updateData);
+        setDepartments(departments.map(d => d._id === editingId ? { ...updatedDept, lastModified: new Date().toISOString().split('T')[0] } : d));
+        alert('Department updated successfully!');
+      } else {
+      // CREATE NEW
+        // 1. Create the Page first (content)
+        const pageData = {
+          title: newDept.name,
+          slug: slug,
+          sections: []
+        };
+        await PageService.createPage(pageData);
 
-      // 2. Create the Department metadata
-      const deptData = {
-        name: newDept.name,
-        slug: slug,
-        head: newDept.head
-      };
-      const createdDept = await DepartmentService.createDepartment(deptData);
+        // 2. Create the Department metadata
+        const deptData = {
+          name: newDept.name,
+          slug: slug,
+          head: newDept.head,
+          description: newDept.description
+        };
+        const createdDept = await DepartmentService.createDepartment(deptData);
 
-      setDepartments([...departments, {
-        ...createdDept,
-        lastModified: new Date().toISOString().split('T')[0] // API might return createdAt
-      }]);
+        setDepartments([...departments, {
+          ...createdDept,
+          lastModified: new Date().toISOString().split('T')[0]
+        }]);
+        alert('Department created successfully!');
+      }
 
       setIsModalOpen(false);
-      setNewDept({ name: '', slug: '', head: '' });
-      alert('Department created successfully!');
+      setNewDept({ name: '', slug: '', head: '', description: '' });
+      setEditingId(null);
     } catch (error) {
-      alert('Error creating department: ' + error.message);
+      alert('Error saving department: ' + error.message);
     }
   };
 
@@ -86,7 +123,7 @@ const DepartmentsList = () => {
           <p className="mt-1 text-sm text-gray-500">Manage department pages and content.</p>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={openCreateModal}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
@@ -118,7 +155,6 @@ const DepartmentsList = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {departments.map((dept) => (
               <tr key={dept._id} className="hover:bg-gray-50 transition-colors">
-                {/* ... */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
@@ -126,6 +162,7 @@ const DepartmentsList = () => {
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">{dept.name}</div>
+                      {dept.description && <div className="text-xs text-gray-500 truncate max-w-xs">{dept.description}</div>}
                     </div>
                   </div>
                 </td>
@@ -142,13 +179,21 @@ const DepartmentsList = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => openEditModal(dept)}
+                      className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                      title="Edit Details"
+                    >
+                      <Cog6ToothIcon className="h-5 w-5 mr-1" />
+                      <span className="hidden lg:inline">Settings</span>
+                    </button>
                     <Link
                       to={`/admin/pages/${encodeURIComponent(dept.slug)}`}
                       className="text-blue-600 hover:text-blue-900 flex items-center"
                       title="Edit Page Content"
                     >
                       <PencilSquareIcon className="h-5 w-5 mr-1" />
-                      <span className="hidden lg:inline">Edit</span>
+                      <span className="hidden lg:inline">Page</span>
                     </Link>
                     <a href={`/${dept.slug}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600" title="View Live">
                       <EyeIcon className="h-5 w-5" />
@@ -183,9 +228,9 @@ const DepartmentsList = () => {
               <div className="sm:flex sm:items-start w-full">
                 <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
                   <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                    Add New Department
+                    {editingId ? 'Edit Department' : 'Add New Department'}
                   </h3>
-                  <form onSubmit={handleCreateDepartment} className="mt-4 space-y-4">
+                  <form onSubmit={handleSubmit} className="mt-4 space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Department Name</label>
                       <input
@@ -221,12 +266,21 @@ const DepartmentsList = () => {
                         onChange={(e) => setNewDept({ ...newDept, head: e.target.value })}
                       />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Description</label>
+                      <textarea
+                        rows={3}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        value={newDept.description}
+                        onChange={(e) => setNewDept({ ...newDept, description: e.target.value })}
+                      />
+                    </div>
                     <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                       <button
                         type="submit"
                         className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                       >
-                        Create Department
+                        {editingId ? 'Update Department' : 'Create Department'}
                       </button>
                       <button
                         type="button"

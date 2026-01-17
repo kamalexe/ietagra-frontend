@@ -3,7 +3,13 @@ import { motion } from 'framer-motion';
 
 const DesignSeventeen = ({ title, description }) => {
     const [gateData, setGateData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Filter States
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedYear, setSelectedYear] = useState('');
+    const [selectedBranch, setSelectedBranch] = useState('');
 
     useEffect(() => {
         const fetchGateData = async () => {
@@ -12,6 +18,7 @@ const DesignSeventeen = ({ title, description }) => {
                 const result = await response.json();
                 if (result.success) {
                     setGateData(result.data);
+                    setFilteredData(result.data);
                 }
             } catch (error) {
                 console.error("Error fetching GATE data:", error);
@@ -22,6 +29,33 @@ const DesignSeventeen = ({ title, description }) => {
 
         fetchGateData();
     }, []);
+
+    // Filter Logic
+    useEffect(() => {
+        let result = gateData;
+
+        if (selectedYear) {
+            result = result.filter(item => (item.metadata?.year || '').toString() === selectedYear);
+        }
+
+        if (selectedBranch) {
+            result = result.filter(item => item.branch === selectedBranch);
+        }
+
+        if (searchTerm) {
+            const lowerTerm = searchTerm.toLowerCase();
+            result = result.filter(item =>
+                item.studentName.toLowerCase().includes(lowerTerm) ||
+                (item.enrollmentNo && item.enrollmentNo.toLowerCase().includes(lowerTerm))
+            );
+        }
+
+        setFilteredData(result);
+    }, [gateData, selectedYear, selectedBranch, searchTerm]);
+
+    // Derived Options for Dropdowns
+    const uniqueYears = [...new Set(gateData.map(item => item.metadata?.year).filter(Boolean))].sort().reverse();
+    const uniqueBranches = [...new Set(gateData.map(item => item.branch).filter(Boolean))].sort();
 
     if (loading) {
         return <div className="p-8 text-center text-gray-500">Loading GATE Data...</div>;
@@ -34,6 +68,41 @@ const DesignSeventeen = ({ title, description }) => {
                     <h2 className="text-3xl font-bold text-gray-800 mb-4">{title || "GATE Qualified Students"}</h2>
                     {description && <p className="text-gray-600 max-w-2xl mx-auto">{description}</p>}
                     <div className="w-24 h-1.5 bg-indigo-600 mx-auto rounded-full mt-4"></div>
+                </div>
+
+                {/* Search and Filters */}
+                <div className="mb-6 flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <div className="w-full md:w-1/3">
+                        <input
+                            type="text"
+                            placeholder="Search by Name or Enrollment No..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                        />
+                    </div>
+                    <div className="flex gap-4 w-full md:w-auto">
+                        <select
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white"
+                        >
+                            <option value="">All Years</option>
+                            {uniqueYears.map(year => (
+                                <option key={year} value={year}>{year}</option>
+                            ))}
+                        </select>
+                        <select
+                            value={selectedBranch}
+                            onChange={(e) => setSelectedBranch(e.target.value)}
+                            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white"
+                        >
+                            <option value="">All Branches</option>
+                            {uniqueBranches.map(branch => (
+                                <option key={branch} value={branch}>{branch}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="overflow-hidden shadow-xl rounded-lg border border-gray-200 bg-white">
@@ -61,8 +130,8 @@ const DesignSeventeen = ({ title, description }) => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {gateData.length > 0 ? (
-                                gateData.map((record, index) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((record, index) => (
                                     <motion.tr 
                                         key={record._id}
                                         initial={{ opacity: 0, y: 10 }}

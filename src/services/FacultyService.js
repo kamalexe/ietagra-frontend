@@ -68,6 +68,25 @@ const FacultyService = {
         }
 
         return true;
+    },
+
+    async bulkUpload(formData) {
+        const { access_token } = getToken();
+        const response = await fetch(`${API_BASE_URL}/admin/faculty/bulk-upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': access_token ? `Bearer ${access_token}` : ''
+                // Content-Type is handled automatically by browser for FormData
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to bulk upload faculty');
+        }
+
+        return await response.json();
     }
 };
 
