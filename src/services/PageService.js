@@ -41,7 +41,7 @@ const PageService = {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `Failed to create page (${response.status} ${response.statusText})`);
+            throw new Error(errorData.error || errorData.message || `Failed to create page (${response.status} ${response.statusText})`);
         }
 
         const resData = await response.json();
@@ -61,7 +61,7 @@ const PageService = {
         if (!response.ok) {
             const errorData = await response.json();
             console.error('[DEBUG] PageService: Update failed', errorData);
-            throw new Error(errorData.message || 'Failed to update page');
+            throw new Error(errorData.error || errorData.message || 'Failed to update page');
         }
 
         const resData = await response.json();

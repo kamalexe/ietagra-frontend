@@ -41,7 +41,17 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
     });
 
     const templates = [
-
+        {
+            key: 'design_twenty',
+            name: 'Events List',
+            description: 'List of all events with alternating layout.',
+            demoData: {
+                // This component fetches its own data, so demoData can be minimal or empty
+                title: "Events List",
+                subtitle: "Exploring Excellence",
+                content: "<p>Stay updated with the latest happenings, workshops, and seminars at our institute.</p>"
+            }
+        },
         {
             key: 'design_one',
             variant: 'simple',

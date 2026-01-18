@@ -34,7 +34,7 @@ const FacultyService = {
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Failed to create faculty member');
+            throw new Error(error.error || error.message || 'Failed to create faculty member');
         }
 
         const resData = await response.json();
@@ -50,7 +50,7 @@ const FacultyService = {
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Failed to update faculty member');
+            throw new Error(error.error || error.message || 'Failed to update faculty member');
         }
 
         const resData = await response.json();

@@ -6,7 +6,8 @@ import {
   AcademicCapIcon,
   UserGroupIcon,
   Cog6ToothIcon,
-  Squares2X2Icon
+  Squares2X2Icon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
 
@@ -25,6 +26,8 @@ const AdminLayout = () => {
     { name: 'Pages', href: '/admin/pages', icon: DocumentTextIcon },
     { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon },
     { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon },
+    { name: 'Events', href: '/admin/events', icon: CalendarIcon },
+    { name: 'Events Config', href: '/admin/events-config', icon: CalendarIcon },
     { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon }, // Reusing icon for now
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
   ];

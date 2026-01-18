@@ -34,7 +34,7 @@ const DepartmentService = {
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Failed to create department');
+            throw new Error(error.error || error.message || 'Failed to create department');
         }
 
         const resData = await response.json();
@@ -50,7 +50,7 @@ const DepartmentService = {
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Failed to update department');
+            throw new Error(error.error || error.message || 'Failed to update department');
         }
 
         const resData = await response.json();

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, AcademicCapIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { Combobox } from '@headlessui/react';
 import PageService from '../../services/PageService';
 import DepartmentService from '../../services/DepartmentService';
+import FacultyService from '../../services/FacultyService';
 
 const DepartmentsList = () => {
   // State
@@ -11,8 +14,13 @@ const DepartmentsList = () => {
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
 
+  // Faculty Autocomplete State
+  const [facultyMembers, setFacultyMembers] = useState([]);
+  const [query, setQuery] = useState('');
+
   React.useEffect(() => {
     loadDepartments();
+    loadFaculty();
   }, []);
 
   const loadDepartments = async () => {
@@ -28,19 +36,28 @@ const DepartmentsList = () => {
     }
   };
 
+  const loadFaculty = async () => {
+    try {
+      const data = await FacultyService.getAllFaculty();
+      setFacultyMembers(data || []);
+    } catch (err) {
+      console.error("Failed to load faculty", err);
+    }
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDept, setNewDept] = useState({ name: '', slug: '', head: '', description: '' });
 
   const openCreateModal = () => {
     setEditingId(null);
     setNewDept({ name: '', slug: '', head: '', description: '' });
+    setQuery('');
     setIsModalOpen(true);
   };
 
   const openEditModal = (dept) => {
     setEditingId(dept._id);
-    // Remove 'departments/' prefix from slug for display if needed, but the input adds it back.
-    // The current input has a prefix span "departments/", so we should extract just the unique part.
+    // Remove 'departments/' prefix from slug for display if needed
     const slugPart = dept.slug.replace('departments/', '');
     setNewDept({
       name: dept.name,
@@ -48,6 +65,7 @@ const DepartmentsList = () => {
       head: dept.head || '',
       description: dept.description || ''
     });
+    setQuery('');
     setIsModalOpen(true);
   };
 
@@ -68,7 +86,7 @@ const DepartmentsList = () => {
         setDepartments(departments.map(d => d._id === editingId ? { ...updatedDept, lastModified: new Date().toISOString().split('T')[0] } : d));
         alert('Department updated successfully!');
       } else {
-      // CREATE NEW
+        // CREATE NEW
         // 1. Create the Page first (content)
         const pageData = {
           title: newDept.name,
@@ -104,16 +122,29 @@ const DepartmentsList = () => {
   const handleDelete = async (id, slug) => {
     if (window.confirm("Are you sure? This will delete the department and its page.")) {
       try {
-        // Delete department metadata
+        // 1. Delete department metadata
         await DepartmentService.deleteDepartment(id);
-        // Ideally we also delete the page content? 
-        // For now let's just update UI
+
+        // 2. Delete the associated page content
+        try {
+          await PageService.deletePage(slug);
+        } catch (pageErr) {
+          console.warn("Failed to delete associated page (might already be missing):", pageErr);
+        }
+
         setDepartments(departments.filter(d => d._id !== id));
       } catch (err) {
         alert("Failed to delete: " + err.message);
       }
     }
-  }
+  };
+
+  const filteredPeople =
+    query === ''
+      ? facultyMembers
+      : facultyMembers.filter((person) => {
+        return person.name.toLowerCase().includes(query.toLowerCase());
+      });
 
   return (
     <div className="space-y-6 relative">
@@ -257,15 +288,65 @@ const DepartmentsList = () => {
                         />
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Head of Department</label>
-                      <input
-                        type="text"
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        value={newDept.head}
-                        onChange={(e) => setNewDept({ ...newDept, head: e.target.value })}
-                      />
+
+                    {/* Head of Department with Combobox */}
+                    <div className="relative z-20">
+                      <Combobox value={newDept.head} onChange={(val) => setNewDept({ ...newDept, head: val })}>
+                        <Combobox.Label className="block text-sm font-medium text-gray-700">Head of Department</Combobox.Label>
+                        <div className="relative mt-1">
+                          <Combobox.Input
+                            className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                            onChange={(event) => setQuery(event.target.value)}
+                            displayValue={(person) => person}
+                            placeholder="Select or type name..."
+                          />
+                          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                          </Combobox.Button>
+
+                          <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                            {filteredPeople.map((person) => (
+                              <Combobox.Option
+                                key={person._id}
+                                value={person.name}
+                                className={({ active }) =>
+                                  `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-blue-600 text-white' : 'text-gray-900'
+                                  }`
+                                }
+                              >
+                                {({ active, selected }) => (
+                                  <>
+                                    <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                                      {person.name}
+                                    </span>
+                                    {selected && (
+                                      <span
+                                        className={`absolute inset-y-0 right-0 flex items-center pr-4 ${active ? 'text-white' : 'text-blue-600'
+                                          }`}
+                                      >
+                                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                      </span>
+                                    )}
+                                  </>
+                                )}
+                              </Combobox.Option>
+                            ))}
+                            {query.length > 0 && !filteredPeople.some(p => p.name.toLowerCase() === query.toLowerCase()) && (
+                              <Combobox.Option
+                                value={query}
+                                className={({ active }) =>
+                                  `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-blue-600 text-white' : 'text-gray-900'
+                                  }`
+                                }
+                              >
+                                Create "{query}"
+                              </Combobox.Option>
+                            )}
+                          </Combobox.Options>
+                        </div>
+                      </Combobox>
                     </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Description</label>
                       <textarea

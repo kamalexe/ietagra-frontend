@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PageService from '../../services/PageService';
+import FileService from '../../services/FileService';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import {
   Bars3Icon,
@@ -184,28 +185,77 @@ const HomeConfig = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-gray-700 font-medium">Poster Image URL (First Image)</label>
-              <input
-                type="text"
-                value={admissionConfig.posters[0] || ''}
-                onChange={(e) => {
-                   const newPosters = [...admissionConfig.posters];
-                   newPosters[0] = e.target.value;
-                   setAdmissionConfig({ ...admissionConfig, posters: newPosters });
-                }}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
-                placeholder="/images/admissionPoster.jpg"
-              />
-              <p className="text-sm text-gray-500">Currently supporting editing the first poster only for simplicity. Add comma separated logic or array inputs for multiple if needed.</p>
-            </div>
-            
-            {admissionConfig.posters[0] && (
-                <div className="mt-2">
-                    <p className="text-sm font-medium text-gray-700 mb-1">Preview:</p>
-                    <img src={admissionConfig.posters[0]} alt="Preview" className="h-40 object-contain border rounded bg-gray-50" />
+            <div className="space-y-4">
+              <label className="block text-gray-700 font-medium">Poster Images</label>
+
+              {/* Image List */}
+              <div className="grid grid-cols-2 gap-4">
+                {admissionConfig.posters.map((url, index) => (
+                  <div key={index} className="relative group border rounded-lg p-2 bg-gray-50">
+                    <img src={url} alt={`Poster ${index + 1}`} className="h-32 w-full object-contain mb-2" />
+                    <button
+                      onClick={() => {
+                        const newPosters = admissionConfig.posters.filter((_, i) => i !== index);
+                        setAdmissionConfig({ ...admissionConfig, posters: newPosters });
+                      }}
+                      className="absolute top-1 right-1 bg-red-100 text-red-600 rounded-full p-1 hover:bg-red-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remove Image"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add New Image */}
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <label className="block text-xs text-gray-500 mb-1">Add Image URL</label>
+                  <input
+                    type="text"
+                    placeholder="https://... or /images/..."
+                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (e.target.value) {
+                          setAdmissionConfig({
+                            ...admissionConfig,
+                            posters: [...admissionConfig.posters, e.target.value]
+                          });
+                          e.target.value = '';
+                        }
+                      }
+                    }}
+                  />
                 </div>
-            )}
+                <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                  Upload
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      try {
+                        const data = await FileService.uploadFile(file);
+                        setAdmissionConfig({
+                          ...admissionConfig,
+                          posters: [...admissionConfig.posters, data.url]
+                        });
+                      } catch (err) {
+                        alert("Upload failed: " + err.message);
+                      } finally {
+                        e.target.value = null;
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+              <p className="text-xs text-gray-500">Press Enter in the text box to add a standard URL, or click Upload to pick a file.</p>
+            </div>
           </div>
         )}
 

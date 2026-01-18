@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
 import { PencilSquareIcon, TrashIcon, PlusIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { Combobox } from '@headlessui/react';
 import FacultyService from '../../services/FacultyService';
+import DepartmentService from '../../services/DepartmentService';
+import FileService from '../../services/FileService';
 
 const FacultyList = () => {
     // State for faculty list
     const [faculty, setFaculty] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [uploading, setUploading] = useState(false);
+
+    // Department Selection State
+    const [departmentOptions, setDepartmentOptions] = useState([]);
+    const [deptQuery, setDeptQuery] = useState('');
+
     // Fetch faculty on mount
     React.useEffect(() => {
         loadFaculty();
+        loadDepartments();
     }, []);
 
     const loadFaculty = async () => {
@@ -24,6 +34,15 @@ const FacultyList = () => {
             setError("Failed to load faculty list.");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadDepartments = async () => {
+        try {
+            const data = await DepartmentService.getAllDepartments();
+            setDepartmentOptions(data || []);
+        } catch (err) {
+            console.error("Failed to load departments:", err);
         }
     };
 
@@ -43,9 +62,8 @@ const FacultyList = () => {
     const [editingMember, setEditingMember] = useState(null);
     const [formData, setFormData] = useState({ name: '', designation: '', department: '', email: '', image: '', specialization: '', achievements: '' });
 
-    const departments = ['Computer Science', 'Civil Engineering', 'Mechanical Engineering', 'Electronics & Comm.', 'Electrical Engineering', 'Applied Science'];
-
     const handleOpenModal = (member = null) => {
+        setDeptQuery('');
         if (member) {
             setEditingMember(member);
             setFormData({
@@ -54,7 +72,7 @@ const FacultyList = () => {
             });
         } else {
             setEditingMember(null);
-            setFormData({ name: '', designation: '', department: departments[0], email: '', image: '', specialization: '', achievements: '' });
+            setFormData({ name: '', designation: '', department: '', email: '', image: '', specialization: '', achievements: '' });
         }
         setIsModalOpen(true);
     };
@@ -86,6 +104,22 @@ const FacultyList = () => {
             alert("Upload Failed: " + error.message);
         } finally {
             e.target.value = null; // Reset input
+        }
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            setUploading(true);
+            const data = await FileService.uploadFile(file);
+            setFormData(prev => ({ ...prev, image: data.url }));
+        } catch (error) {
+            alert("Image upload failed: " + error.message);
+        } finally {
+            setUploading(false);
+            e.target.value = null;
         }
     };
 
@@ -121,6 +155,14 @@ const FacultyList = () => {
             .toUpperCase()
             .substring(0, 2);
     };
+
+    const filteredDepartments =
+        deptQuery === ''
+            ? departmentOptions
+            : departmentOptions.filter((dept) => {
+                return dept.name.toLowerCase().includes(deptQuery.toLowerCase());
+            });
+
 
     return (
         <div className="space-y-6">
@@ -215,11 +257,63 @@ const FacultyList = () => {
                                             <label className="block text-sm font-medium text-gray-700">Designation</label>
                                             <input type="text" required value={formData.designation} onChange={e => setFormData({ ...formData, designation: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                         </div>
-                                        <div className="sm:col-span-3">
-                                            <label className="block text-sm font-medium text-gray-700">Department</label>
-                                            <select value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                                {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
-                                            </select>
+
+                                        {/* Department Combobox */}
+                                        <div className="sm:col-span-3 relative z-20">
+                                            <Combobox value={formData.department} onChange={(val) => setFormData({ ...formData, department: val })}>
+                                                <Combobox.Label className="block text-sm font-medium text-gray-700">Department</Combobox.Label>
+                                                <div className="relative mt-1">
+                                                    <Combobox.Input
+                                                        className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                                                        onChange={(event) => setDeptQuery(event.target.value)}
+                                                        displayValue={(deptName) => deptName}
+                                                        placeholder="Select or type..."
+                                                    />
+                                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                                        <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                                    </Combobox.Button>
+
+                                                    <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                                        {filteredDepartments.map((dept) => (
+                                                            <Combobox.Option
+                                                                key={dept._id}
+                                                                value={dept.name}
+                                                                className={({ active }) =>
+                                                                    `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-blue-600 text-white' : 'text-gray-900'
+                                                                    }`
+                                                                }
+                                                            >
+                                                                {({ active, selected }) => (
+                                                                    <>
+                                                                        <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                                                                            {dept.name}
+                                                                        </span>
+                                                                        {selected && (
+                                                                            <span
+                                                                                className={`absolute inset-y-0 right-0 flex items-center pr-4 ${active ? 'text-white' : 'text-blue-600'
+                                                                                    }`}
+                                                                            >
+                                                                                <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                                                            </span>
+                                                                        )}
+                                                                    </>
+                                                                )}
+                                                            </Combobox.Option>
+                                                        ))}
+                                                        {deptQuery.length > 0 && !filteredDepartments.some(d => d.name.toLowerCase() === deptQuery.toLowerCase()) && (
+                                                            <Combobox.Option
+                                                                value={deptQuery}
+                                                                className={({ active }) =>
+                                                                    `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-blue-600 text-white' : 'text-gray-900'
+                                                                    }`
+                                                                }
+                                                            >
+                                                                Create "{deptQuery}"
+                                                            </Combobox.Option>
+                                                        )}
+                                                    </Combobox.Options>
+                                                </div>
+                                            </Combobox>
                                         </div>
                                     </div>
                                     <div>
@@ -236,7 +330,13 @@ const FacultyList = () => {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Image URL</label>
-                                        <input type="text" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} placeholder="/images/..." className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                        <div className="flex gap-2">
+                                            <input type="text" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} placeholder="/images/..." className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                            <label className={`mt-1 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-gray-50 hover:bg-gray-100 cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                                {uploading ? 'Uploading...' : 'Upload'}
+                                                <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                            </label>
+                                        </div>
                                     </div>
                                     <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                         <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
