@@ -20,6 +20,7 @@ import DesignEighteen from './sections/DesignEighteen';
 import DesignNineteen from './sections/DesignNineteen';
 import DesignTwenty from './sections/DesignTwenty';
 import DesignTwentyOne from './sections/DesignTwentyOne';
+import DesignTwentyTwo from './sections/DesignTwentyTwo';
 import DesignFifteen from './sections/DesignFifteen';
 
 // Adapters for new documentation-based templates
@@ -77,6 +78,7 @@ const SectionRegistry = {
     design_nineteen: DesignNineteen,
     design_twenty: DesignTwenty,
     design_twenty_one: DesignTwentyOne,
+    design_twenty_two: DesignTwentyTwo,
 
     // New Aliases
     hero_section: HeroSection,

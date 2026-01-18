@@ -43,13 +43,15 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
     const templates = [
         {
             key: 'design_twenty',
-            name: 'Events List',
-            description: 'List of all events with alternating layout.',
+            name: 'Events Grid (Tile Layout)',
+            description: 'Grid of event cards with image filters and detailed view.',
             demoData: {
                 // This component fetches its own data, so demoData can be minimal or empty
                 title: "Events List",
                 subtitle: "Exploring Excellence",
-                content: "<p>Stay updated with the latest happenings, workshops, and seminars at our institute.</p>"
+                content: "<p>Stay updated with the latest happenings, workshops, and seminars at our institute.</p>",
+                backgroundImage: "https://picsum.photos/1920/600",
+                limit: 6
             }
         },
         {
@@ -264,7 +266,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     }
                 ]
             }
-        }, 
+        },
         {
             key: 'design_thirteen',
             name: 'Departments Grid',
@@ -439,21 +441,35 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
         },
         {
             key: 'design_nineteen',
-            name: "Chairman's Message",
+            name: "Vice Chancellor's Message",
             description: "Dedicated section for leadership message with image and quote.",
             demoData: {
-                title: "Chairman's Message",
-                image: "https://d3ahzzdje1trpm.cloudfront.net/uploads/topics/16527634095335.webp",
-                name: "Mr. Satish Kumar Singh",
-                designation: "Chairman - SMS Group of Institution",
-                quote: "We are here to bring out the best in you. If you are also as committed to learn and develop, we ensure that a bright future is awaiting you!!",
-                content: `<p>The current scenario of higher education in India needs substantial improvement. Every year, thousands of fresh graduates are produced and are consequently being exposed to a fierce competition to grab employment. Besides, traditional pedagogy with a focus on rote learning creating a lack of analytical and critical thinking, appropriate skills to be readily absorbed by the industry and above all life skills, has further aggravated the problem.</p>
+                title: "Vice Chancellor's Message",
+                image: "https://dbrau.ac.in/wp-content/uploads/elementor/thumbs/ashu_rani-qob6fukhcqrs0rce8uvi9u8791vatwg3wggmjx0dy8.webp",
+                name: "Prof. Ashu Rani",
+                designation: "Vice Chancellor - Dr. Bhimrao Ambedkar University, Agra",
+                quote: "To be a quality higher education Institution by producing students with knowledge, professional skill and ethical values and remain as preferred partner to the Industry and Community for their progress and development",
+                content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
                 <br/>
-                <p>We, at SMS Lucknow, are passionate about solving this growing problem of employability gap and providing ample opportunities to our students to develop themselves holistically and also to become industry ready professionals and responsible citizens of tomorrow. We believe in training our students enough to face challenges at work and in life. SMS has rapidly grown from a newcomer, in technology and management education, to a noted name in Uttar Pradesh, today, ten years since its foundation was laid, back in 2008.</p>
+                <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris.</p>
                 <br/>
-                <p>We take pride in being the youngest and the only institution to have received a <b>A+</b> grade from NAAC amongst engineering and management institutions in the state. Our strong emphasis on providing skill based education has made us the first and the only institute in Lucknow, to provide a B.Voc. (Bachelor of Vocation) course in Software Development.</p>
+                <p>Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam.</p>
                 <br/>
-                <p>Everyday, we are striving to improve and become better and aspire to emerge as a leading university with a world class infrastructure, capable of contributing to the society through education, employment, research and innovation.</p>`
+                <p>Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat.</p>`
+            }
+        },
+        {
+            key: 'design_twenty_two',
+            name: "Contact Form Section",
+            description: "Two-column layout with Venue details (map, address) and a comprehensive Contact Form.",
+            demoData: {
+                title: "Feedback/Query Form",
+                subtitle: "Please fill out the form below to get in touch with us.",
+                buttonText: "Send",
+                venueTitle: "Venue",
+                venueName: "Institute of Engineering & Technology, Agra",
+                venueDetails: "Khandari Campus, Agra - 282002\nPhone: +91-562-2858585\nEmail: contact@ietagra.ac.in",
+                mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3548.8654876798224!2d78.0063233150567!3d27.19172298299881!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3974775d5b5b5b5b%3A0x5b5b5b5b5b5b5b5b!2sInstitute%20of%20Engineering%20and%20Technology%20Agra!5e0!3m2!1sen!2sin!4v1622222222222!5m2!1sen!2sin"
             }
         }
     ];

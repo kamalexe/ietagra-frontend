@@ -23,7 +23,19 @@ const schemas = {
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'backgroundImage', label: 'Background Image URL', type: 'image' },
-        { name: 'badge', label: 'Badge', type: 'text' }
+        { name: 'badge', label: 'Badge (Simple Only)', type: 'text' },
+        { name: 'underlineColor', label: 'Underline Color Class (Simple Only)', type: 'text', placeholder: 'from-blue-500 to-indigo-500' },
+        { name: 'gradient', label: 'Gradient Class (Hero Only)', type: 'text', placeholder: 'bg-gradient-to-r ...' },
+        {
+            name: 'buttons',
+            label: 'Buttons List (Hero Only)',
+            type: 'list',
+            itemSchema: [
+                { name: 'text', label: 'Button Text', type: 'text' },
+                { name: 'link', label: 'Link URL', type: 'text' },
+                { name: 'primary', label: 'Is Primary?', type: 'select', options: ['true', 'false'] }
+            ]
+        }
     ],
     'design_two': [
         {
@@ -169,15 +181,24 @@ const schemas = {
     ],
     'design_twelve': [
         { name: 'title', label: 'Title', type: 'text' },
-        { name: 'subtitle', label: 'Subtitle', type: 'text' },
-        { name: 'image', label: 'Side Image', type: 'image' },
-        { name: 'content', label: 'Content', type: 'textarea' },
         {
-            name: 'listItems',
-            label: 'Bullet Points List',
+            name: 'items',
+            label: 'Team / Faculty Members',
             type: 'list',
             itemSchema: [
-                { name: 'text', label: 'Item Text', type: 'text' }
+                { name: 'name', label: 'Name', type: 'text' },
+                { name: 'designation', label: 'Designation', type: 'text' },
+                { name: 'image', label: 'Photo URL', type: 'image' },
+                { name: 'specialization', label: 'Specialization', type: 'text' },
+                { name: 'email', label: 'Email', type: 'text' },
+                {
+                    name: 'achievements',
+                    label: 'Achievements List',
+                    type: 'list',
+                    itemSchema: [
+                        { name: 'text', label: 'Achievement Text', type: 'text' }
+                    ]
+                }
             ]
         }
     ],
@@ -284,32 +305,19 @@ const schemas = {
         }
     ],
     'design_nineteen': [
-        { name: 'title', label: 'Title', type: 'text' },
-        {
-            name: 'members',
-            label: 'Team Members',
-            type: 'list',
-            itemSchema: [
-                { name: 'name', label: 'Name', type: 'text' },
-                { name: 'role', label: 'Role', type: 'text' },
-                { name: 'image', label: 'Photo', type: 'image' },
-                { name: 'bio', label: 'Bio', type: 'textarea' }
-            ]
-        }
+        { name: 'title', label: 'Section Title', type: 'text' },
+        { name: 'image', label: 'Person Image', type: 'image' },
+        { name: 'name', label: 'Name', type: 'text' },
+        { name: 'designation', label: 'Designation', type: 'text' },
+        { name: 'quote', label: 'Quote', type: 'textarea' },
+        { name: 'content', label: 'Content (HTML supported)', type: 'textarea' }
     ],
     'design_twenty': [
-        { name: 'title', label: 'Title', type: 'text' },
-        {
-            name: 'testimonials',
-            label: 'Testimonials',
-            type: 'list',
-            itemSchema: [
-                { name: 'name', label: 'Name', type: 'text' },
-                { name: 'designation', label: 'Role/Designation', type: 'text' },
-                { name: 'quote', label: 'Quote', type: 'textarea' },
-                { name: 'image', label: 'Photo', type: 'image' }
-            ]
-        }
+        { name: 'title', label: 'Section Title', type: 'text' },
+        { name: 'subtitle', label: 'Subtitle', type: 'text' },
+        { name: 'content', label: 'Content (HTML)', type: 'textarea' },
+        { name: 'backgroundImage', label: 'Header Background Image', type: 'image' },
+        { name: 'limit', label: 'Number of Events (leave empty for all)', type: 'number' }
     ],
     'design_twenty_one': [
         { name: 'title', label: 'Title', type: 'text' },
@@ -354,6 +362,16 @@ const schemas = {
                 { name: 'link', label: 'Link', type: 'text' }
             ]
         }
+    ],
+    'design_twenty_two': [
+        { name: 'title', label: 'Form Title', type: 'text', placeholder: 'Feedback/Query Form' },
+        { name: 'subtitle', label: 'Form Subtitle', type: 'text' },
+        { name: 'buttonText', label: 'Button Text', type: 'text', placeholder: 'Send' },
+        { name: 'venueTitle', label: 'Venue Title', type: 'text', placeholder: 'Venue' },
+        { name: 'venueName', label: 'Venue Name', type: 'textarea', placeholder: 'Babu Banarasi Das College...' },
+        { name: 'venueDetails', label: 'Venue Contact Details', type: 'textarea', placeholder: 'Phone, Email, Website...' },
+        { name: 'mapEmbedUrl', label: 'Google Maps Embed URL', type: 'text' },
+        { name: 'backgroundImage', label: 'Background Image', type: 'image' }
     ],
     'hod_message': [
         { name: 'name', label: 'HOD Name', type: 'text' },

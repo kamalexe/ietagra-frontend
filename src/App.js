@@ -25,8 +25,10 @@ import PageBuilder from './pages/admin/PageBuilder';
 import HomeConfig from './pages/admin/HomeConfig';
 import StudentDataManager from './pages/admin/StudentDataManager';
 import EventsList from './pages/admin/EventsList';
+import ContactSubmissions from './pages/admin/ContactSubmissions';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
+import DynamicPage from './pages/DynamicPage';
 
 function App() {
   const { access_token } = useSelector((state) => state.auth);
@@ -41,6 +43,7 @@ function App() {
             <Route path="home" element={<HomeConfig />} />
             <Route path="training-placement" element={<PageBuilder slug="tandpcell" />} />
             <Route path="student-data" element={<StudentDataManager />} />
+            <Route path="contacts" element={<ContactSubmissions />} />
             <Route path="pages" element={<PagesList />} />
             <Route path="departments" element={<DepartmentsList />} />
             <Route path="faculty" element={<FacultyList />} />
@@ -72,6 +75,7 @@ function App() {
             <Route path="/departments/ee" element={<EeDepartment />} />
             <Route path="/departments/civil" element={<CivilDepartment />} />
             <Route path="/departments/asm" element={<AppliedScience />} />
+            <Route path="/:slug" element={<DynamicPage />} />
             <Route path="*" element={<h1>Error 404 Page not found !!</h1>} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="tandpcell" element={<SideNavTandP />} />
