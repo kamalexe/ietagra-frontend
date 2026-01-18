@@ -69,6 +69,10 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             name: 'Features Grid (3 Cols)',
             description: 'Grid of cards with icons and descriptions.',
             demoData: {
+                title: "Our Features",
+                badge: "Highlights",
+                description: "Discover what makes us unique.",
+                underlineColor: "from-blue-500 to-cyan-500",
                 items: [
                     { title: "Feature 1", description: "Description 1", icon: "FaStar" },
                     { title: "Feature 2", description: "Description 2", icon: "FaHeart" },
@@ -81,6 +85,9 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             name: 'Colored Cards Grid',
             description: 'Two-column colored cards with icons.',
             demoData: {
+                title: "Our Mission & Vision",
+                badge: "Goals",
+                underlineColor: "from-green-500 to-teal-500",
                 items: [
                     { title: "Vision", content: "To be a center of excellence...", icon: "FaEye", colorTheme: "green" },
                     { title: "Mission", content: "To provide quality education...", icon: "FaBullseye", colorTheme: "teal" }
@@ -93,6 +100,9 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'Cards with circular photos for team members.',
             demoData: {
                 title: "Our Team",
+                badge: "Faculty",
+                description: "Meet our dedicated team members.",
+                underlineColor: "from-indigo-500 to-purple-500",
                 items: [
                     { name: "Dr. Smith", position: "Professor", image: "https://via.placeholder.com/150" },
                     { name: "Prof. Doe", position: "HOD", image: "https://via.placeholder.com/150" }
@@ -105,6 +115,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'Strengths, Weaknesses, Opportunities, Threats display.',
             demoData: {
                 title: "Department SWOT",
+                badge: "Analysis",
                 description: "Analysis of our current standing.",
                 swotData: {
                     strengths: ["Experienced Faculty", "Modern Labs"],
@@ -160,6 +171,8 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'Split view with image slider and detailed content.',
             demoData: {
                 title: "Infrastructure",
+                badge: "Facilities",
+                underlineColor: "from-orange-500 to-red-500",
                 content: "State of the art labs and classrooms.",
                 images: [{ src: "https://via.placeholder.com/400" }]
             }
@@ -170,6 +183,8 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'List views for events, news, or publications.',
             demoData: {
                 title: "Recent News",
+                badge: "Updates",
+                underlineColor: "from-blue-600 to-cyan-600",
                 items: [
                     { title: "Event One", description: "Details about event.", date: "Jan 10" },
                     { title: "Publication", description: "Research paper published.", date: "Feb 15" }
@@ -182,6 +197,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'Clean grid with icons on top of cards.',
             demoData: {
                 title: "Our Core Values",
+                badge: "Values",
                 description: "What drives us forward.",
                 features: [
                     { title: "Integrity", description: "Honesty in all we do.", icon: "🛡️" },
@@ -319,6 +335,9 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'Two column features with icons and gradients, supports external links.',
             demoData: {
                 title: "Training & Placement and Clubs",
+                badge: "Opportunities",
+                description: "Explore career opportunities and student activities.",
+                underlineColor: "from-yellow-500 to-orange-500",
                 items: [
                     {
                         title: "Training & Placement Cell",

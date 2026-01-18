@@ -111,7 +111,7 @@ const AdmissionModal = ({ config }) => {
           onClick={closeModal}
         >
           <motion.div
-            className="relative max-w-4xl w-11/12 mx-auto"
+            className="relative max-w-4xl w-11/12 mx-auto flex flex-col max-h-[95vh]"
             variants={modalVariants}
             initial="hidden"
             animate="visible"
@@ -120,7 +120,7 @@ const AdmissionModal = ({ config }) => {
           >
             {/* Close button */}
             <motion.button
-              className="absolute -top-4 -right-4 bg-red-600 text-white p-2 rounded-full z-50 shadow-lg"
+              className="absolute top-2 right-2 md:-top-4 md:-right-4 bg-white/90 md:bg-red-600 text-gray-800 md:text-white p-2 rounded-full z-50 shadow-lg backdrop-blur-sm transition-transform"
               onClick={closeModal}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -129,10 +129,10 @@ const AdmissionModal = ({ config }) => {
             </motion.button>
 
             {/* Poster display */}
-            <div className="relative overflow-hidden rounded-lg shadow-2xl">
+            <div className="relative overflow-hidden rounded-lg shadow-2xl bg-gray-100 flex justify-center items-center">
               {/* Image */}
               <motion.div
-                className="relative aspect-[1/1.4] sm:aspect-[4/3] md:aspect-auto"
+                className="relative w-full flex justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -140,7 +140,7 @@ const AdmissionModal = ({ config }) => {
                 <img
                   src={posterImages[currentPoster]}
                   alt={`IET Agra Admissions 2025-26 Poster ${currentPoster + 1}`}
-                  className="w-full h-full object-contain bg-transparent md:bg-white rounded-lg"
+                  className="w-auto h-auto max-w-full max-h-[60vh] md:max-h-[75vh] object-contain rounded-lg"
                 />
               </motion.div>
 
@@ -186,7 +186,7 @@ const AdmissionModal = ({ config }) => {
 
             {/* Call to action button */}
             <motion.div
-              className="text-center mt-6"
+              className="text-center py-4 bg-white md:bg-transparent md:mt-6 rounded-b-lg md:rounded-none shrink-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}

@@ -3,7 +3,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import * as FaIcons from 'react-icons/fa';
 
-const DesignTwo = ({ items, cards }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignTwo = ({ items, cards, badge, title, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
     const dataItems = items || cards || [];
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
@@ -18,7 +20,15 @@ const DesignTwo = ({ items, cards }) => {
     };
 
     return (
-        <div className="container mx-auto max-w-6xl px-4 pb-16">
+        <SectionWrapper
+            badge={badge}
+            title={title}
+            underlineColor={underlineColor}
+            description={description}
+            backgroundImage={backgroundImage}
+            gradient={gradient}
+            buttons={buttons}
+        >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
                 {dataItems.map((item, index) => {
                     const Icon = FaIcons[item.icon] || FaIcons['FaInfoCircle'];
@@ -46,7 +56,7 @@ const DesignTwo = ({ items, cards }) => {
                     );
                 })}
             </div>
-        </div>
+        </SectionWrapper>
     );
 };
 

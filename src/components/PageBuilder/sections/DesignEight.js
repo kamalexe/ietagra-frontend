@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import * as FaIcons from 'react-icons/fa';
 
-const DesignEight = ({ title, content, images, features, badge }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignEight = ({ title, content, images, features, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Auto-rotate images
@@ -22,33 +24,15 @@ const DesignEight = ({ title, content, images, features, badge }) => {
   };
 
   return (
-    <section className="py-16 px-4">
-      <div className="container mx-auto max-w-6xl">
-        {/* Optional Header if not using DesignOne above this */}
-        {(title || content) && (
-             <motion.div
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             variants={fadeIn}
-             className="text-center mb-14"
-           >
-             {badge && (
-                <span className="bg-green-50 text-green-700 py-1 px-3 rounded-full text-sm font-medium mb-3 inline-block">
-                    {badge}
-                </span>
-             )}
-             {title && (
-                 <>
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">{title}</h2>
-                    <div className="w-24 h-1.5 bg-gradient-to-r from-green-500 to-teal-600 mx-auto mb-5 rounded-full"></div>
-                 </>
-             )}
-             {content && (
-                <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed">{content}</p>
-             )}
-           </motion.div>
-        )}
+    <SectionWrapper
+      badge={badge}
+      title={title}
+      underlineColor={underlineColor || 'from-green-500 to-teal-600'}
+      description={content}
+      backgroundImage={backgroundImage}
+      gradient={gradient}
+      buttons={buttons}
+    >
 
         <motion.div
           variants={containerVariants}
@@ -132,8 +116,7 @@ const DesignEight = ({ title, content, images, features, badge }) => {
             </div>
           </div>
         </motion.div>
-      </div>
-    </section>
+    </SectionWrapper>
   );
 };
 

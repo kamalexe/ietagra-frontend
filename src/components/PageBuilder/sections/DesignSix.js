@@ -4,10 +4,20 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import * as FaIcons from 'react-icons/fa';
 
-const DesignSix = ({ title, items, cards }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignSix = ({ title, items, cards, badge, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
     const dataItems = items || cards || [];
     return (
-        <div className="container mx-auto max-w-6xl px-4">
+        <SectionWrapper
+            badge={badge}
+            title={title}
+            underlineColor={underlineColor}
+            description={description}
+            backgroundImage={backgroundImage}
+            gradient={gradient}
+            buttons={buttons}
+        >
             <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -17,8 +27,7 @@ const DesignSix = ({ title, items, cards }) => {
             >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full opacity-5 -mt-20 -mr-20"></div>
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full opacity-5 -mb-20 -ml-20"></div>
-
-                <h3 className="text-2xl font-bold text-center mb-8 relative">{title}</h3>
+                {/* Title removed from here as it's now handled by SectionWrapper, or validation needed if user wants it inside card */}
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                     {dataItems.map((item, index) => {
@@ -37,7 +46,7 @@ const DesignSix = ({ title, items, cards }) => {
                     })}
                 </div>
             </motion.div>
-        </div>
+        </SectionWrapper>
     );
 };
 

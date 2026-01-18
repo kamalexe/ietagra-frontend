@@ -2,20 +2,20 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { fadeIn, staggerContainer } from '../../../utils/animations';
 
-const DesignTen = ({ title, description, features = [], bgColor = 'bg-gray-50' }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignTen = ({ title, description, features = [], bgColor, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
     return (
-        <section className={`py-16 ${bgColor}`}>
-            <div className="container mx-auto px-4">
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="text-center max-w-3xl mx-auto mb-16"
-                >
-                    {title && <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{title}</h2>}
-                    {description && <p className="text-lg text-gray-600">{description}</p>}
-                </motion.div>
+        <SectionWrapper
+            badge={badge}
+            title={title}
+            underlineColor={underlineColor}
+            description={description}
+            backgroundImage={backgroundImage}
+            gradient={gradient || (bgColor ? '' : undefined)} // fallback if needed
+            buttons={buttons}
+            className={bgColor}
+        >
 
                 <motion.div
                     variants={staggerContainer}
@@ -38,8 +38,7 @@ const DesignTen = ({ title, description, features = [], bgColor = 'bg-gray-50' }
                         </motion.div>
                     ))}
                 </motion.div>
-            </div>
-        </section>
+        </SectionWrapper>
     );
 };
 

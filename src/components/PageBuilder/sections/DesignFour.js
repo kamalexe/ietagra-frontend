@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import { FaAward } from 'react-icons/fa';
 
-const DesignFour = ({ title, description, facultyMembers, members, items }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignFour = ({ title, description, facultyMembers, members, items, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
   const dataItems = facultyMembers || members || items || [];
 
   const itemVariants = {
@@ -17,7 +19,15 @@ const DesignFour = ({ title, description, facultyMembers, members, items }) => {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 mb-16">
+    <SectionWrapper
+      badge={badge}
+      title={title}
+      underlineColor={underlineColor || 'from-green-500 to-teal-600'}
+      description={description}
+      backgroundImage={backgroundImage}
+      gradient={gradient}
+      buttons={buttons}
+    >
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -25,13 +35,6 @@ const DesignFour = ({ title, description, facultyMembers, members, items }) => {
         variants={fadeIn}
         className="mb-16"
       >
-        <div className="text-center mb-10">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">{title}</h3>
-          <div className="w-16 h-1 bg-gradient-to-r from-green-500 to-teal-600 mx-auto mb-4 rounded-full"></div>
-          {description && (
-            <p className="text-gray-600 max-w-2xl mx-auto">{description}</p>
-          )}
-        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {dataItems.map((item, index) => {
@@ -104,7 +107,7 @@ const DesignFour = ({ title, description, facultyMembers, members, items }) => {
           })}
         </div>
       </motion.div>
-    </div>
+    </SectionWrapper>
   );
 };
 

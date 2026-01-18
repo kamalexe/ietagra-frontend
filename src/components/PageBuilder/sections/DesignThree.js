@@ -4,10 +4,20 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import * as FaIcons from 'react-icons/fa';
 
-const DesignThree = ({ cards, items }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignThree = ({ cards, items, badge, title, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
   const dataItems = cards || items || [];
   return (
-    <div className="container mx-auto max-w-6xl px-4 mb-16">
+    <SectionWrapper
+      badge={badge}
+      title={title}
+      underlineColor={underlineColor}
+      description={description}
+      backgroundImage={backgroundImage}
+      gradient={gradient}
+      buttons={buttons}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {dataItems.map((card, index) => {
           const Icon = FaIcons[card.icon];
@@ -63,7 +73,7 @@ const DesignThree = ({ cards, items }) => {
           );
         })}
       </div>
-    </div>
+    </SectionWrapper>
   );
 };
 

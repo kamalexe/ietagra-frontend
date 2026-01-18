@@ -58,6 +58,8 @@ const Navbar = () => {
           <div className="hidden md:flex md:items-center md:gap-8">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/tandpcell">Career Hub</NavLink>
+            <NavLink to="/events">Events</NavLink>
+            <NavLink to="/about-us">About Us</NavLink>
             <NavLink to="/gallery">Gallery</NavLink>
           </div>
 

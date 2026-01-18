@@ -4,10 +4,20 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import { FaChartLine } from 'react-icons/fa';
 
-const DesignFive = ({ title, description, swotData, data }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignFive = ({ title, description, swotData, data, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
   const finalData = swotData || data || {};
   return (
-    <div className="container mx-auto max-w-6xl px-4 mb-12">
+    <SectionWrapper
+      badge={badge}
+      title={title}
+      underlineColor={underlineColor || 'from-green-500 to-teal-600'}
+      description={description}
+      backgroundImage={backgroundImage}
+      gradient={gradient}
+      buttons={buttons}
+    >
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -15,13 +25,6 @@ const DesignFive = ({ title, description, swotData, data }) => {
         variants={fadeIn}
         className="mb-12"
       >
-        <div className="text-center mb-10">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">{title}</h3>
-          <div className="w-16 h-1 bg-gradient-to-r from-green-500 to-teal-600 mx-auto mb-4 rounded-full"></div>
-          {description && (
-            <p className="text-gray-600 max-w-2xl mx-auto">{description}</p>
-          )}
-        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Strengths */}
@@ -109,7 +112,7 @@ const DesignFive = ({ title, description, swotData, data }) => {
           )}
         </div>
       </motion.div>
-    </div>
+    </SectionWrapper>
   );
 };
 

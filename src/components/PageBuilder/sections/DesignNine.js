@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import * as FaIcons from 'react-icons/fa';
 
-const DesignNine = ({ title, variant = 'simple', items, cards, columns = 2 }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignNine = ({ title, variant = 'simple', items, cards, columns = 2, badge, underlineColor, description, backgroundImage, buttons, gradient }) => {
     const dataItems = items || cards || [];
 
     const itemVariants = {
@@ -21,8 +23,16 @@ const DesignNine = ({ title, variant = 'simple', items, cards, columns = 2 }) =>
     };
 
     return (
-        <div className="container mx-auto max-w-6xl px-4 mb-16">
-            {title && <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">{title}</h3>}
+        <SectionWrapper
+            badge={badge}
+            title={title}
+            underlineColor={underlineColor}
+            description={description}
+            backgroundImage={backgroundImage}
+            gradient={gradient}
+            buttons={buttons}
+            className="mb-16"
+        >
 
             <motion.div
                 className={`grid ${getGridClass()} gap-6`}
@@ -98,7 +108,7 @@ const DesignNine = ({ title, variant = 'simple', items, cards, columns = 2 }) =>
                     );
                 })}
             </motion.div>
-        </div>
+        </SectionWrapper >
     );
 };
 

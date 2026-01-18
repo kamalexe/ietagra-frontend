@@ -2,22 +2,28 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { fadeIn, staggerContainer } from '../../../utils/animations';
 
-const DesignFourteen = ({ title, items = [] }) => {
+import SectionWrapper from '../SectionWrapper';
+
+const DesignFourteen = ({ title, items, badge, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
+    // Expected Item Properties:
+    // - title: string
+    // - description: string
+    // - link: string (URL)
+    // - target: string ('_blank' or '_self')
+    // - icon: string (emoji or icon name)
+    // - gradient: string (Tailwind gradient classes)
+    const dataItems = items || [];
+
     return (
-        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            {title && (
-                <motion.h2 
-                    initial={{ opacity: 0, y: -20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12 relative"
-                >
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                        {title}
-                    </span>
-                    <div className="w-32 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 mx-auto mt-2"></div>
-                </motion.h2>
-            )}
+        <SectionWrapper
+            badge={badge}
+            title={title}
+            underlineColor={underlineColor}
+            description={description}
+            backgroundImage={backgroundImage}
+            gradient={gradient}
+            buttons={buttons}
+        >
 
             <motion.div 
                 variants={staggerContainer}
@@ -26,7 +32,7 @@ const DesignFourteen = ({ title, items = [] }) => {
                 viewport={{ once: true }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-8"
             >
-                {items.map((item, index) => (
+                {dataItems.map((item, index) => (
                     <motion.a 
                         key={index}
                         href={item.link || '#'}
@@ -57,7 +63,7 @@ const DesignFourteen = ({ title, items = [] }) => {
                     </motion.a>
                 ))}
             </motion.div>
-        </section>
+        </SectionWrapper >
     );
 };
 
