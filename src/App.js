@@ -1,4 +1,4 @@
-import TemplatePicker from './pages/admin/components/TemplatePicker';
+
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginReg from './pages/auth/LoginReg';
@@ -62,7 +62,7 @@ function App() {
             <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/profile" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/:slug" element={<DynamicPage />} />
-            <Route path="/test-picker" element={<TemplatePicker onClose={() => { }} onSelect={() => { }} currentSlug="cse" />} />
+            <Route path="/:slug" element={<DynamicPage />} />
             <Route path="*" element={<h1>Error 404 Page not found !!</h1>} />
           </Route>
         </Routes>

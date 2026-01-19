@@ -539,6 +539,23 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     { studentName: "Pooja Verma", batch: "2024", branch: "Civil", company: "L&T", package: "6 LPA", designation: "GET" }
                 ]
             }
+        },
+        {
+            key: 'design_twenty_six',
+            name: "Student Achievements (Timeline)",
+            description: "Visual timeline or card layout for displaying student awards and achievements.",
+            demoData: {
+                title: "Hall of Fame",
+                subtitle: "Recognizing Excellence",
+                description: "<p>A timeline of our students' remarkable achievements in various fields.</p>",
+                items: [
+                    { title: "Smart India Hackathon Winner", studentName: "Team Innovators", date: "Sep 2024", batch: "2024", branch: "CSE", description: "Won the first prize in the Smart India Hackathon 2024 for developing an AI-based solution for agriculture." },
+                    { title: "Best Research Paper", studentName: "Priya Sharma", date: "Aug 2024", batch: "2024", branch: "ECE", description: "Awarded Best Paper at the International Conference on Signal Processing for research on 6G communication." },
+                    { title: "Gold Medal in Athletics", studentName: "Rahul Singh", date: "Jul 2024", batch: "2025", branch: "ME", description: "Secured Gold Medal in 100m sprint at the Inter-University Sports Meet." },
+                    { title: "Google Summer of Code", studentName: "Amit Patel", date: "May 2024", batch: "2025", branch: "CSE", description: "Selected for GSoC 2024 with the Apache Software Foundation." },
+                    { title: "Patent Granted", studentName: "Dr. Smith & Team", date: "Apr 2024", batch: "2024", branch: "EE", description: "Granted a patent for a novel solar power inversion technique." }
+                ]
+            }
         }
     ];
 
