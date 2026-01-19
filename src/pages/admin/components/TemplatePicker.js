@@ -471,6 +471,36 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 venueDetails: "Khandari Campus, Agra - 282002\nPhone: +91-562-2858585\nEmail: contact@ietagra.ac.in",
                 mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3548.8654876798224!2d78.0063233150567!3d27.19172298299881!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3974775d5b5b5b5b%3A0x5b5b5b5b5b5b5b5b!2sInstitute%20of%20Engineering%20and%20Technology%20Agra!5e0!3m2!1sen!2sin!4v1622222222222!5m2!1sen!2sin"
             }
+        },
+        {
+            key: 'design_twenty_three',
+            name: "Advanced Gallery & Albums",
+            description: "Future-ready gallery with Albums, Lightbox, and Video support.",
+            demoData: {
+                title: "University Media Gallery",
+                subtitle: "Explore our campus events and memories.",
+                layout: "albums",
+                albums: [
+                    {
+                        id: "album-1",
+                        title: "Campus Life",
+                        cover: "https://picsum.photos/400/300?random=1",
+                        description: "Photos from around the campus.",
+                        media: [
+                            { type: "image", src: "https://picsum.photos/800/600?random=2", caption: "Library Entrance" },
+                            { type: "image", src: "https://picsum.photos/800/600?random=3", caption: "Main Auditorium" }
+                        ]
+                    },
+                    {
+                        id: "album-2",
+                        title: "Annual Fest 2024",
+                        cover: "https://picsum.photos/400/300?random=4",
+                        media: [
+                            { type: "video", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", caption: "Event Highlights" }
+                        ]
+                    }
+                ]
+            }
         }
     ];
 
@@ -504,23 +534,27 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 <div className="inline-block bg-white rounded-xl overflow-hidden shadow-2xl transform transition-all align-middle sm:max-w-5xl sm:w-full relative">
 
                     {/* Header */}
-                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <div>
+                    <div className="relative bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-center">
+                        <div className="text-center">
                             <h3 className="text-xl font-bold text-gray-900" id="modal-title">
                                 Select Component ({currentIndex + 1}/{templates.length})
                             </h3>
-                            <p className="text-sm text-gray-500 mt-1">{currentTemplate.name} - {currentTemplate.description}</p>
+                            <p className="text-sm text-gray-500 mt-1">
+                                {currentTemplate.name} - {currentTemplate.description}
+                            </p>
                         </div>
+
                         <button
                             onClick={onClose}
                             type="button"
-                            className="bg-white rounded-full p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
-                            title="Close (Esc)" // Accessible hint
+                            className="absolute right-6 bg-white rounded-full p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+                            title="Close (Esc)"
                         >
                             <span className="sr-only">Close</span>
                             <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                         </button>
                     </div>
+
 
                     {/* Carousel Body */}
                     <div className="relative bg-gray-100 h-[60vh] flex items-center justify-center p-8 overflow-hidden group">

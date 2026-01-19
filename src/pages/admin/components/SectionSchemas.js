@@ -386,6 +386,38 @@ const schemas = {
         { name: 'mapEmbedUrl', label: 'Google Maps Embed URL', type: 'text' },
         { name: 'backgroundImage', label: 'Background Image', type: 'image' }
     ],
+    'design_twenty_three': [
+        { name: 'title', label: 'Gallery Title', type: 'text' },
+        { name: 'subtitle', label: 'Subtitle', type: 'text' },
+        {
+            name: 'layout',
+            label: 'Default Layout',
+            type: 'select',
+            options: ['albums', 'grid', 'masonry']
+        },
+        {
+            name: 'albums',
+            label: 'Albums / Collections',
+            type: 'list',
+            itemSchema: [
+                { name: 'id', label: 'Album ID (unique)', type: 'text' },
+                { name: 'title', label: 'Album Title', type: 'text' },
+                { name: 'cover', label: 'Cover Image', type: 'image' },
+                { name: 'description', label: 'Description', type: 'textarea' },
+                {
+                    name: 'media',
+                    label: 'Media Items',
+                    type: 'list',
+                    itemSchema: [
+                        { name: 'type', label: 'Type', type: 'select', options: ['image', 'video'] },
+                        { name: 'src', label: 'Image URL', type: 'image' },
+                        { name: 'videoUrl', label: 'Video URL (YouTube)', type: 'text' },
+                        { name: 'caption', label: 'Caption', type: 'text' }
+                    ]
+                }
+            ]
+        }
+    ],
     'hod_message': [
         { name: 'name', label: 'HOD Name', type: 'text' },
         { name: 'designation', label: 'Designation', type: 'text' },
