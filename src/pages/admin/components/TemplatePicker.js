@@ -501,6 +501,24 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     }
                 ]
             }
+        },
+        {
+            key: 'design_twenty_four',
+            name: "MOOC Courses Filterable Table",
+            description: "Table for MOOC courses with filtering by Batch, Branch, and Platform.",
+            demoData: {
+                title: "Student MOOC Achievements",
+                subtitle: "Online Certifications & Courses",
+                description: "<p>Explore the online certifications completed by our students across various platforms.</p>",
+                items: [
+                    { studentName: "Rohan Sharma", enrollmentNo: "123456", courseName: "Data Structures", platform: "NPTEL", score: "90", batch: "2024", branch: "CSE" },
+                    { studentName: "Priya Singh", enrollmentNo: "123457", courseName: "Machine Learning", platform: "Coursera", score: "95", batch: "2024", branch: "ECE" },
+                    { studentName: "Amit Verma", enrollmentNo: "123458", courseName: "Web Development", platform: "Udemy", score: "88", batch: "2025", branch: "CSE" },
+                    { studentName: "Sneha Gupta", enrollmentNo: "123459", courseName: "Python for Everybody", platform: "Coursera", score: "92", batch: "2024", branch: "CSE" },
+                    { studentName: "Vikram Malhotra", enrollmentNo: "123460", courseName: "Cloud Computing", platform: "NPTEL", score: "85", batch: "2025", branch: "IT" },
+                    { studentName: "Anjali Desai", enrollmentNo: "123461", courseName: "Digital Marketing", platform: "Udemy", score: "89", batch: "2024", branch: "MBA" }
+                ]
+            }
         }
     ];
 
