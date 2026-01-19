@@ -215,7 +215,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             demoData: {
                 title: "About The Department",
                 description: "Detailed description of the department's history and achievements.",
-                image: "https://via.placeholder.com/600x400",
+                image: "https://picsum.photos/200",
                 buttonText: "Learn More",
                 buttonLink: "#",
                 reverse: false

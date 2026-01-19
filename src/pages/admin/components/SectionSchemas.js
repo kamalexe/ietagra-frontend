@@ -106,7 +106,26 @@ const schemas = {
         }
     ],
     'design_seven': [
-        { name: 'tabs', label: 'Tabs Implementation (Complex JSON)', type: 'json_full' }
+        {
+            name: 'tabs',
+            label: 'Tabs List',
+            type: 'list',
+            itemSchema: [
+                { name: 'id', label: 'Tab ID (unique)', type: 'text' },
+                { name: 'label', label: 'Tab Label', type: 'text' },
+                { name: 'icon', label: 'Icon (e.g. FaHome)', type: 'text' },
+                {
+                    name: 'sections',
+                    label: 'Sections in Tab',
+                    type: 'list',
+                    itemSchema: [
+                        { name: 'templateKey', label: 'Template Key (e.g. hero_section)', type: 'text' },
+                        { name: 'id', label: 'Section ID (unique)', type: 'text' },
+                        { name: 'data', label: 'Section Data (JSON)', type: 'json' }
+                    ]
+                }
+            ]
+        }
     ],
     'design_eight': [
         { name: 'title', label: 'Title', type: 'text' },
@@ -167,17 +186,11 @@ const schemas = {
     ],
     'design_eleven': [
         { name: 'title', label: 'Title', type: 'text' },
-        {
-            name: 'cards',
-            label: 'Cards List',
-            type: 'list',
-            itemSchema: [
-                { name: 'title', label: 'Title', type: 'text' },
-                { name: 'description', label: 'Description', type: 'textarea' },
-                { name: 'image', label: 'Image', type: 'image' },
-                { name: 'link', label: 'Link', type: 'text' }
-            ]
-        }
+        { name: 'description', label: 'Description', type: 'textarea' },
+        { name: 'image', label: 'Image', type: 'image' },
+        { name: 'buttonText', label: 'Button Text', type: 'text' },
+        { name: 'buttonLink', label: 'Button Link', type: 'text' },
+        { name: 'reverse', label: 'Reverse Layout', type: 'select', options: ['true', 'false'] }
     ],
     'design_twelve': [
         { name: 'title', label: 'Title', type: 'text' },

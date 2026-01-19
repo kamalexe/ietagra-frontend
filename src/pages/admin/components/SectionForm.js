@@ -22,26 +22,26 @@ const SectionForm = ({ section, onClose, onSave }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleJsonChange = (name, value, isFull) => {
+  const handleJsonChange = (key, value, isFull, onUpdate) => {
     // Update raw input
-    setJsonInputs(prev => ({ ...prev, [name]: value }));
+    setJsonInputs(prev => ({ ...prev, [key]: value }));
 
     try {
       const parsed = JSON.parse(value);
       setJsonErrors(prev => {
         const newErrors = { ...prev };
-        delete newErrors[name];
+        delete newErrors[key];
         return newErrors;
       });
 
       // Update actual data if valid
       if (isFull) {
         setFormData(parsed);
-      } else {
-        setFormData(prev => ({ ...prev, [name]: parsed }));
+      } else if (onUpdate) {
+        onUpdate(parsed);
       }
     } catch (err) {
-      setJsonErrors(prev => ({ ...prev, [name]: 'Invalid JSON format' }));
+      setJsonErrors(prev => ({ ...prev, [key]: 'Invalid JSON format' }));
     }
   };
 
@@ -261,23 +261,33 @@ const SectionForm = ({ section, onClose, onSave }) => {
       case 'json':
       case 'json_full':
         const isFull = field.type === 'json_full';
-        const fieldName = isFull ? 'raw_full_json' : field.name;
+
+        // Use inputId as key for local state to support recursion
+        const jsonStateKey = inputId;
+
         // Determine value to show: explicit unsaved input -> OR stringified current data
         const currentDataValue = isFull ? formData : value;
         const stringified = JSON.stringify(currentDataValue === undefined ? {} : currentDataValue, null, 2);
-        const displayValue = jsonInputs[fieldName] !== undefined ? jsonInputs[fieldName] : stringified;
-        const error = jsonErrors[fieldName];
+        const displayValue = jsonInputs[jsonStateKey] !== undefined ? jsonInputs[jsonStateKey] : stringified;
+        const error = jsonErrors[jsonStateKey];
 
         return (
           <div className="col-span-6" key={index}>
-            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 font-mono text-xs uppercase tracking-wide">
+            <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 font-mono text-xs uppercase tracking-wide">
               {field.label}
             </label>
             <textarea
-              name={fieldName}
+              name={field.name}
+              id={inputId}
               rows={6}
               value={displayValue}
-              onChange={(e) => handleJsonChange(fieldName, e.target.value, isFull)}
+              onChange={(e) => {
+                if (isFull) {
+                  handleJsonChange(jsonStateKey, e.target.value, true, null);
+                } else {
+                  handleJsonChange(jsonStateKey, e.target.value, false, (val) => onFieldChange(field.name, val));
+                }
+              }}
               className={`mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm rounded-md py-2 px-3 border font-mono bg-gray-50 ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300'}`}
             />
             {error ? (
