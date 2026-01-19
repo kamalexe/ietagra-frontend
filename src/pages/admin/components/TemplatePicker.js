@@ -519,6 +519,26 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     { studentName: "Anjali Desai", enrollmentNo: "123461", courseName: "Digital Marketing", platform: "Udemy", score: "89", batch: "2024", branch: "MBA" }
                 ]
             }
+        },
+        {
+            key: 'design_twenty_five',
+            name: "Placement Records (Hall of Fame)",
+            description: "Dedicated section for placement records with stats, filters, and tiered display.",
+            demoData: {
+                title: "Placement Highlights",
+                subtitle: "Celebrating Success Stories",
+                description: "<p>Our students continue to shine in the corporate world with top-tier placements.</p>",
+                items: [
+                    { studentName: "Aarav Patel", batch: "2024", branch: "CSE", company: "Microsoft", package: "45 LPA", designation: "SDE I" },
+                    { studentName: "Sanya Mir", batch: "2024", branch: "CSE", company: "Amazon", package: "42 LPA", designation: "SDE" },
+                    { studentName: "Rahul Dravid", batch: "2024", branch: "ECE", company: "Qualcomm", package: "28 LPA", designation: "Hardware Engineer" },
+                    { studentName: "Ishita Sharma", batch: "2024", branch: "IT", company: "Adobe", package: "22 LPA", designation: "MTS" },
+                    { studentName: "Karan Singh", batch: "2024", branch: "ME", company: "Tata Motors", package: "8 LPA", designation: "GET" },
+                    { studentName: "Neha Gupta", batch: "2024", branch: "CSE", company: "TCS", package: "3.36 LPA", designation: "Systems Engineer" },
+                    { studentName: "Vikram Rathore", batch: "2024", branch: "EE", company: "Infosys", package: "3.6 LPA", designation: "Systems Engineer" },
+                    { studentName: "Pooja Verma", batch: "2024", branch: "Civil", company: "L&T", package: "6 LPA", designation: "GET" }
+                ]
+            }
         }
     ];
 
