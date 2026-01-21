@@ -556,6 +556,60 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     { title: "Patent Granted", studentName: "Dr. Smith & Team", date: "Apr 2024", batch: "2024", branch: "EE", description: "Granted a patent for a novel solar power inversion technique." }
                 ]
             }
+        },
+        {
+            key: 'design_twenty_seven',
+            name: "Animated Step Slider (Snabbit)",
+            description: "Mobile swiper and desktop scrolling stack animation.",
+            demoData: {
+                title1: "HOW SNABBIT",
+                title2: "WORKS?",
+                cards: [
+                    {
+                        stepLabel: "STEP 1",
+                        title: "LOREM IPSUM DOLOR",
+                        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.",
+                        image: "https://via.placeholder.com/600x400?text=Step+1"
+                    },
+                    {
+                        stepLabel: "STEP 2",
+                        title: "TEMPOR INCIDIDUNT",
+                        description: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.",
+                        image: "https://via.placeholder.com/600x400?text=Step+2"
+                    },
+                    {
+                        stepLabel: "STEP 3",
+                        title: "SED DO EIUSMOD",
+                        description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat.",
+                        image: "https://via.placeholder.com/600x400?text=Step+3"
+                    },
+                    {
+                        stepLabel: "STEP 4",
+                        title: "MAGNA ALIQUA",
+                        description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit.",
+                        image: "https://via.placeholder.com/600x400?text=Step+4"
+                    },
+                    {
+                        stepLabel: "STEP 5",
+                        title: "NULLA PARIATUR",
+                        description: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.",
+                        image: "https://via.placeholder.com/600x400?text=Step+5"
+                    },
+                    {
+                        stepLabel: "STEP 6",
+                        title: "SIT VOLUPTATEM",
+                        description: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sed quia.",
+                        image: "https://via.placeholder.com/600x400?text=Step+6"
+                    },
+                    {
+                        stepLabel: "STEP 7",
+                        title: "QUIA CONSEQUUNTUR",
+                        description: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur adipisci.",
+                        image: "https://via.placeholder.com/600x400?text=Step+7"
+                    }
+                ]
+
+            }
         }
     ];
 

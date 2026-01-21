@@ -3,13 +3,22 @@ import { Link } from 'react-router-dom';
 import PageService from '../../services/PageService';
 import DepartmentService from '../../services/DepartmentService';
 import FacultyService from '../../services/FacultyService';
+import EventService from '../../services/EventService';
+import ContactService from '../../services/ContactService';
+import StudentRecordService from '../../services/StudentRecordService';
+import FileService from '../../services/FileService';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState([
     { name: 'Total Pages', value: '0', change: '0', changeType: 'neutral' },
     { name: 'Departments', value: '0', change: '0', changeType: 'neutral' },
     { name: 'Faculty Members', value: '0', change: '0', changeType: 'neutral' },
-    { name: 'System Status', value: 'Active', change: '', changeType: 'neutral' },
+    { name: 'Active Events', value: '0', change: '0', changeType: 'neutral' },
+    { name: 'Contact Queries', value: '0', change: '0', changeType: 'neutral' },
+    { name: 'MOOC Completions', value: '0', change: '0', changeType: 'neutral' },
+    { name: 'Student Projects', value: '0', change: '0', changeType: 'neutral' },
+    { name: 'Achievements', value: '0', change: '0', changeType: 'neutral' },
+    { name: 'Uploaded Images', value: '0', change: '0', changeType: 'neutral' },
   ]);
   const [loading, setLoading] = useState(true);
 
@@ -17,18 +26,38 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch all data in parallel
-        const [pages, departments, faculty] = await Promise.all([
+        const [
+          pages,
+          departments,
+          faculty,
+          events,
+          contacts,
+          moocs,
+          projects,
+          achievements,
+          fileCount
+        ] = await Promise.all([
           PageService.getAllPages().catch(e => []),
           DepartmentService.getAllDepartments().catch(e => []),
-          FacultyService.getAllFaculty().catch(e => [])
+          FacultyService.getAllFaculty().catch(e => []),
+          EventService.getAllEvents().catch(e => []),
+          ContactService.getContacts().catch(e => []),
+          StudentRecordService.getRecords('mooc').catch(e => []),
+          StudentRecordService.getRecords('project').catch(e => []),
+          StudentRecordService.getRecords('achievement').catch(e => []),
+          FileService.getFileCount().catch(e => 0)
         ]);
 
         setStats([
           { name: 'Total Pages', value: pages.length.toString(), change: '-', changeType: 'neutral' },
           { name: 'Departments', value: departments.length.toString(), change: '-', changeType: 'neutral' },
           { name: 'Faculty Members', value: faculty.length.toString(), change: '-', changeType: 'neutral' },
-          // Just a placeholder for now as we don't have historical data to calc change
-          { name: 'System Status', value: 'Online', change: 'Stable', changeType: 'increase' }, // Green text
+          { name: 'Active Events', value: events.length.toString(), change: '-', changeType: 'neutral' },
+          { name: 'Contact Queries', value: contacts.length.toString(), change: '-', changeType: 'neutral' },
+          { name: 'MOOC Completions', value: moocs.length.toString(), change: '-', changeType: 'neutral' },
+          { name: 'Student Projects', value: projects.length.toString(), change: '-', changeType: 'neutral' },
+          { name: 'Achievements', value: achievements.length.toString(), change: '-', changeType: 'neutral' },
+          { name: 'Uploaded Images', value: fileCount.toString(), change: '-', changeType: 'neutral' },
         ]);
       } catch (error) {
         console.error("Dashboard fetch error:", error);
@@ -60,16 +89,16 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 px-5 py-3">
+            {/* <div className="bg-gray-50 px-5 py-3">
               <div className="text-sm">
                 <span className={`font-medium ${item.changeType === 'increase' ? 'text-green-600' :
                   item.changeType === 'decrease' ? 'text-red-600' : 'text-gray-600'
                   }`}>
                   {item.change}
                 </span>
-                {item.change && <span className="text-gray-500"> vs last fetch</span>}
+                {item.change !== '-' && <span className="text-gray-500"> vs last fetch</span>}
               </div>
-            </div>
+            </div> */}
           </div>
         ))}
       </div>
@@ -91,6 +120,9 @@ const AdminDashboard = () => {
             </Link>
             <Link to="/admin/faculty" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
               Manage Faculty
+            </Link>
+            <Link to="/admin/events" className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Manage Events
             </Link>
           </div>
         </div>

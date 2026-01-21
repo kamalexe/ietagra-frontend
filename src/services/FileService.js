@@ -30,6 +30,24 @@ const FileService = {
 
         const resData = await response.json();
         return resData.data; // Expected: { filename, url, relativePath }
+    },
+
+    async getFileCount() {
+        const { access_token } = getToken();
+        const response = await fetch(`${UPLOAD_URL}/stats`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': access_token ? `Bearer ${access_token}` : ''
+            }
+        });
+
+        if (!response.ok) {
+            return 0; // Graceful fallback
+        }
+
+        const resData = await response.json();
+        return resData?.data?.count || 0;
     }
 };
 

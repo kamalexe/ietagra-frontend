@@ -25,6 +25,7 @@ import DesignTwentyThree from './sections/DesignTwentyThree';
 import DesignTwentyFour from './sections/DesignTwentyFour';
 import DesignTwentyFive from './sections/DesignTwentyFive';
 import DesignTwentySix from './sections/DesignTwentySix';
+import DesignTwentySeven from './sections/DesignTwentySeven';
 import DesignFifteen from './sections/DesignFifteen';
 
 // Adapters for new documentation-based templates
@@ -86,6 +87,7 @@ const SectionRegistry = {
     design_twenty_four: DesignTwentyFour,
     design_twenty_five: DesignTwentyFive,
     design_twenty_six: DesignTwentySix,
+    design_twenty_seven: DesignTwentySeven,
 
     // New Aliases
     hero_section: HeroSection,

@@ -435,6 +435,21 @@ const schemas = {
             ]
         }
     ],
+    'design_twenty_seven': [
+        { name: 'title1', label: 'Main Title', type: 'text' },
+        { name: 'title2', label: 'Italic/Accent Title', type: 'text' },
+        {
+            name: 'cards',
+            label: 'Step Cards',
+            type: 'list',
+            itemSchema: [
+                { name: 'stepLabel', label: 'Step Label (e.g. STEP 1)', type: 'text' },
+                { name: 'title', label: 'Card Title', type: 'text' },
+                { name: 'description', label: 'Description', type: 'textarea' },
+                { name: 'image', label: 'Image URL', type: 'image' }
+            ]
+        }
+    ]
 };
 
 export default schemas;
