@@ -147,23 +147,23 @@ const AdmissionModal = ({ config }) => {
               {/* Navigation buttons */}
               {posterImages.length > 1 && (
                 <>
-                  <button
+                  <motion.button
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full"
                     onClick={prevPoster}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
                     <FaChevronLeft />
-                  </button>
+                  </motion.button>
 
-                  <button
+                  <motion.button
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full"
                     onClick={nextPoster}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
                     <FaChevronRight />
-                  </button>
+                  </motion.button>
 
                   {/* Pagination indicators */}
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">

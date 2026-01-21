@@ -28,7 +28,7 @@ function App() {
   const { access_token } = useSelector((state) => state.auth);
   return (
     <>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>

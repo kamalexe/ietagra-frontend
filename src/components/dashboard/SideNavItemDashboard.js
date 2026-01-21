@@ -18,8 +18,8 @@ const SideNavItemDashboard = ({ sidebarData }) => {
                 }`}
               onClick={() => handleItemClick(index)}
             >
-              <div class="flex items-center " >
-                <div class="mr-2">
+              <div className="flex items-center " >
+                <div className="mr-2">
                   {item.icon}
                 </div>
                 <span className="block whitespace-nowrap">{item.title}</span>

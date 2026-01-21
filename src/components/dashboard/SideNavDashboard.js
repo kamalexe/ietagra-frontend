@@ -65,7 +65,7 @@ const SideNavDashboard = () => {
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-6 h-6"
+                    className="w-6 h-6"
                 >
                     <path
                         stroke-linecap="round"
@@ -88,7 +88,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -112,7 +112,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -136,7 +136,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -160,7 +160,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -185,7 +185,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -208,7 +208,7 @@ const SideNavDashboard = () => {
 
     return (
         <section className="bg-white dark:bg-gray-900">
-            <div class="container mx-auto p-8">
+            <div className="container mx-auto p-8">
                 <div className="flex">
                     <div>
                         {/* Pass all SidebarData to the SideNavItemDashboard component */}

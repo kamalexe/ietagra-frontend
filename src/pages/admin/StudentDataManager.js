@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { PlusIcon, ArrowUpTrayIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, ArrowUpTrayIcon, TrashIcon, PencilIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
+import * as XLSX from 'xlsx';
 
 const CATEGORIES = [
     { id: 'gate', label: 'GATE Qualified' },
@@ -23,28 +24,52 @@ const StudentDataManager = () => {
     const { access_token } = useSelector((state) => state.auth);
     const [activeTab, setActiveTab] = useState('gate');
     const [records, setRecords] = useState([]);
+    const [filteredRecords, setFilteredRecords] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [uploading, setUploading] = useState(false);
+
+    // Search & Selection
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedIds, setSelectedIds] = useState([]);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editRecord, setEditRecord] = useState(null);
     const [formData, setFormData] = useState({});
 
+    // Upload & Validation State
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [previewData, setPreviewData] = useState([]);
+    const [uploading, setUploading] = useState(false);
+
     useEffect(() => {
         fetchRecords();
     }, [activeTab]);
 
+    useEffect(() => {
+        if (!searchQuery) {
+            setFilteredRecords(records);
+        } else {
+            const lowerQuery = searchQuery.toLowerCase();
+            const filtered = records.filter(r =>
+                r.studentName.toLowerCase().includes(lowerQuery) ||
+                (r.enrollmentNo && r.enrollmentNo.toLowerCase().includes(lowerQuery)) ||
+                (r.batch && r.batch.toLowerCase().includes(lowerQuery))
+            );
+            setFilteredRecords(filtered);
+        }
+        // Reset selection when filter changes to avoid confusion
+        setSelectedIds([]);
+    }, [searchQuery, records]);
+
     const downloadSample = () => {
         const headers = SAMPLE_HEADERS[activeTab] || ['studentName', 'batch', 'branch'];
-        const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + "Example Student,2024,CSE,123456";
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `${activeTab}_sample.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const ws = XLSX.utils.json_to_sheet([
+            headers.reduce((acc, curr) => ({ ...acc, [curr]: "" }), {}), // Empty row for structure
+            headers.reduce((acc, curr) => ({ ...acc, [curr]: `sample_${curr}` }), {}) // Sample row
+        ], { header: headers, skipHeader: false });
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Template");
+        XLSX.writeFile(wb, `${activeTab}_template.xlsx`);
     };
 
     const fetchRecords = async () => {
@@ -54,6 +79,8 @@ const StudentDataManager = () => {
                 headers: { Authorization: `Bearer ${access_token}` }
             });
             setRecords(res.data.data);
+            setFilteredRecords(res.data.data);
+            setSelectedIds([]);
         } catch (error) {
             console.error("Error fetching records:", error);
             alert("Failed to fetch records");
@@ -62,30 +89,72 @@ const StudentDataManager = () => {
         }
     };
 
-    const handleFileUpload = async (e) => {
+    const handleFileUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('category', activeTab);
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const bstr = evt.target.result;
+            const wb = XLSX.read(bstr, { type: 'binary' });
+            const wsname = wb.SheetNames[0];
+            const ws = wb.Sheets[wsname];
+            const data = XLSX.utils.sheet_to_json(ws);
+
+            // Validate Data
+            const validatedData = data.map(row => {
+                const isValid = row.studentName || row.StudentName || row.Name;
+                return { ...row, _isValid: !!isValid };
+            });
+
+            setPreviewData(validatedData);
+            setIsPreviewOpen(true);
+            e.target.value = null; // Reset input
+        };
+        reader.readAsBinaryString(file);
+    };
+
+    const confirmUpload = async () => {
+        const validRecords = previewData.filter(r => r._isValid).map(r => {
+            const { _isValid, ...rest } = r;
+            // Normalize name
+            const studentName = rest.studentName || rest.StudentName || rest.Name || 'Unknown';
+            const enrollmentNo = rest.enrollmentNo || rest.EnrollmentNo;
+            const batch = rest.batch || rest.Batch;
+            const branch = rest.branch || rest.Branch;
+            const { studentName: _sn, enrollmentNo: _en, batch: _ba, branch: _br, ...meta } = rest;
+
+            return {
+                studentName,
+                enrollmentNo,
+                batch,
+                branch,
+                metadata: meta
+            };
+        });
+
+        if (validRecords.length === 0) {
+            alert("No valid records to upload.");
+            return;
+        }
 
         setUploading(true);
         try {
-            await axios.post('http://localhost:5000/api/student-records/bulk-upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${access_token}`
-                }
+            await axios.post('http://localhost:5000/api/student-records/bulk-json', {
+                records: validRecords,
+                category: activeTab
+            }, {
+                headers: { Authorization: `Bearer ${access_token}` }
             });
-            alert("Upload Successful!");
+            alert(`Successfully uploaded ${validRecords.length} records!`);
+            setIsPreviewOpen(false);
+            setPreviewData([]);
             fetchRecords();
         } catch (error) {
-            console.error("Upload failed:", error);
-            alert("Upload Failed: " + (error.response?.data?.message || error.message));
+            console.error("Upload failed", error);
+            alert("Upload failed: " + (error.response?.data?.message || error.message));
         } finally {
             setUploading(false);
-            e.target.value = null; // Reset input
         }
     };
 
@@ -102,6 +171,55 @@ const StudentDataManager = () => {
         }
     };
 
+    const handleDeleteSelected = async () => {
+        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} records?`)) return;
+        try {
+            await axios.post('http://localhost:5000/api/student-records/delete-many', { ids: selectedIds }, {
+                headers: { Authorization: `Bearer ${access_token}` }
+            });
+            fetchRecords();
+            setSelectedIds([]);
+        } catch (error) {
+            console.error("Bulk delete failed", error);
+            alert("Bulk delete failed");
+        }
+    };
+
+    const handleExport = () => {
+        const dataToExport = selectedIds.length > 0
+            ? records.filter(r => selectedIds.includes(r._id))
+            : filteredRecords;
+
+        const flattenedData = dataToExport.map(r => ({
+            studentName: r.studentName,
+            batch: r.batch,
+            branch: r.branch,
+            enrollmentNo: r.enrollmentNo,
+            ...r.metadata // Flatten metadata
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(flattenedData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Students");
+        XLSX.writeFile(wb, `${activeTab}_export_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    };
+
+    const toggleSelection = (id) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(sid => sid !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === filteredRecords.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(filteredRecords.map(r => r._id));
+        }
+    };
+
     const handleSave = async (e) => {
         e.preventDefault();
         try {
@@ -111,10 +229,9 @@ const StudentDataManager = () => {
                 enrollmentNo: formData.enrollmentNo,
                 batch: formData.batch,
                 branch: formData.branch,
-                metadata: { ...formData.metadata } // Flattened in form, nested in payload
+                metadata: { ...formData.metadata }
             };
 
-            // Heuristic to put non-standard fields into metadata
             Object.keys(formData).forEach(key => {
                 if (!['studentName', 'enrollmentNo', 'batch', 'branch', 'metadata'].includes(key)) {
                     payload.metadata[key] = formData[key];
@@ -148,7 +265,7 @@ const StudentDataManager = () => {
                 enrollmentNo: record.enrollmentNo,
                 batch: record.batch,
                 branch: record.branch,
-                ...record.metadata // Spread metadata for easier editing
+                ...record.metadata
             });
         } else {
             setFormData({});
@@ -157,7 +274,6 @@ const StudentDataManager = () => {
     };
 
     const renderFormFields = () => {
-        // Generic fields + Category specific hints
         return (
             <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -195,7 +311,6 @@ const StudentDataManager = () => {
 
                 <div className="border-t pt-4">
                     <h4 className="text-sm font-bold text-gray-500 mb-2">Additional Data (Category Specific)</h4>
-                    {/* Dynamic Fields based on Category could go here, or just generic inputs for now */}
                     {activeTab === 'project' && (
                         <div className="grid grid-cols-1 gap-4">
                             <input placeholder="Project Name" className="border p-2 rounded"
@@ -240,10 +355,6 @@ const StudentDataManager = () => {
                                 value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
                         </div>
                     )}
-                    {/* Fallback for other metadata */}
-                    {!['project', 'gate', 'placement', 'achievement'].includes(activeTab) && (
-                        <p className="text-xs text-gray-500">For this category, upload via Excel or ensure Excel columns match required metadata.</p>
-                    )}
                 </div>
             </div>
         );
@@ -251,16 +362,29 @@ const StudentDataManager = () => {
 
     return (
         <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold text-gray-800">Student Data Management</h1>
-                <div className="flex gap-3">
-                    <button onClick={downloadSample} className="flex items-center px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition text-sm">
-                        <ArrowUpTrayIcon className="w-4 h-4 mr-2 rotate-180" />
-                        Download Template
+                <div className="flex flex-wrap gap-3">
+                    {selectedIds.length > 0 && (
+                        <>
+                            <button onClick={handleDeleteSelected} className="flex items-center px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm">
+                                <TrashIcon className="w-4 h-4 mr-2" />
+                                Delete ({selectedIds.length})
+                            </button>
+                        </>
+                    )}
+                    <button onClick={handleExport} className="flex items-center px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm">
+                        <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
+                        {selectedIds.length > 0 ? `Export (${selectedIds.length})` : 'Export All'}
                     </button>
-                    <label className={`flex items-center px-4 py-2 bg-green-600 text-white rounded cursor-pointer hover:bg-green-700 transition ${uploading ? 'opacity-50' : ''}`}>
-                        <ArrowUpTrayIcon className="w-5 h-5 mr-2" />
-                        {uploading ? "Uploading..." : "Import Excel"}
+
+                    <button onClick={downloadSample} className="flex items-center px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition text-sm">
+                        <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
+                        Template
+                    </button>
+                    <label className={`flex items-center px-4 py-2 bg-indigo-600 text-white rounded cursor-pointer hover:bg-indigo-700 transition ${uploading ? 'opacity-50' : ''}`}>
+                        <CloudArrowUpIcon className="w-5 h-5 mr-2" />
+                        Import Excel
                         <input type="file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileUpload} disabled={uploading} />
                     </label>
                     <button onClick={() => openModal()} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
@@ -270,22 +394,36 @@ const StudentDataManager = () => {
                 </div>
             </div>
 
-            {/* Tabs */}
-            <div className="border-b border-gray-200 mb-6">
-                <nav className="-mb-px flex space-x-8">
-                    {CATEGORIES.map(cat => (
-                        <button
-                            key={cat.id}
-                            onClick={() => setActiveTab(cat.id)}
-                            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === cat.id
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                }`}
-                        >
-                            {cat.label}
-                        </button>
-                    ))}
-                </nav>
+            {/* Filter & Tabs */}
+            <div className="bg-white p-4 rounded-lg shadow mb-6 space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center border-b border-gray-200 pb-2">
+                    <nav className="-mb-px flex space-x-6 overflow-x-auto w-full sm:w-auto">
+                        {CATEGORIES.map(cat => (
+                            <button
+                                key={cat.id}
+                                onClick={() => setActiveTab(cat.id)}
+                                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === cat.id
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                            >
+                                {cat.label}
+                            </button>
+                        ))}
+                    </nav>
+                    <div className="relative mt-2 sm:mt-0 w-full sm:w-64">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search records..."
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Table */}
@@ -293,54 +431,67 @@ const StudentDataManager = () => {
                 {loading ? (
                     <div className="flex justify-center items-center h-64 text-gray-500">Loading...</div>
                 ) : (
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batch</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {records.length > 0 ? (
-                                records.map((record) => (
-                                    <tr key={record._id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{record.studentName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.batch}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.branch}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                            {/* Quick peek at metadata */}
-                                            {Object.entries(record.metadata || {}).slice(0, 3).map(([k, v]) => (
-                                                <span key={k} className="mr-2 inline-block bg-gray-100 px-2 py-0.5 rounded text-xs">
-                                                    {k}: {v}
-                                                </span>
-                                            ))}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openModal(record)} className="text-blue-600 hover:text-blue-900 mr-4">
-                                                <PencilIcon className="w-5 h-5" />
-                                            </button>
-                                            <button onClick={() => handleDelete(record._id)} className="text-red-600 hover:text-red-900">
-                                                <TrashIcon className="w-5 h-5" />
-                                            </button>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left">
+                                            <input type="checkbox"
+                                                onChange={toggleSelectAll}
+                                                checked={filteredRecords.length > 0 && selectedIds.length === filteredRecords.length}
+                                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batch</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
-                                        No records found. Upload an Excel file or add manually.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredRecords.length > 0 ? (
+                                        filteredRecords.map((record) => (
+                                            <tr key={record._id} className={selectedIds.includes(record._id) ? "bg-blue-50" : "hover:bg-gray-50"}>
+                                                <td className="px-6 py-4">
+                                                    <input type="checkbox"
+                                                        checked={selectedIds.includes(record._id)}
+                                                        onChange={() => toggleSelection(record._id)}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{record.studentName}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.batch}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.branch}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                                                {Object.entries(record.metadata || {}).slice(0, 3).map(([k, v]) => (
+                                                    <span key={k} className="mr-2 inline-block bg-gray-100 px-2 py-0.5 rounded text-xs mb-1">
+                                                        {k}: {v}
+                                                    </span>
+                                                ))}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openModal(record)} className="text-blue-600 hover:text-blue-900 mr-4">
+                                                    <PencilIcon className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => handleDelete(record._id)} className="text-red-600 hover:text-red-900">
+                                                    <TrashIcon className="w-5 h-5" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                                                No records found.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                 )}
             </div>
 
-            {/* Modal */}
+            {/* Edit Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     <div className="flex items-center justify-center min-h-screen px-4 text-center sm:block sm:p-0">
@@ -363,6 +514,69 @@ const StudentDataManager = () => {
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Preview Modal for Upload */}
+            {isPreviewOpen && (
+                <div className="fixed inset-0 z-50 overflow-y-auto">
+                    <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                        </div>
+                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <h3 className="text-lg leading-6 font-medium text-gray-900">Upload Preview ({activeTab})</h3>
+                                <div className="mt-4 max-h-[60vh] overflow-y-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Batch</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Branch</th>
+                                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Metadata Preview</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {previewData.map((row, idx) => (
+                                                <tr key={idx} className={row._isValid ? "bg-green-50" : "bg-red-50"}>
+                                                    <td className="px-3 py-2 text-xs font-bold">
+                                                        {row._isValid ? <span className="text-green-600">Valid</span> : <span className="text-red-600">Invalid</span>}
+                                                    </td>
+                                                    <td className="px-3 py-2 text-sm">{row.studentName || row.StudentName || row.Name || '-'}</td>
+                                                    <td className="px-3 py-2 text-sm">{row.batch || row.Batch || '-'}</td>
+                                                    <td className="px-3 py-2 text-sm">{row.branch || row.Branch || '-'}</td>
+                                                    <td className="px-3 py-2 text-xs text-gray-500 truncate max-w-xs">
+                                                        {/* rough preview of other fields */}
+                                                        {JSON.stringify(row).slice(0, 50)}...
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button
+                                    type="button"
+                                    onClick={confirmUpload}
+                                    disabled={uploading}
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                                >
+                                    {uploading ? 'Uploading...' : `Confirm Import (${previewData.filter(r => r._isValid).length})`}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsPreviewOpen(false); setPreviewData([]); }}
+                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -25,7 +25,7 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
     const [editingSection, setEditingSection] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(null); // eslint-disable-line no-unused-vars
     const [notification, setNotification] = useState(null); // { message, type }
 
     useEffect(() => {
@@ -69,15 +69,23 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
         ));
     };
 
-    const deleteSection = (id) => {
-        if (window.confirm('Are you sure you want to delete this section?')) {
-            setSections(sections.filter(sec => sec.id !== id));
-        }
+    const deleteSection = (e, id) => {
+        e.stopPropagation();
+        console.log('Attempting to delete section:', id);
+        // Temporary bypass confirm for debugging
+        // if (window.confirm('Are you sure you want to delete this section?')) {
+        const sectionExists = sections.some(sec => sec.id === id);
+        console.log('Section exists in state checking:', sectionExists);
+
+        const newSections = sections.filter(sec => sec.id !== id);
+        console.log('Sections before:', sections.length, 'After:', newSections.length);
+        setSections(newSections);
+    // }
     };
 
     const handleAddSection = (templateKey, variant = null, initialData = {}) => {
         const newSection = {
-            id: `sec-${Date.now()}`,
+            id: `sec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             templateKey,
             title: templateKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) + (variant ? ` (${variant})` : ''),
             visible: true,
@@ -216,7 +224,7 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                                                         <PencilIcon className="h-5 w-5" />
                                                     </button>
                                                     <button
-                                                        onClick={() => deleteSection(section.id)}
+                                                        onClick={(e) => deleteSection(e, section.id)}
                                                         className="p-1.5 rounded-md hover:bg-red-50 text-red-400 hover:text-red-600"
                                                         title="Delete Section"
                                                     >

@@ -3,21 +3,42 @@ import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/2
 import SectionRegistry from '../../../components/PageBuilder/SectionRegistry';
 import DepartmentService from '../../../services/DepartmentService';
 import FacultyService from '../../../services/FacultyService';
+import StudentRecordService from '../../../services/StudentRecordService';
 
 const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [departments, setDepartments] = useState([]);
     const [faculty, setFaculty] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [moocs, setMoocs] = useState([]);
+    const [placements, setPlacements] = useState([]);
+    const [achievements, setAchievements] = useState([]);
 
     React.useEffect(() => {
         const fetchData = async () => {
             try {
-                const [deptData, facultyData] = await Promise.all([
+                const [deptData, facultyData, projectData, moocData, placementData, achievementData] = await Promise.all([
                     DepartmentService.getAllDepartments(),
-                    FacultyService.getAllFaculty()
+                    FacultyService.getAllFaculty(),
+                    StudentRecordService.getRecords('project'),
+                    StudentRecordService.getRecords('mooc'),
+                    StudentRecordService.getRecords('placement'),
+                    StudentRecordService.getRecords('achievement')
                 ]);
                 setDepartments(deptData);
                 setFaculty(facultyData);
+
+                // Helper to flatten metadata
+                const processRecords = (records) => records.map(record => ({
+                    ...record,
+                    ...record.metadata
+                }));
+
+                setProjects(processRecords(projectData));
+                setMoocs(processRecords(moocData));
+                setPlacements(processRecords(placementData));
+                setAchievements(processRecords(achievementData));
+
             } catch (error) {
                 console.error("Failed to fetch data", error);
             }
@@ -39,6 +60,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
         if (!currentDept) return true; // Show all if no dept context
         return f.department === currentDept.name || f.department.includes(currentDept.name) || currentDept.name.includes(f.department);
     });
+
 
     const templates = [
         {
@@ -344,7 +366,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     {
                         title: "Training & Placement Cell",
                         description: "Enhance your employability with our dedicated training programs, workshops, and placement assistance.",
-                        link: "/tnpcell",
+                        link: "/tandpcell",
                         icon: "📈",
                         gradient: "from-yellow-500 to-orange-400",
                         target: "_blank"
@@ -392,7 +414,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             demoData: {
                 title: "Student Projects",
                 description: "List of major projects by final year students.",
-                projects: [
+                projects: projects.length > 0 ? projects : [
                     {
                         batch: "2024",
                         studentName: "John Doe",
@@ -510,7 +532,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 title: "Student MOOC Achievements",
                 subtitle: "Online Certifications & Courses",
                 description: "<p>Explore the online certifications completed by our students across various platforms.</p>",
-                items: [
+                items: moocs.length > 0 ? moocs : [
                     { studentName: "Rohan Sharma", enrollmentNo: "123456", courseName: "Data Structures", platform: "NPTEL", score: "90", batch: "2024", branch: "CSE" },
                     { studentName: "Priya Singh", enrollmentNo: "123457", courseName: "Machine Learning", platform: "Coursera", score: "95", batch: "2024", branch: "ECE" },
                     { studentName: "Amit Verma", enrollmentNo: "123458", courseName: "Web Development", platform: "Udemy", score: "88", batch: "2025", branch: "CSE" },
@@ -528,7 +550,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 title: "Placement Highlights",
                 subtitle: "Celebrating Success Stories",
                 description: "<p>Our students continue to shine in the corporate world with top-tier placements.</p>",
-                items: [
+                items: placements.length > 0 ? placements : [
                     { studentName: "Aarav Patel", batch: "2024", branch: "CSE", company: "Microsoft", package: "45 LPA", designation: "SDE I" },
                     { studentName: "Sanya Mir", batch: "2024", branch: "CSE", company: "Amazon", package: "42 LPA", designation: "SDE" },
                     { studentName: "Rahul Dravid", batch: "2024", branch: "ECE", company: "Qualcomm", package: "28 LPA", designation: "Hardware Engineer" },
@@ -548,7 +570,15 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 title: "Hall of Fame",
                 subtitle: "Recognizing Excellence",
                 description: "<p>A timeline of our students' remarkable achievements in various fields.</p>",
-                items: [
+                // Fetch Data from Achievement Model Dynamically
+                items: achievements.length > 0 ? achievements.map(item => ({
+                    title: item.title,
+                    studentName: item.studentName,
+                    date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+                    batch: item.batch,
+                    branch: item.branch,
+                    description: item.description
+                })) : [
                     { title: "Smart India Hackathon Winner", studentName: "Team Innovators", date: "Sep 2024", batch: "2024", branch: "CSE", description: "Won the first prize in the Smart India Hackathon 2024 for developing an AI-based solution for agriculture." },
                     { title: "Best Research Paper", studentName: "Priya Sharma", date: "Aug 2024", batch: "2024", branch: "ECE", description: "Awarded Best Paper at the International Conference on Signal Processing for research on 6G communication." },
                     { title: "Gold Medal in Athletics", studentName: "Rahul Singh", date: "Jul 2024", batch: "2025", branch: "ME", description: "Secured Gold Medal in 100m sprint at the Inter-University Sports Meet." },
@@ -562,32 +592,32 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             name: "Animated Step Slider (Snabbit)",
             description: "Mobile swiper and desktop scrolling stack animation.",
             demoData: {
-                title1: "HOW SNABBIT",
-                title2: "WORKS?",
+                title1: "Hi! Its Look",
+                title2: "Cool Na?",
                 cards: [
                     {
                         stepLabel: "STEP 1",
                         title: "LOREM IPSUM DOLOR",
                         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.",
-                        image: "https://via.placeholder.com/600x400?text=Step+1"
+                        image: "https://picsum.photos/200"
                     },
                     {
                         stepLabel: "STEP 2",
                         title: "TEMPOR INCIDIDUNT",
                         description: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.",
-                        image: "https://via.placeholder.com/600x400?text=Step+2"
+                        image: "https://picsum.photos/200"
                     },
                     {
                         stepLabel: "STEP 3",
                         title: "SED DO EIUSMOD",
                         description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat.",
-                        image: "https://via.placeholder.com/600x400?text=Step+3"
+                        image: "https://picsum.photos/200"
                     },
                     {
                         stepLabel: "STEP 4",
                         title: "MAGNA ALIQUA",
                         description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit.",
-                        image: "https://via.placeholder.com/600x400?text=Step+4"
+                        image: "https://picsum.photos/200"
                     },
                     {
                         stepLabel: "STEP 5",
