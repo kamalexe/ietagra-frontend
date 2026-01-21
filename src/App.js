@@ -17,6 +17,7 @@ import DepartmentsList from './pages/admin/DepartmentsList';
 import FacultyList from './pages/admin/FacultyList';
 import PageBuilder from './pages/admin/PageBuilder';
 import HomeConfig from './pages/admin/HomeConfig';
+import FooterConfig from './pages/admin/FooterConfig';
 import StudentDataManager from './pages/admin/StudentDataManager';
 import EventsList from './pages/admin/EventsList';
 import ContactSubmissions from './pages/admin/ContactSubmissions';
@@ -44,6 +45,7 @@ function App() {
             <Route path="pages/:slug" element={<PageBuilder />} />
             <Route path="events" element={<EventsList />} />
             <Route path="events-config" element={<PageBuilder slug="events" />} />
+            <Route path="footer" element={<FooterConfig />} />
           </Route>
 
           {/* Main Site Routes */}

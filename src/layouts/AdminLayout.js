@@ -8,7 +8,8 @@ import {
   Cog6ToothIcon,
   Squares2X2Icon,
   CalendarIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  SwatchIcon
 } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
 
@@ -31,6 +32,7 @@ const AdminLayout = () => {
     { name: 'Events Config', href: '/admin/events-config', icon: CalendarIcon },
     { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon }, // Reusing icon for now
     { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon },
+    { name: 'Footer', href: '/admin/footer', icon: SwatchIcon },
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
   ];
 
