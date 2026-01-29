@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import EventService from '../../services/EventService';
 import { getToken } from '../../services/LocalStorageService';
-import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon, PlusIcon, ShareIcon } from '@heroicons/react/24/outline';
 
 const EventsList = () => {
     const [events, setEvents] = useState([]);
@@ -10,6 +10,39 @@ const EventsList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({ title: '', date: '', place: '', description: '', image: '' });
     const [editingId, setEditingId] = useState(null);
+    const [activeShareMenu, setActiveShareMenu] = useState(null);
+
+    const shareEvent = (event, platform) => {
+        const backendUrl = 'http://localhost:5000/api'; // Or use process.env.REACT_APP_API_BASE_URL
+        const shareBridgeUrl = `${backendUrl}/events/share/event/${event._id}`;
+
+        // Helper to strip HTML and get clean text
+        const stripHtml = (html) => {
+            const tmp = document.createElement("DIV");
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || "";
+        };
+
+        const cleanDescription = stripHtml(event.description);
+        const shortDescription = cleanDescription.length > 100
+            ? cleanDescription.substring(0, 100) + '...'
+            : cleanDescription;
+
+        const introMessage = "Check out our new event: ";
+        const title = event.title;
+        const text = encodeURIComponent(`${introMessage}${title}\n\n${shortDescription}`);
+        const url = encodeURIComponent(shareBridgeUrl);
+
+        const shareLinks = {
+            whatsapp: `https://api.whatsapp.com/send?text=${text}%0A%0A${url}`,
+            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+            twitter: `https://twitter.com/intent/tweet?text=${text}&url=${url}`
+        };
+
+        window.open(shareLinks[platform], '_blank');
+        setActiveShareMenu(null);
+    };
 
     const loadEvents = async () => {
         try {
@@ -207,12 +240,44 @@ const EventsList = () => {
                                     {event.place}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onClick={() => handleOpenModal(event)} className="text-indigo-600 hover:text-indigo-900 mr-4">
-                                        <PencilIcon className="h-5 w-5" />
-                                    </button>
-                                    <button onClick={() => handleDelete(event._id)} className="text-red-600 hover:text-red-900">
-                                        <TrashIcon className="h-5 w-5" />
-                                    </button>
+                                    <div className="flex items-center justify-end space-x-3">
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setActiveShareMenu(activeShareMenu === event._id ? null : event._id)}
+                                                className="text-gray-400 hover:text-blue-600 transition-colors"
+                                                title="Share Event"
+                                            >
+                                                <ShareIcon className="h-5 w-5" />
+                                            </button>
+
+                                            {activeShareMenu === event._id && (
+                                                <>
+                                                    <div className="fixed inset-0 z-10" onClick={() => setActiveShareMenu(null)}></div>
+                                                    <div className="absolute right-0 mt-2 w-40 rounded-xl bg-white shadow-2xl border border-gray-100 py-2 z-20 animate-fade-in origin-top-right">
+                                                        <button onClick={() => shareEvent(event, 'whatsapp')} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2 transition-colors">
+                                                            <span className="w-2 h-2 rounded-full bg-green-500"></span> WhatsApp
+                                                        </button>
+                                                        <button onClick={() => shareEvent(event, 'linkedin')} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 transition-colors">
+                                                            <span className="w-2 h-2 rounded-full bg-blue-600"></span> LinkedIn
+                                                        </button>
+                                                        <button onClick={() => shareEvent(event, 'facebook')} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-800 flex items-center gap-2 transition-colors">
+                                                            <span className="w-2 h-2 rounded-full bg-blue-700"></span> Facebook
+                                                        </button>
+                                                        <button onClick={() => shareEvent(event, 'twitter')} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-black flex items-center gap-2 transition-colors">
+                                                            <span className="w-2 h-2 rounded-full bg-black"></span> Twitter (X)
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+
+                                        <button onClick={() => handleOpenModal(event)} className="text-indigo-600 hover:text-indigo-900">
+                                            <PencilIcon className="h-5 w-5" />
+                                        </button>
+                                        <button onClick={() => handleDelete(event._id)} className="text-red-600 hover:text-red-900">
+                                            <TrashIcon className="h-5 w-5" />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
