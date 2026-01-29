@@ -7,6 +7,10 @@ const DesignEighteen = ({
         { value: "12+", label: "Modern Labs" },
         { value: "95%", label: "Placement Rate" },
         { value: "8+", label: "Research Areas" }
+    ],
+    buttons = [
+        { text: "Explore Department", link: "#about", variant: "primary" },
+        { text: "Contact Us", link: "#contact", variant: "secondary" }
     ]
 }) => {
     return (
@@ -42,7 +46,7 @@ const DesignEighteen = ({
                     <div className="flex justify-center mb-6">
                         <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full" style={{ transform: 'rotateY(142.411deg)' }}>
                             <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 640 512" className="text-4xl md:text-5xl text-white" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M255.03 261.65c6.25 6.25 16.38 6.25 22.63 0l11.31-11.31c6.25-6.25 6.25-16.38 0-22.63L253.25 192l35.71-35.72c6.25-6.25 6.25-16.38 0-22.63l-11.31-11.31c-6.25-6.25-16.38-6.25-22.63 0l-58.34 58.34c-6.25 6.25-6.25 16.38 0 22.63l58.35 58.34zm96.01-11.3l11.31 11.31c6.25 6.25 16.38 6.25 22.63 0l58.34-58.34c6.25-6.25 6.25-16.38 0-22.63l-58.34-58.34c-6.25-6.25-16.38-6.25-22.63 0l-11.31 11.31c-6.25 6.25-6.25 16.38 0 22.63L386.75 192l-35.71 35.72c-6.25 6.25-6.25 16.38 0 22.63zM624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"></path>
+                                <path d="M255.03 261.65c6.25 6.25 16.38 6.25 22.63 0l11.31-11.31c6.25-6.25 6.25-16.38 0-22.63L253.25 192l35.71-35.72c6.25-6.25 6.25-16.38 0-22.63l-11.31-11.31c-6.25-6.25-16.38-6.25-22.63 0l-58.34 58.34c-6.25 6.25-6.25 16.38 0 22.63l58.35 58.34zm96.01-11.3l11.31 11.31c6.25 6.25 16.38 6.25 22.63 0l58.34-58.34c6.25-6.25 6.25-16.38 0-22.63l-58.34-58.34c-6.25-6.25-16.38-6.25-22.63 0l-11.31 11.31c-6.25 6.25-6.25 16.38 0-22.63L386.75 192l-35.71 35.72c-6.25 6.25-6.25 16.38 0 22.63zM624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"></path>
                             </svg>
                         </div>
                     </div>
@@ -51,18 +55,21 @@ const DesignEighteen = ({
                     <p className="text-base sm:text-lg md:text-xl opacity-90 mb-8 max-w-3xl mx-auto px-2">{subtitle}</p>
                     
                     <div className="flex flex-col sm:flex-row justify-center gap-5">
-                        <a href="#about" className="px-6 py-3 bg-white text-blue-800 rounded-lg font-medium transition-all duration-300 shadow-lg text-base inline-flex items-center justify-center space-x-2 shadow-sm hover:shadow-xl">
-                            <span>Explore Department</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                            </svg>
-                        </a>
-                        <a href="#contact" className="px-6 py-3 bg-transparent border-2 border-white/70 backdrop-blur-sm text-white rounded-lg font-medium transition-all duration-300 shadow-lg text-base inline-flex items-center justify-center space-x-2 mt-3 sm:mt-0 hover:bg-white/10">
-                            <span>Contact Us</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                            </svg>
-                        </a>
+                        {buttons && buttons.map((button, index) => (
+                            <a
+                                key={index}
+                                href={button.link}
+                                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg text-base inline-flex items-center justify-center space-x-2 ${button.variant === 'primary'
+                                        ? 'bg-white text-blue-800 shadow-sm hover:shadow-xl'
+                                        : 'bg-transparent border-2 border-white/70 backdrop-blur-sm text-white hover:bg-white/10'
+                                    } ${index > 0 ? 'mt-3 sm:mt-0' : ''}`}
+                            >
+                                <span>{button.text}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            </a>
+                        ))}
                     </div>
 
                     <div className="mt-12 grid grid-cols-3 gap-6 max-w-lg mx-auto">

@@ -458,6 +458,10 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                     { value: "12+", label: "Modern Labs" },
                     { value: "95%", label: "Placement Rate" },
                     { value: "8+", label: "Research Areas" }
+                ],
+                buttons: [
+                    { text: "Explore Department", link: "#about", variant: "primary" },
+                    { text: "Contact Us", link: "#contact", variant: "secondary" }
                 ]
             }
         },
@@ -638,7 +642,37 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                         image: "https://via.placeholder.com/600x400?text=Step+7"
                     }
                 ]
-
+            }
+        },
+        {
+            key: 'design_twenty_eight',
+            name: 'Director\'s Message',
+            description: 'Professional leadership message section with image and styled content.',
+            demoData: {
+                title: "Message from the Director",
+                name: "Prof. V. Kamakoti",
+                designation: "Director - IIT Madras",
+                image: "/sites/default/files/2022-01/Director-Best_Resized_0.png",
+                greeting: "Greetings to all!",
+                content: `<p>It is with great pleasure that I write this in the capacity of the Director of this prestigious institute. I thank all the faculty members, students, and staff of IIT Madras for their continuing efforts every day in keeping this distinguished institute of national importance at the top of the ranking scales, year after year.</p>
+                <p>The role of a campus in ensuring quality learning is of great significance and IIT Madras, which already has a world-class campus, will now ensure it is further infused with the spirit of inclusivity, by celebrating the pluralism of cultures, nationalities, and personalities in a global world. We envision our campus to reflect the ethos of innovation, entrepreneurship, and dynamism of spirit.</p>
+                <p>Industry should be able to sit up and take notice of the impact we make and we should strive to ensure that our students continue to become part of global corporations and governments alike. As is said - change should be from within the system by being part of it and not exclusive to the system itself.</p>`,
+                themeColor: "blue-600"
+            }
+        },
+        {
+            key: 'design_twenty_nine',
+            name: 'Announcement Board',
+            description: 'Scrolling marquee for latest notices and updates.',
+            demoData: {
+                title: "Announcements",
+                announcements: [
+                    { text: "Kashi Tamil Sangamam (KTS) 4.0", link: "https://kashitamil.bhu.edu.in" },
+                    { text: "OPD Online Booking [Click here]", link: "https://bhuopd.com/" },
+                    { text: "Admission Open for Session 2026-27", link: "#" }
+                ],
+                themeColor: "bg-red-600",
+                speed: "30s"
             }
         }
     ];

@@ -307,13 +307,24 @@ const schemas = {
     ],
     'design_eighteen': [
         { name: 'title', label: 'Title', type: 'text' },
+        { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
         {
-            name: 'faqItems',
-            label: 'FAQ Items',
+            name: 'stats',
+            label: 'Statistics',
             type: 'list',
             itemSchema: [
-                { name: 'question', label: 'Question', type: 'text' },
-                { name: 'answer', label: 'Answer', type: 'textarea' }
+                { name: 'value', label: 'Value (e.g. 12+)', type: 'text' },
+                { name: 'label', label: 'Label', type: 'text' }
+            ]
+        },
+        {
+            name: 'buttons',
+            label: 'Buttons List',
+            type: 'list',
+            itemSchema: [
+                { name: 'text', label: 'Button Text', type: 'text' },
+                { name: 'link', label: 'Link URL', type: 'text' },
+                { name: 'variant', label: 'Style Variant', type: 'select', options: ['primary', 'secondary'] }
             ]
         }
     ],
@@ -449,6 +460,29 @@ const schemas = {
                 { name: 'image', label: 'Image URL', type: 'image' }
             ]
         }
+    ],
+    'design_twenty_eight': [
+        { name: 'title', label: 'Section Title', type: 'text' },
+        { name: 'name', label: 'Director Name', type: 'text' },
+        { name: 'designation', label: 'Designation', type: 'text' },
+        { name: 'image', label: 'Director Image', type: 'image' },
+        { name: 'greeting', label: 'Greeting Text', type: 'text' },
+        { name: 'content', label: 'Message Content (HTML)', type: 'textarea' },
+        { name: 'themeColor', label: 'Theme Color Class (e.g. blue-600)', type: 'text' }
+    ],
+    'design_twenty_nine': [
+        { name: 'title', label: 'Marquee Title', type: 'text' },
+        {
+            name: 'announcements',
+            label: 'Announcements List',
+            type: 'list',
+            itemSchema: [
+                { name: 'text', label: 'Announcement Text', type: 'text' },
+                { name: 'link', label: 'Link URL', type: 'text' }
+            ]
+        },
+        { name: 'themeColor', label: 'Theme Background Color (Tailwind class, e.g. bg-red-600)', type: 'text' },
+        { name: 'speed', label: 'Animation Speed (e.g. 20s)', type: 'text' }
     ]
 };
 
