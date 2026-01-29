@@ -64,6 +64,17 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
 
     const templates = [
         {
+            key: 'design_thirty',
+            name: 'University Media Gallery (Premium)',
+            description: 'Advanced media showcase with albums, lightbox, and video support.',
+            demoData: {
+                title: "Our Memories",
+                subtitle: "Glimpses into the vibrant campus life and historical events of our university.",
+                limit: 6,
+                category: "All"
+            }
+        },
+        {
             key: 'design_twenty',
             name: 'Events Grid (Tile Layout)',
             description: 'Grid of event cards with image filters and detailed view.',

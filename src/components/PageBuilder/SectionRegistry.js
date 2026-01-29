@@ -28,6 +28,7 @@ import DesignTwentySix from './sections/DesignTwentySix';
 import DesignTwentySeven from './sections/DesignTwentySeven';
 import DesignTwentyEight from './sections/DesignTwentyEight';
 import DesignTwentyNine from './sections/DesignTwentyNine';
+import DesignThirty from './sections/DesignThirty';
 import DesignFifteen from './sections/DesignFifteen';
 
 // Adapters for new documentation-based templates
@@ -92,6 +93,7 @@ const SectionRegistry = {
     design_twenty_seven: DesignTwentySeven,
     design_twenty_eight: DesignTwentyEight,
     design_twenty_nine: DesignTwentyNine,
+    design_thirty: DesignThirty,
 
     // New Aliases
     hero_section: HeroSection,
@@ -101,7 +103,8 @@ const SectionRegistry = {
     vision_mission: VisionMission,
     stats_grid: StatsGrid,
     director_message: DesignTwentyEight,
-    announcement_board: DesignTwentyNine
+    announcement_board: DesignTwentyNine,
+    university_media_gallery: DesignThirty
 };
 
 export default SectionRegistry;

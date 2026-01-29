@@ -10,7 +10,9 @@ import {
   CalendarIcon,
   EnvelopeIcon,
   SwatchIcon,
-  MapIcon
+  MapIcon,
+  PhotoIcon,
+  FolderIcon
 } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
 
@@ -31,6 +33,8 @@ const AdminLayout = () => {
     { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon },
     { name: 'Events', href: '/admin/events', icon: CalendarIcon },
     { name: 'Events Config', href: '/admin/events-config', icon: CalendarIcon },
+    { name: 'Gallery', href: '/admin/gallery', icon: PhotoIcon },
+    { name: 'Albums', href: '/admin/albums', icon: FolderIcon },
     { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon }, // Reusing icon for now
     { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon },
     { name: 'Footer', href: '/admin/footer', icon: SwatchIcon },

@@ -1,15 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon, PlayCircleIcon, PhotoIcon, FolderIcon } from '@heroicons/react/24/outline';
+import AlbumService from '../../../services/AlbumService';
 
-const DesignTwentyThree = ({ title, subtitle, layout = 'grid', albums = [] }) => {
+const DesignTwentyThree = ({ title, subtitle, layout = 'grid', albums: initialAlbums = [] }) => {
+    const [albums, setAlbums] = useState(initialAlbums);
+    const [loading, setLoading] = useState(initialAlbums.length === 0);
     const [currentAlbum, setCurrentAlbum] = useState(null);
     const [lightboxMedia, setLightboxMedia] = useState(null);
 
-    // If layout is 'albums', we start at root (album list). Otherwise, or if an album is selected, we show media.
-    // If layout is NOT 'albums', we treat all media from all albums as one big gallery (or expect a flat list if schema allowed, but for now we flatten albums).
-    
+    useEffect(() => {
+        if (initialAlbums.length === 0) {
+            const fetchAlbums = async () => {
+                setLoading(true);
+                try {
+                    const data = await AlbumService.getAlbums();
+                    setAlbums(data);
+                } catch (error) {
+                    console.error("DesignTwentyThree: Failed to fetch albums", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchAlbums();
+        } else {
+            setAlbums(initialAlbums);
+            setLoading(false);
+        }
+    }, [initialAlbums]);
+
     // Flatten media for non-album view or simple gallery usage
     const allMedia = albums.reduce((acc, album) => [...acc, ...(album.media || [])], []);
     
@@ -22,6 +42,8 @@ const DesignTwentyThree = ({ title, subtitle, layout = 'grid', albums = [] }) =>
 
     const openLightbox = (media) => setLightboxMedia(media);
     const closeLightbox = () => setLightboxMedia(null);
+
+    if (loading) return <div className="py-20 text-center">Loading gallery...</div>;
 
     return (
         <section className="py-16 bg-white overflow-hidden">

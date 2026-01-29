@@ -21,10 +21,13 @@ import FooterConfig from './pages/admin/FooterConfig';
 import NavbarConfig from './pages/admin/NavbarConfig';
 import StudentDataManager from './pages/admin/StudentDataManager';
 import EventsList from './pages/admin/EventsList';
+import GalleryList from './pages/admin/GalleryList';
+import AlbumList from './pages/admin/AlbumList';
 import ContactSubmissions from './pages/admin/ContactSubmissions';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import DynamicPage from './pages/DynamicPage';
+import GalleryPage from './pages/GalleryPage';
 
 function App() {
   const { access_token } = useSelector((state) => state.auth);
@@ -48,6 +51,10 @@ function App() {
             <Route path="events-config" element={<PageBuilder slug="events" />} />
             <Route path="footer" element={<FooterConfig />} />
             <Route path="navbar" element={<NavbarConfig />} />
+            <Route path="gallery" element={<GalleryList />} />
+            <Route path="albums" element={<AlbumList />} />
+            <Route path="settings" element={<div>Settings Page</div>} />
+            <Route path="settings" element={<div>Settings Page</div>} />
           </Route>
 
           {/* Main Site Routes */}
@@ -66,7 +73,7 @@ function App() {
             <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/profile" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/:slug" element={<DynamicPage />} />
-            <Route path="/:slug" element={<DynamicPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
             <Route path="*" element={<h1>Error 404 Page not found !!</h1>} />
           </Route>
         </Routes>
