@@ -9,7 +9,8 @@ import {
   Squares2X2Icon,
   CalendarIcon,
   EnvelopeIcon,
-  SwatchIcon
+  SwatchIcon,
+  MapIcon
 } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
 
@@ -33,6 +34,7 @@ const AdminLayout = () => {
     { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon }, // Reusing icon for now
     { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon },
     { name: 'Footer', href: '/admin/footer', icon: SwatchIcon },
+    { name: 'Navbar', href: '/admin/navbar', icon: MapIcon },
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
   ];
 
