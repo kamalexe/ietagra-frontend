@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import GalleryService from '../../services/GalleryService';
 import { getToken } from '../../services/LocalStorageService';
+import { useSelector } from 'react-redux';
+import DepartmentService from '../../services/DepartmentService';
 import { PencilIcon, TrashIcon, PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const GalleryList = () => {
@@ -11,9 +13,11 @@ const GalleryList = () => {
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [mediaFiles, setMediaFiles] = useState([]);
     const [loadingMedia, setLoadingMedia] = useState(false);
-    const [formData, setFormData] = useState({ title: '', category: 'Others', description: '', imageUrl: '' });
+    const [formData, setFormData] = useState({ title: '', category: 'Others', description: '', imageUrl: '', department: '' });
     const [editingId, setEditingId] = useState(null);
     const [uploading, setUploading] = useState(false);
+    const [departments, setDepartments] = useState([]);
+    const { role, department } = useSelector(state => state.user);
 
     const categories = ['Events', 'Campus', 'Academic', 'Sports', 'Others'];
 
@@ -63,7 +67,19 @@ const GalleryList = () => {
 
     useEffect(() => {
         loadImages();
-    }, []);
+        if (role === 'admin') {
+            loadDepartments();
+        }
+    }, [role]);
+
+    const loadDepartments = async () => {
+        try {
+            const data = await DepartmentService.getAllDepartments();
+            setDepartments(data);
+        } catch (err) {
+            console.error("Failed to load departments:", err);
+        }
+    };
 
     const handleOpenModal = (image = null) => {
         if (image) {
@@ -72,11 +88,18 @@ const GalleryList = () => {
                 title: image.title,
                 category: image.category,
                 description: image.description || '',
-                imageUrl: image.imageUrl
+                imageUrl: image.imageUrl,
+                department: image.department?._id || image.department || ''
             });
         } else {
             setEditingId(null);
-            setFormData({ title: '', category: 'Others', description: '', imageUrl: '' });
+            setFormData({
+                title: '',
+                category: 'Others',
+                description: '',
+                imageUrl: '',
+                department: role === 'department_admin' ? department?._id : ''
+            });
         }
         setIsModalOpen(true);
     };
@@ -226,6 +249,22 @@ const GalleryList = () => {
                                                 ))}
                                             </select>
                                         </div>
+                                        {role === 'admin' ? (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Department</label>
+                                                <select name="department" value={formData.department} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                    <option value="">General / All Departments</option>
+                                                    {departments.map(dept => (
+                                                        <option key={dept._id} value={dept._id}>{dept.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Department</label>
+                                                <input type="text" readOnly value={department?.name || 'My Department'} className="mt-1 block w-full border border-gray-200 bg-gray-50 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm cursor-not-allowed" />
+                                            </div>
+                                        )}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Image</label>
                                             <div className="mt-1 flex items-center space-x-4">

@@ -5,7 +5,12 @@ const API_URL = 'http://localhost:5000/api/gallery';
 
 class GalleryService {
     getGalleryImages() {
-        return axios.get(API_URL).then(res => res.data.data);
+        const { access_token } = getToken();
+        return axios.get(API_URL, {
+            headers: {
+                Authorization: access_token ? `Bearer ${access_token}` : ''
+            }
+        }).then(res => res.data.data);
     }
 
     getGalleryImage(id) {
@@ -40,4 +45,5 @@ class GalleryService {
     }
 }
 
-export default new GalleryService();
+const galleryServiceInstance = new GalleryService();
+export default galleryServiceInstance;

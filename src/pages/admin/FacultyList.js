@@ -1,39 +1,36 @@
-import React, { useState } from 'react';
-import { PencilSquareIcon, TrashIcon, PlusIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
-import { Combobox } from '@headlessui/react';
+import React, { useState, useEffect } from 'react';
+import { PencilSquareIcon, TrashIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import FacultyService from '../../services/FacultyService';
 import DepartmentService from '../../services/DepartmentService';
 import FileService from '../../services/FileService';
+import { useSelector } from 'react-redux';
 
 const FacultyList = () => {
     // State for faculty list
     const [faculty, setFaculty] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [uploading, setUploading] = useState(false);
 
     // Department Selection State
     const [departmentOptions, setDepartmentOptions] = useState([]);
-    const [deptQuery, setDeptQuery] = useState('');
+
+    // Auth State
+    const { role, department } = useSelector(state => state.user);
 
     // Fetch faculty on mount
-    React.useEffect(() => {
+    useEffect(() => {
         loadFaculty();
-        loadDepartments();
-    }, []);
+        if (role === 'admin') {
+            loadDepartments();
+        }
+    }, [role]);
 
     const loadFaculty = async () => {
         try {
-            setLoading(true);
             const data = await FacultyService.getAllFaculty();
             setFaculty(data);
-            setError(null);
         } catch (err) {
             console.error("Failed to load faculty:", err);
-            setError("Failed to load faculty list.");
         } finally {
-            setLoading(false);
         }
     };
 
@@ -48,7 +45,7 @@ const FacultyList = () => {
 
     const downloadSample = () => {
         const headers = ['Name', 'Designation', 'Department', 'Email', 'Specialization', 'Achievements', 'Image'];
-        const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + "Dr. John Doe,Professor,Computer Science,john.doe@example.com,AI & ML,\"Best Researcher 2024, Gold Medalist\",https://example.com/image.jpg";
+        const csvContent = `data:text/csv;charset=utf-8,${headers.join(",")}\nDr. John Doe,Professor,Computer Science,john.doe@example.com,AI & ML,"Best Researcher 2024, Gold Medalist",https://example.com/image.jpg`;
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -60,19 +57,40 @@ const FacultyList = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMember, setEditingMember] = useState(null);
-    const [formData, setFormData] = useState({ name: '', designation: '', department: '', email: '', image: '', specialization: '', achievements: '' });
+    const [formData, setFormData] = useState({
+        name: '',
+        designation: '',
+        department: '',
+        email: '',
+        image: '',
+        specialization: '',
+        experience: '',
+        skills: '',
+        achievements: ''
+    });
 
     const handleOpenModal = (member = null) => {
-        setDeptQuery('');
         if (member) {
             setEditingMember(member);
             setFormData({
                 ...member,
+                department: member.department?._id || member.department || '',
+                skills: member.skills ? member.skills.join(', ') : '',
                 achievements: member.achievements ? member.achievements.join('\n') : ''
             });
         } else {
             setEditingMember(null);
-            setFormData({ name: '', designation: '', department: '', email: '', image: '', specialization: '', achievements: '' });
+            setFormData({
+                name: '',
+                designation: '',
+                department: role === 'department_admin' ? department?._id : '',
+                email: '',
+                image: '',
+                specialization: '',
+                experience: '',
+                skills: '',
+                achievements: ''
+            });
         }
         setIsModalOpen(true);
     };
@@ -128,6 +146,7 @@ const FacultyList = () => {
         try {
             const payload = {
                 ...formData,
+                skills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(s => s) : [],
                 achievements: formData.achievements.split('\n').filter(line => line.trim() !== '')
             };
 
@@ -156,12 +175,7 @@ const FacultyList = () => {
             .substring(0, 2);
     };
 
-    const filteredDepartments =
-        deptQuery === ''
-            ? departmentOptions
-            : departmentOptions.filter((dept) => {
-                return dept.name.toLowerCase().includes(deptQuery.toLowerCase());
-            });
+
 
 
     return (
@@ -206,7 +220,7 @@ const FacultyList = () => {
                                     <div className="ml-4">
                                         <div className="text-sm font-medium text-gray-900">{person.name}</div>
                                         <div className="text-sm text-gray-500">{person.designation}</div>
-                                        <div className="text-xs text-gray-400">{person.department}</div>
+                                        <div className="text-xs text-blue-600 font-semibold">{person.department?.name || person.department}</div>
                                     </div>
                                 </div>
                                 <div className="flex space-x-3">
@@ -258,71 +272,47 @@ const FacultyList = () => {
                                             <input type="text" required value={formData.designation} onChange={e => setFormData({ ...formData, designation: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                         </div>
 
-                                        {/* Department Combobox */}
-                                        <div className="sm:col-span-3 relative z-20">
-                                            <Combobox value={formData.department} onChange={(val) => setFormData({ ...formData, department: val })}>
-                                                <Combobox.Label className="block text-sm font-medium text-gray-700">Department</Combobox.Label>
-                                                <div className="relative mt-1">
-                                                    <Combobox.Input
-                                                        className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
-                                                        onChange={(event) => setDeptQuery(event.target.value)}
-                                                        displayValue={(deptName) => deptName}
-                                                        placeholder="Select or type..."
-                                                    />
-                                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                                                        <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                                                    </Combobox.Button>
-
-                                                    <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                                        {filteredDepartments.map((dept) => (
-                                                            <Combobox.Option
-                                                                key={dept._id}
-                                                                value={dept.name}
-                                                                className={({ active }) =>
-                                                                    `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-blue-600 text-white' : 'text-gray-900'
-                                                                    }`
-                                                                }
-                                                            >
-                                                                {({ active, selected }) => (
-                                                                    <>
-                                                                        <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
-                                                                            {dept.name}
-                                                                        </span>
-                                                                        {selected && (
-                                                                            <span
-                                                                                className={`absolute inset-y-0 right-0 flex items-center pr-4 ${active ? 'text-white' : 'text-blue-600'
-                                                                                    }`}
-                                                                            >
-                                                                                <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                                                                            </span>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                            </Combobox.Option>
-                                                        ))}
-                                                        {deptQuery.length > 0 && !filteredDepartments.some(d => d.name.toLowerCase() === deptQuery.toLowerCase()) && (
-                                                            <Combobox.Option
-                                                                value={deptQuery}
-                                                                className={({ active }) =>
-                                                                    `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-blue-600 text-white' : 'text-gray-900'
-                                                                    }`
-                                                                }
-                                                            >
-                                                                Create "{deptQuery}"
-                                                            </Combobox.Option>
-                                                        )}
-                                                    </Combobox.Options>
-                                                </div>
-                                            </Combobox>
+                                        {/* Department Selection */}
+                                        <div className="sm:col-span-3">
+                                            <label className="block text-sm font-medium text-gray-700">Department</label>
+                                            {role === 'admin' ? (
+                                                <select
+                                                    value={formData.department}
+                                                    onChange={e => setFormData({ ...formData, department: e.target.value })}
+                                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                >
+                                                    <option value="">Select Department</option>
+                                                    {departmentOptions.map(dept => (
+                                                        <option key={dept._id} value={dept._id}>{dept.name}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    readOnly
+                                                    value={department?.name || 'My Department'}
+                                                    className="mt-1 block w-full border border-gray-200 bg-gray-50 rounded-md shadow-sm py-2 px-3 sm:text-sm cursor-not-allowed"
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Email Address</label>
                                         <input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                     </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Experience</label>
+                                            <input type="text" value={formData.experience} onChange={e => setFormData({ ...formData, experience: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g. 10 Years" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Specialization</label>
+                                            <input type="text" value={formData.specialization} onChange={e => setFormData({ ...formData, specialization: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                        </div>
+                                    </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Specialization</label>
-                                        <input type="text" value={formData.specialization} onChange={e => setFormData({ ...formData, specialization: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                        <label className="block text-sm font-medium text-gray-700">Skills (comma separated)</label>
+                                        <input type="text" value={formData.skills} onChange={e => setFormData({ ...formData, skills: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="React, Node.js, etc." />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Achievements (one per line)</label>

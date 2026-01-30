@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import {
   HomeIcon,
@@ -12,35 +12,62 @@ import {
   SwatchIcon,
   MapIcon,
   PhotoIcon,
-  FolderIcon
+  FolderIcon,
+  ClipboardDocumentCheckIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useGetLoggedUserQuery } from '../services/userAuthApi';
+import { setUserInfo } from '../features/userSlice';
 
 const AdminLayout = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const { access_token } = useSelector((state) => state.auth);
+  const { role, name, department } = useSelector((state) => state.user);
+
+  // Fetch user info if access_token is present
+  const { data, isSuccess } = useGetLoggedUserQuery(access_token, {
+    skip: !access_token
+  });
+
+  useEffect(() => {
+    if (data && isSuccess) {
+      dispatch(setUserInfo({
+        email: data.user.email,
+        name: data.user.name,
+        role: data.user.role,
+        department: data.user.department,
+        id: data.user._id
+      }));
+    }
+  }, [data, isSuccess, dispatch]);
 
   if (!access_token) {
     return <Navigate to="/login" replace />;
   }
 
-  const navigation = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: Squares2X2Icon },
-    { name: 'Home', href: '/admin/home', icon: HomeIcon },
-    { name: 'Training and Placement', href: '/admin/training-placement', icon: AcademicCapIcon },
-    { name: 'Pages', href: '/admin/pages', icon: DocumentTextIcon },
-    { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon },
-    { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon },
-    { name: 'Events', href: '/admin/events', icon: CalendarIcon },
-    { name: 'Events Config', href: '/admin/events-config', icon: CalendarIcon },
-    { name: 'Gallery', href: '/admin/gallery', icon: PhotoIcon },
-    { name: 'Albums', href: '/admin/albums', icon: FolderIcon },
-    { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon }, // Reusing icon for now
-    { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon },
-    { name: 'Footer', href: '/admin/footer', icon: SwatchIcon },
-    { name: 'Navbar', href: '/admin/navbar', icon: MapIcon },
-    { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
+  const allNavigation = [
+    { name: 'Dashboard', href: '/admin/dashboard', icon: Squares2X2Icon, roles: ['admin', 'department_admin'] },
+    { name: 'Home', href: '/admin/home', icon: HomeIcon, roles: ['admin'] },
+    { name: 'Training and Placement', href: '/admin/training-placement', icon: AcademicCapIcon, roles: ['admin'] },
+    { name: 'Pages', href: '/admin/pages', icon: DocumentTextIcon, roles: ['admin'] },
+    { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon, roles: ['admin'] },
+    { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Events', href: '/admin/events', icon: CalendarIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Events Config', href: '/admin/events-config', icon: CalendarIcon, roles: ['admin'] },
+    { name: 'Gallery', href: '/admin/gallery', icon: PhotoIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Albums', href: '/admin/albums', icon: FolderIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Research', href: '/admin/research', icon: ClipboardDocumentCheckIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Testimonials', href: '/admin/testimonials', icon: ChatBubbleLeftRightIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon, roles: ['admin'] },
+    { name: 'Footer', href: '/admin/footer', icon: SwatchIcon, roles: ['admin'] },
+    { name: 'Navbar', href: '/admin/navbar', icon: MapIcon, roles: ['admin'] },
+    { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon, roles: ['admin', 'department_admin'] },
   ];
+
+  const navigation = allNavigation.filter(item => item.roles.includes(role));
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -80,9 +107,12 @@ const AdminLayout = () => {
             {navigation.find(n => location.pathname.startsWith(n.href))?.name || 'Admin Panel'}
           </h2>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">Admin User</span>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900">{name || 'Admin User'}</p>
+              <p className="text-xs text-gray-500 capitalize">{department?.name || role || 'Access Level'}</p>
+            </div>
             <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold">
-              A
+              {name ? name[0].toUpperCase() : 'A'}
             </div>
           </div>
         </header>

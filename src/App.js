@@ -28,6 +28,8 @@ import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import DynamicPage from './pages/DynamicPage';
 import GalleryPage from './pages/GalleryPage';
+import ResearchList from './pages/admin/ResearchList';
+import TestimonialsList from './pages/admin/TestimonialsList';
 
 function App() {
   const { access_token } = useSelector((state) => state.auth);
@@ -53,6 +55,8 @@ function App() {
             <Route path="navbar" element={<NavbarConfig />} />
             <Route path="gallery" element={<GalleryList />} />
             <Route path="albums" element={<AlbumList />} />
+            <Route path="research" element={<ResearchList />} />
+            <Route path="testimonials" element={<TestimonialsList />} />
             <Route path="settings" element={<div>Settings Page</div>} />
             <Route path="settings" element={<div>Settings Page</div>} />
           </Route>

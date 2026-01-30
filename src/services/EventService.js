@@ -12,9 +12,10 @@ const getAuthHeaders = () => {
 
 const EventService = {
     async getAllEvents() {
-        // Public endpoint
+        // Passing auth headers to allow backend to filter by department for department_admin
         const response = await fetch(`${API_BASE_URL}/events`, {
-            method: 'GET'
+            method: 'GET',
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {

@@ -7,6 +7,8 @@ import EventService from '../../services/EventService';
 import ContactService from '../../services/ContactService';
 import StudentRecordService from '../../services/StudentRecordService';
 import FileService from '../../services/FileService';
+import ResearchService from '../../services/ResearchService';
+import TestimonialService from '../../services/TestimonialService';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState([
@@ -18,6 +20,8 @@ const AdminDashboard = () => {
     { name: 'MOOC Completions', value: '0', change: '0', changeType: 'neutral' },
     { name: 'Student Projects', value: '0', change: '0', changeType: 'neutral' },
     { name: 'Achievements', value: '0', change: '0', changeType: 'neutral' },
+    { name: 'Research Papers', value: '0', change: '0', changeType: 'neutral' },
+    { name: 'Testimonials', value: '0', change: '0', changeType: 'neutral' },
     { name: 'Uploaded Images', value: '0', change: '0', changeType: 'neutral' },
   ]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +39,8 @@ const AdminDashboard = () => {
           moocs,
           projects,
           achievements,
+          research,
+          testimonials,
           fileCount
         ] = await Promise.all([
           PageService.getAllPages().catch(e => []),
@@ -45,6 +51,8 @@ const AdminDashboard = () => {
           StudentRecordService.getRecords('mooc').catch(e => []),
           StudentRecordService.getRecords('project').catch(e => []),
           StudentRecordService.getRecords('achievement').catch(e => []),
+          ResearchService.getAllResearch().catch(e => []),
+          TestimonialService.getAllTestimonials().catch(e => []),
           FileService.getFileCount().catch(e => 0)
         ]);
 
@@ -57,6 +65,8 @@ const AdminDashboard = () => {
           { name: 'MOOC Completions', value: moocs.length.toString(), change: '-', changeType: 'neutral' },
           { name: 'Student Projects', value: projects.length.toString(), change: '-', changeType: 'neutral' },
           { name: 'Achievements', value: achievements.length.toString(), change: '-', changeType: 'neutral' },
+          { name: 'Research Papers', value: research.length.toString(), change: '-', changeType: 'neutral' },
+          { name: 'Testimonials', value: testimonials.length.toString(), change: '-', changeType: 'neutral' },
           { name: 'Uploaded Images', value: fileCount.toString(), change: '-', changeType: 'neutral' },
         ]);
       } catch (error) {

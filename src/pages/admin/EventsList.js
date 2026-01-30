@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import EventService from '../../services/EventService';
 import { getToken } from '../../services/LocalStorageService';
+import { useSelector } from 'react-redux';
+import DepartmentService from '../../services/DepartmentService';
 import { PencilIcon, TrashIcon, PlusIcon, ShareIcon } from '@heroicons/react/24/outline';
 
 const EventsList = () => {
@@ -11,6 +13,8 @@ const EventsList = () => {
     const [formData, setFormData] = useState({ title: '', date: '', place: '', description: '', image: '' });
     const [editingId, setEditingId] = useState(null);
     const [activeShareMenu, setActiveShareMenu] = useState(null);
+    const [departments, setDepartments] = useState([]);
+    const { role } = useSelector(state => state.user);
 
     const shareEvent = (event, platform) => {
         const backendUrl = 'http://localhost:5000/api'; // Or use process.env.REACT_APP_API_BASE_URL
@@ -60,7 +64,19 @@ const EventsList = () => {
 
     useEffect(() => {
         loadEvents();
-    }, []);
+        if (role === 'admin') {
+            loadDepartments();
+        }
+    }, [role]);
+
+    const loadDepartments = async () => {
+        try {
+            const data = await DepartmentService.getAllDepartments();
+            setDepartments(data);
+        } catch (err) {
+            console.error("Failed to load departments:", err);
+        }
+    };
 
     const handleOpenModal = (event = null) => {
         if (event) {
@@ -71,11 +87,12 @@ const EventsList = () => {
                 date: event.date ? new Date(event.date).toISOString().split('T')[0] : '',
                 place: event.place,
                 description: event.description,
-                image: event.image
+                image: event.image,
+                department: event.department?._id || event.department || ''
             });
         } else {
             setEditingId(null);
-            setFormData({ title: '', subtitle: '', date: '', place: '', description: '', image: '' });
+            setFormData({ title: '', subtitle: '', date: '', place: '', description: '', image: '', department: '' });
         }
         setIsModalOpen(true);
     };
@@ -119,7 +136,7 @@ const EventsList = () => {
 
     const downloadSample = () => {
         const headers = ['Title', 'Date', 'Place', 'Description', 'Image'];
-        const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + "Annual Tech Fest,2023-11-25,Main Auditorium,A grand technology festival featuring various events.,https://via.placeholder.com/150";
+        const csvContent = `data:text/csv;charset=utf-8,${headers.join(",")}\nAnnual Tech Fest,2023-11-25,Main Auditorium,A grand technology festival featuring various events.,https://via.placeholder.com/150`;
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -219,6 +236,7 @@ const EventsList = () => {
                     <thead className="bg-gray-50">
                         <tr>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Place</th>
                             <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -232,6 +250,11 @@ const EventsList = () => {
                                         {event.image && <img className="h-10 w-10 rounded-full mr-3 object-cover" src={event.image} alt="" />}
                                         <div className="text-sm font-medium text-gray-900">{event.title}</div>
                                     </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        {event.department?.name || 'General'}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {new Date(event.date).toLocaleDateString()}
@@ -311,6 +334,22 @@ const EventsList = () => {
                                             <label className="block text-sm font-medium text-gray-700">Subtitle</label>
                                             <input type="text" name="subtitle" value={formData.subtitle} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Optional subtitle" />
                                         </div>
+                                        {role === 'admin' && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Department</label>
+                                                <select
+                                                    name="department"
+                                                    value={formData.department}
+                                                    onChange={handleChange}
+                                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                >
+                                                    <option value="">General (No Department)</option>
+                                                    {departments.map(dept => (
+                                                        <option key={dept._id} value={dept._id}>{dept.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Date</label>
                                             <input type="date" name="date" value={formData.date} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { PlusIcon, ArrowUpTrayIcon, TrashIcon, PencilIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, PencilIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
 
 const CATEGORIES = [
@@ -22,6 +22,7 @@ const SAMPLE_HEADERS = {
 
 const StudentDataManager = () => {
     const { access_token } = useSelector((state) => state.auth);
+    const { role, department: userDept } = useSelector((state) => state.user);
     const [activeTab, setActiveTab] = useState('gate');
     const [records, setRecords] = useState([]);
     const [filteredRecords, setFilteredRecords] = useState([]);
@@ -41,9 +42,26 @@ const StudentDataManager = () => {
     const [previewData, setPreviewData] = useState([]);
     const [uploading, setUploading] = useState(false);
 
+    const fetchRecords = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`http://localhost:5000/api/student-records?category=${activeTab}`, {
+                headers: { Authorization: `Bearer ${access_token}` }
+            });
+            setRecords(res.data.data);
+            setFilteredRecords(res.data.data);
+            setSelectedIds([]);
+        } catch (error) {
+            console.error("Error fetching records:", error);
+            alert("Failed to fetch records");
+        } finally {
+            setLoading(false);
+        }
+    }, [activeTab, access_token]);
+
     useEffect(() => {
         fetchRecords();
-    }, [activeTab]);
+    }, [activeTab, fetchRecords]);
 
     useEffect(() => {
         if (!searchQuery) {
@@ -70,23 +88,6 @@ const StudentDataManager = () => {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Template");
         XLSX.writeFile(wb, `${activeTab}_template.xlsx`);
-    };
-
-    const fetchRecords = async () => {
-        setLoading(true);
-        try {
-            const res = await axios.get(`http://localhost:5000/api/student-records?category=${activeTab}`, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
-            setRecords(res.data.data);
-            setFilteredRecords(res.data.data);
-            setSelectedIds([]);
-        } catch (error) {
-            console.error("Error fetching records:", error);
-            alert("Failed to fetch records");
-        } finally {
-            setLoading(false);
-        }
     };
 
     const handleFileUpload = (e) => {
@@ -129,6 +130,7 @@ const StudentDataManager = () => {
                 enrollmentNo,
                 batch,
                 branch,
+                department: role === 'department_admin' ? userDept?._id : (meta.department || ''),
                 metadata: meta
             };
         });
@@ -229,6 +231,7 @@ const StudentDataManager = () => {
                 enrollmentNo: formData.enrollmentNo,
                 batch: formData.batch,
                 branch: formData.branch,
+                department: role === 'department_admin' ? userDept?._id : formData.department,
                 metadata: { ...formData.metadata }
             };
 
@@ -265,10 +268,13 @@ const StudentDataManager = () => {
                 enrollmentNo: record.enrollmentNo,
                 batch: record.batch,
                 branch: record.branch,
+                department: record.department?._id || record.department || '',
                 ...record.metadata
             });
         } else {
-            setFormData({});
+            setFormData({
+                department: role === 'department_admin' ? userDept?._id : ''
+            });
         }
         setIsModalOpen(true);
     };
@@ -307,6 +313,16 @@ const StudentDataManager = () => {
                             onChange={e => setFormData({ ...formData, enrollmentNo: e.target.value })}
                         />
                     </div>
+                    {role === 'admin' && (
+                        <div className="col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">Department</label>
+                            <input type="text" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                placeholder="Department ID (optional)"
+                                value={formData.department || ''}
+                                onChange={e => setFormData({ ...formData, department: e.target.value })}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className="border-t pt-4">

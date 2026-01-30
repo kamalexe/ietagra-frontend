@@ -1,12 +1,20 @@
+import { getToken } from './LocalStorageService';
+
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+const getAuthHeaders = () => {
+    const { access_token } = getToken();
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': access_token ? `Bearer ${access_token}` : ''
+    };
+};
 
 const StudentRecordService = {
     async getRecords(category) {
         const response = await fetch(`${API_BASE_URL}/student-records?category=${category}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {
