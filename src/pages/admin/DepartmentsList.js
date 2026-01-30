@@ -57,11 +57,9 @@ const DepartmentsList = () => {
 
   const openEditModal = (dept) => {
     setEditingId(dept._id);
-    // Remove 'departments/' prefix from slug for display if needed
-    const slugPart = dept.slug.replace('departments/', '');
     setNewDept({
       name: dept.name,
-      slug: slugPart,
+      slug: dept.slug, // Use original slug
       head: dept.head || '',
       description: dept.description || ''
     });
@@ -71,7 +69,7 @@ const DepartmentsList = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const slug = `departments/${newDept.slug.toLowerCase().replace(/\s+/g, '-')}`;
+    const slug = newDept.slug.toLowerCase().trim().replace(/\s+/g, '-');
 
     try {
       if (editingId) {
@@ -87,15 +85,7 @@ const DepartmentsList = () => {
         alert('Department updated successfully!');
       } else {
         // CREATE NEW
-        // 1. Create the Page first (content)
-        const pageData = {
-          title: newDept.name,
-          slug: slug,
-          sections: []
-        };
-        await PageService.createPage(pageData);
-
-        // 2. Create the Department metadata
+        // The backend now automatically handles Page creation and linking
         const deptData = {
           name: newDept.name,
           slug: slug,
@@ -108,7 +98,7 @@ const DepartmentsList = () => {
           ...createdDept,
           lastModified: new Date().toISOString().split('T')[0]
         }]);
-        alert('Department created successfully!');
+        alert('Department created successfully (Page also created)!');
       }
 
       setIsModalOpen(false);
@@ -125,11 +115,12 @@ const DepartmentsList = () => {
         // 1. Delete department metadata
         await DepartmentService.deleteDepartment(id);
 
-        // 2. Delete the associated page content
+        // 2. Delete the associated page content (Optional, backend could handle this too but keeping for now)
         try {
+          // If the page doesn't exist, we just continue
           await PageService.deletePage(slug);
         } catch (pageErr) {
-          console.warn("Failed to delete associated page (might already be missing):", pageErr);
+          console.warn("Could not delete associated page:", pageErr);
         }
 
         setDepartments(departments.filter(d => d._id !== id));
@@ -276,7 +267,7 @@ const DepartmentsList = () => {
                       <label className="block text-sm font-medium text-gray-700">Slug (ID)</label>
                       <div className="mt-1 flex rounded-md shadow-sm">
                         <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
-                          departments/
+                          /
                         </span>
                         <input
                           type="text"

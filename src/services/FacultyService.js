@@ -12,13 +12,32 @@ const getAuthHeaders = () => {
 
 const FacultyService = {
     async getAllFaculty() {
-        const response = await fetch(`${API_BASE_URL}/admin/faculty`, {
+        const response = await fetch(`${API_BASE_URL}/faculty`, {
             method: 'GET',
             headers: getAuthHeaders()
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch faculty list');
+            let errorMessage = `Failed to fetch faculty list (${response.status})`;
+            try {
+                const error = await response.json();
+                errorMessage = error.error || error.message || errorMessage;
+            } catch (e) { }
+            throw new Error(errorMessage);
+        }
+
+        const resData = await response.json();
+        return resData.data;
+    },
+
+    async getPublicFacultyByDepartment(departmentId) {
+        const response = await fetch(`${API_BASE_URL}/faculty/public/${departmentId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch department faculty');
         }
 
         const resData = await response.json();
@@ -26,15 +45,23 @@ const FacultyService = {
     },
 
     async createFaculty(data) {
-        const response = await fetch(`${API_BASE_URL}/admin/faculty`, {
+        const response = await fetch(`${API_BASE_URL}/faculty`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || error.message || 'Failed to create faculty member');
+            let errorMessage = `Failed to create faculty member (${response.status})`;
+            try {
+                const error = await response.json();
+                errorMessage = error.error || error.message || errorMessage;
+            } catch (jsonErr) {
+                // Not JSON, maybe get text
+                const text = await response.text().catch(() => '');
+                if (text) errorMessage += `: ${text.substring(0, 100)}`;
+            }
+            throw new Error(errorMessage);
         }
 
         const resData = await response.json();
@@ -42,15 +69,22 @@ const FacultyService = {
     },
 
     async updateFaculty(id, data) {
-        const response = await fetch(`${API_BASE_URL}/admin/faculty/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/faculty/${id}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || error.message || 'Failed to update faculty member');
+            let errorMessage = `Failed to update faculty member (${response.status})`;
+            try {
+                const error = await response.json();
+                errorMessage = error.error || error.message || errorMessage;
+            } catch (jsonErr) {
+                const text = await response.text().catch(() => '');
+                if (text) errorMessage += `: ${text.substring(0, 100)}`;
+            }
+            throw new Error(errorMessage);
         }
 
         const resData = await response.json();
@@ -58,7 +92,7 @@ const FacultyService = {
     },
 
     async deleteFaculty(id) {
-        const response = await fetch(`${API_BASE_URL}/admin/faculty/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/faculty/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
@@ -72,11 +106,10 @@ const FacultyService = {
 
     async bulkUpload(formData) {
         const { access_token } = getToken();
-        const response = await fetch(`${API_BASE_URL}/admin/faculty/bulk-upload`, {
+        const response = await fetch(`${API_BASE_URL}/faculty/bulk-upload`, {
             method: 'POST',
             headers: {
                 'Authorization': access_token ? `Bearer ${access_token}` : ''
-                // Content-Type is handled automatically by browser for FormData
             },
             body: formData
         });

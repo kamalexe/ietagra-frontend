@@ -50,7 +50,11 @@ const PageRenderer = ({ slug, data }) => {
           if (!Component || !section.visible) {
             return null;
           }
-          return <Component key={section.id} {...section.data} />;
+          return <Component
+            key={section.id}
+            {...section.data}
+            departmentId={pageData.departmentId}
+          />;
         })}
     </div>
   );

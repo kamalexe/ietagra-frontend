@@ -25,6 +25,24 @@ const TestimonialService = {
         return resData.data;
     },
 
+    async getTestimonialsByDepartment(departmentId) {
+        // Handle both string ID and object with _id
+        const id = typeof departmentId === 'object' ? departmentId?._id : departmentId;
+        if (!id) return [];
+
+        const response = await fetch(`${API_BASE_URL}/testimonials?department=${id}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch testimonials');
+        }
+
+        const resData = await response.json();
+        return resData.data;
+    },
+
     async createTestimonial(data) {
         const response = await fetch(`${API_BASE_URL}/testimonials`, {
             method: 'POST',

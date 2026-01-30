@@ -11,8 +11,22 @@ const getAuthHeaders = () => {
 };
 
 const DepartmentService = {
+    async getPublishedDepartments() {
+        const response = await fetch(`${API_BASE_URL}/departments/published`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch published departments');
+        }
+
+        const resData = await response.json();
+        return resData.data;
+    },
+
     async getAllDepartments() {
-        const response = await fetch(`${API_BASE_URL}/admin/departments`, {
+        const response = await fetch(`${API_BASE_URL}/departments`, {
             method: 'GET',
             headers: getAuthHeaders()
         });
@@ -26,7 +40,7 @@ const DepartmentService = {
     },
 
     async createDepartment(data) {
-        const response = await fetch(`${API_BASE_URL}/admin/departments`, {
+        const response = await fetch(`${API_BASE_URL}/departments`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
@@ -42,7 +56,7 @@ const DepartmentService = {
     },
 
     async updateDepartment(id, data) {
-         const response = await fetch(`${API_BASE_URL}/admin/departments/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/departments/${id}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
@@ -58,7 +72,7 @@ const DepartmentService = {
     },
 
     async deleteDepartment(id) {
-        const response = await fetch(`${API_BASE_URL}/admin/departments/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/departments/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });

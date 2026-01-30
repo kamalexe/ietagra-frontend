@@ -1,8 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { fadeIn, staggerContainer } from '../../../utils/animations';
+import DepartmentService from '../../../services/DepartmentService';
 
-const DesignThirteen = ({ title, items = [] }) => {
+const DesignThirteen = ({ title }) => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const depts = await DepartmentService.getPublishedDepartments();
+                const formattedItems = depts.map(dept => ({
+                    title: dept.name,
+                    description: dept.description || "Learn more about our core departments and academic excellence.",
+                    link: `/${dept.slug}`,
+                    icon: '🏛️', // Default icon for departments
+                    gradient: 'from-blue-600 to-indigo-700'
+                }));
+                setItems(formattedItems);
+            } catch (error) {
+                console.error("Failed to fetch departments for DesignThirteen:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDepartments();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 flex justify-center items-center">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
     return (
         <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             {title && (

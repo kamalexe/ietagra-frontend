@@ -48,6 +48,10 @@ const GalleryPage = () => {
     });
 
     const openAlbum = (album) => {
+        if (!album.media || album.media.length === 0) {
+            alert("This album is empty.");
+            return;
+        }
         setSelectedAlbum(album);
         setActiveMediaIndex(0);
         document.body.style.overflow = 'hidden';
@@ -228,7 +232,7 @@ const GalleryPage = () => {
                                 <div>
                                     <h4 className="text-white font-bold text-xl md:text-2xl leading-tight">{selectedAlbum.title}</h4>
                                     <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
-                                        Media {activeMediaIndex + 1} of {selectedAlbum.media.length} • {selectedAlbum.media[activeMediaIndex].type}
+                                        Media {activeMediaIndex + 1} of {selectedAlbum.media.length} • {selectedAlbum.media[activeMediaIndex]?.type}
                                     </p>
                                 </div>
                             </div>
@@ -255,10 +259,10 @@ const GalleryPage = () => {
                                 animate={{ opacity: 1, scale: 1, x: 0 }}
                                 className="w-full max-w-6xl h-full flex flex-col items-center justify-center py-10"
                             >
-                                {selectedAlbum.media[activeMediaIndex].type === 'video' ? (
+                                {selectedAlbum.media[activeMediaIndex]?.type === 'video' ? (
                                     <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black border border-white/10">
                                         <iframe
-                                            src={selectedAlbum.media[activeMediaIndex].videoUrl.replace('watch?v=', 'embed/')}
+                                            src={selectedAlbum.media[activeMediaIndex]?.videoUrl?.replace('watch?v=', 'embed/')}
                                             className="w-full h-full border-none"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                             allowFullScreen
@@ -268,15 +272,15 @@ const GalleryPage = () => {
                                 ) : (
                                     <div className="relative group max-h-full">
                                         <img
-                                            src={selectedAlbum.media[activeMediaIndex].src}
+                                                src={selectedAlbum.media[activeMediaIndex]?.src}
                                             alt="Gallery"
                                             className="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl select-none"
                                         />
-                                        {selectedAlbum.media[activeMediaIndex].caption && (
+                                            {selectedAlbum.media[activeMediaIndex]?.caption && (
                                             <div className="absolute -bottom-16 inset-x-0 text-center">
                                                 <div className="inline-block bg-white/5 backdrop-blur-2xl border border-white/10 px-8 py-3 rounded-2xl">
                                                     <p className="text-white text-sm font-medium italic tracking-wide">
-                                                        "{selectedAlbum.media[activeMediaIndex].caption}"
+                                                            "{selectedAlbum.media[activeMediaIndex]?.caption}"
                                                     </p>
                                                 </div>
                                             </div>

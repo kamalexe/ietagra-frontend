@@ -24,6 +24,7 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [editingSection, setEditingSection] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [status, setStatus] = useState('draft');
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState(null); // eslint-disable-line no-unused-vars
     const [notification, setNotification] = useState(null); // { message, type }
@@ -36,6 +37,7 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                 if (pageData) {
                     setSections(pageData.sections || []);
                     setPageTitle(pageData.title || slug);
+                    setStatus(pageData.status || 'draft');
                 }
             } catch (err) {
                 console.error("Failed to fetch page:", err);
@@ -109,7 +111,8 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
             const pageData = {
                 title: pageTitle || slug,
                 slug: slug,
-                sections: sections
+                sections: sections,
+                status: status
             };
 
             await PageService.updatePage(slug, pageData);
@@ -154,7 +157,27 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                         <p className="text-sm text-gray-500">Drag to reorder sections</p>
                     </div>
                 </div>
-                <div className="flex space-x-3">
+                <div className="flex items-center space-x-3">
+                    <div className="flex items-center bg-gray-100 rounded-lg p-1 mr-4">
+                        <button
+                            onClick={() => setStatus('draft')}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${status === 'draft'
+                                ? 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            Draft
+                        </button>
+                        <button
+                            onClick={() => setStatus('published')}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${status === 'published'
+                                ? 'bg-green-600 text-white shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            Published
+                        </button>
+                    </div>
                     <button
                         onClick={() => window.open(`/${slug}`, '_blank')}
                         className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"

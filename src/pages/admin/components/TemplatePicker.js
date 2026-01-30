@@ -57,8 +57,15 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
 
     const currentDept = departments.find(d => d.slug === currentSlug);
     const filteredFaculty = faculty.filter(f => {
-        if (!currentDept) return true; // Show all if no dept context
-        return f.department === currentDept.name || f.department.includes(currentDept.name) || currentDept.name.includes(f.department);
+        if (!currentDept) return true;
+        const deptName = currentDept.name;
+        const facultyDept = typeof f.department === 'object' ? f.department?.name : f.department;
+
+        if (!facultyDept) return false;
+
+        return facultyDept === deptName ||
+            (typeof facultyDept === 'string' && facultyDept.includes(deptName)) ||
+            (typeof deptName === 'string' && deptName.includes(facultyDept));
     });
 
 
@@ -261,43 +268,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'Detailed cards for faculty or team members with achievements.',
             demoData: {
                 title: "Our Faculty",
-                items: filteredFaculty.length > 0 ? filteredFaculty.map(f => ({
-                    name: f.name,
-                    designation: f.designation,
-                    specialization: f.specialization,
-                    email: f.email,
-                    image: f.image,
-                    achievements: f.achievements || [],
-                    totalAchievements: f.achievements ? f.achievements.length : 0
-                })) : [
-                    {
-                        name: "Er. Subodh Sharma",
-                        designation: "Assistant Professor",
-                        specialization: "Data Structures, JAVA",
-                        email: "faculty@ietagra.ac.in",
-                        image: "/images/subodh.jpg",
-                        achievements: ["M.Tech. qualified faculty"],
-                        totalAchievements: 1
-                    },
-                    {
-                        name: "Er. Saurabh Garg",
-                        designation: "Assistant Professor",
-                        specialization: "Digital Electronics",
-                        email: "faculty@ietagra.ac.in",
-                        image: "/images/saurabh.png",
-                        achievements: ["Has qualified GATE five times"],
-                        totalAchievements: 1
-                    },
-                    {
-                        name: "Er. Prashant Maharishi",
-                        designation: "Assistant Professor",
-                        specialization: "DBMS",
-                        email: "faculty@ietagra.ac.in",
-                        image: "/images/Prashant.png",
-                        achievements: ["Participated in EBOOTATHAN (2021)"],
-                        totalAchievements: 3
-                    }
-                ]
+                items: [] // Setting empty items triggers dynamic fetching by departmentId
             }
         },
         {
@@ -305,63 +276,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             name: 'Departments Grid',
             description: 'Grid of departmental cards with icons and gradients.',
             demoData: {
-                title: "Our Departments",
-                items: departments.length > 0 ? departments.map(dept => {
-                    const style = departmentStyleMap[dept.slug] || {
-                        icon: "🏛️",
-                        gradient: "from-gray-500 to-gray-400"
-                    };
-                    return {
-                        title: dept.name,
-                        description: dept.description,
-                        link: dept.slug,
-                        icon: style.icon,
-                        gradient: style.gradient
-                    };
-                }) : [
-                    {
-                        title: "Computer Science & Engineering",
-                        description: "Master programming, algorithms, AI and software development with modern computing infrastructure.",
-                        link: "/departments/cse",
-                        icon: "💻",
-                        gradient: "from-green-500 to-emerald-400"
-                    },
-                    {
-                        title: "Electronics Engineering",
-                        description: "Learn about circuits, devices, and communication systems with cutting-edge technology.",
-                        link: "/departments/ece",
-                        icon: "🔌",
-                        gradient: "from-red-500 to-pink-500"
-                    },
-                    {
-                        title: "Electrical Engineering",
-                        description: "Dive into the study of electricity, power systems, and electronics with hands-on projects.",
-                        link: "/departments/ee",
-                        icon: "⚡",
-                        gradient: "from-purple-500 to-indigo-500"
-                    },
-                    {
-                        title: "Civil Engineering",
-                        description: "Design and build the infrastructure of tomorrow with sustainable practices.",
-                        link: "/departments/civil",
-                        icon: "🏗️",
-                        gradient: "from-teal-500 to-cyan-400"
-                    },
-                    {
-                        title: "Mechanical Engineering",
-                        description: "Explore the world of machines, thermodynamics, and manufacturing.",
-                        link: "/departments/me",
-                        icon: "🔧",
-                        gradient: "from-blue-500 to-cyan-400"
-                    },
-                    {
-                        title: "Applied Science and Mathematics",
-                        description: "Strengthen your foundation in mathematics and science.",
-                        link: "/departments/asm",
-                        icon: "📐",
-                        gradient: "from-yellow-500 to-orange-400"
-                    }
-                ]
+                title: "Our Departments"
             }
         },
         {
@@ -685,6 +600,17 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 themeColor: "bg-red-600",
                 speed: "30s"
             }
+        },
+        {
+            key: 'design_thirty_one',
+            name: 'Multimodal Testimonials',
+            description: 'Display student/faculty testimonials with support for text, images, and YouTube videos.',
+            demoData: {
+                title: "Excellence Speaks",
+                subtitle: "Hear what our community has to say about their journey with us.",
+                badge: "Voices of IET",
+                items: []
+            }
         }
     ];
 
@@ -760,7 +686,10 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                             {/* Rendered Component - Scaled Up for single view */}
                             <div className="transform origin-top-left scale-[0.6] sm:scale-[0.85] w-[166%] sm:w-[117%] h-full p-4 pointer-events-none select-none">
                                 {Component ? (
-                                    <Component {...currentTemplate.demoData} />
+                                    <Component
+                                        {...currentTemplate.demoData}
+                                        departmentId={currentDept?._id}
+                                    />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-gray-400">Preview Not Available</div>
                                 )}

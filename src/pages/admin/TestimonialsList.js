@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import TestimonialService from '../../services/TestimonialService';
 import DepartmentService from '../../services/DepartmentService';
+import FileService from '../../services/FileService';
 import { useSelector } from 'react-redux';
 import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 
@@ -9,6 +10,7 @@ const TestimonialsList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [departments, setDepartments] = useState([]);
     const { role } = useSelector(state => state.user);
     const [formData, setFormData] = useState({ 
@@ -17,7 +19,9 @@ const TestimonialsList = () => {
         message: '', 
         rating: 5, 
         image: '', 
-        department: '' 
+        department: '',
+        type: 'text',
+        videoUrl: ''
     });
     const [editingId, setEditingId] = useState(null);
 
@@ -60,7 +64,9 @@ const TestimonialsList = () => {
                 message: item.message,
                 rating: item.rating,
                 image: item.image || '',
-                department: item.department?._id || item.department || ''
+                department: item.department?._id || item.department || '',
+                type: item.type || 'text',
+                videoUrl: item.videoUrl || ''
             });
         } else {
             setEditingId(null);
@@ -70,7 +76,9 @@ const TestimonialsList = () => {
                 message: '', 
                 rating: 5, 
                 image: '', 
-                department: '' 
+                department: '',
+                type: 'text',
+                videoUrl: ''
             });
         }
         setIsModalOpen(true);
@@ -113,6 +121,22 @@ const TestimonialsList = () => {
         }
     };
 
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            setUploading(true);
+            const data = await FileService.uploadFile(file);
+            setFormData(prev => ({ ...prev, image: data.url }));
+            alert("Image uploaded successfully!");
+        } catch (error) {
+            alert("Image upload failed: " + error.message);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     if (loading) return <div className="p-4 text-center">Loading testimonials...</div>;
 
     return (
@@ -140,6 +164,7 @@ const TestimonialsList = () => {
                         <tr>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
                             <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -159,6 +184,14 @@ const TestimonialsList = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                         {item.department?.name || 'General'}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.type === 'video' ? 'bg-red-100 text-red-800' :
+                                            item.type === 'image' ? 'bg-green-100 text-green-800' :
+                                                'bg-gray-100 text-gray-800'
+                                        }`}>
+                                        {item.type || 'text'}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -229,9 +262,31 @@ const TestimonialsList = () => {
                                             <label className="block text-sm font-medium text-gray-700">Message</label>
                                             <textarea name="message" value={formData.message} onChange={handleChange} required rows={4} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                                         </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Content Type</label>
+                                                <select name="type" value={formData.type} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                    <option value="text">Text Only</option>
+                                                    <option value="image">Image</option>
+                                                    <option value="video">Video (YouTube)</option>
+                                                </select>
+                                            </div>
+                                            {formData.type === 'video' && (
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">YouTube Video URL</label>
+                                                    <input type="text" name="videoUrl" value={formData.videoUrl} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="https://youtube.com/watch?v=..." />
+                                                </div>
+                                            )}
+                                        </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Image URL</label>
-                                            <input type="text" name="image" value={formData.image} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                            <label className="block text-sm font-medium text-gray-700">Profile Image</label>
+                                            <div className="mt-1 flex items-center space-x-4">
+                                                <input type="text" name="image" value={formData.image} onChange={handleChange} placeholder="Image URL" className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                                <label className={`cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                    {uploading ? 'Uploading...' : 'Upload'}
+                                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
