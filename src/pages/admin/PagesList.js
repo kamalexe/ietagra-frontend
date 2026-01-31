@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, XMarkIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import PageService from '../../services/PageService';
 
 const PagesList = () => {
     const [pages, setPages] = useState([]);
     const [loading, setLoading] = useState(true);
+    const user = useSelector((state) => state.user);
 
     useEffect(() => {
         loadPages();
@@ -73,12 +75,14 @@ const PagesList = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Pages</h1>
                     <p className="mt-1 text-sm text-gray-500">Manage all static and dynamic pages of the website.</p>
                 </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                    Create New Page
-                </button>
+                {user && user.role === 'admin' && (
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                        Create New Page
+                    </button>
+                )}
             </div>
 
             <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
@@ -130,9 +134,11 @@ const PagesList = () => {
                                         <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600" title="View Live">
                                             <EyeIcon className="h-5 w-5" />
                                         </a>
-                                        <button onClick={() => handleDeletePage(page.slug)} className="text-red-400 hover:text-red-600" title="Delete">
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
+                                        {user && user.role === 'admin' && (
+                                            <button onClick={() => handleDeletePage(page.slug)} className="text-red-400 hover:text-red-600" title="Delete">
+                                                <TrashIcon className="h-5 w-5" />
+                                            </button>
+                                        )}
                                     </div>
                                 </td>
                             </tr>

@@ -46,27 +46,8 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
         fetchData();
     }, []);
 
-    const departmentStyleMap = {
-        'cse': { icon: "💻", gradient: "from-green-500 to-emerald-400" },
-        'ece': { icon: "🔌", gradient: "from-red-500 to-pink-500" },
-        'ee': { icon: "⚡", gradient: "from-purple-500 to-indigo-500" },
-        'civil': { icon: "🏗️", gradient: "from-teal-500 to-cyan-400" },
-        'me': { icon: "🔧", gradient: "from-blue-500 to-cyan-400" },
-        'asm': { icon: "📐", gradient: "from-yellow-500 to-orange-400" }
-    };
 
-    const currentDept = departments.find(d => d.slug === currentSlug);
-    const filteredFaculty = faculty.filter(f => {
-        if (!currentDept) return true;
-        const deptName = currentDept.name;
-        const facultyDept = typeof f.department === 'object' ? f.department?.name : f.department;
 
-        if (!facultyDept) return false;
-
-        return facultyDept === deptName ||
-            (typeof facultyDept === 'string' && facultyDept.includes(deptName)) ||
-            (typeof deptName === 'string' && deptName.includes(facultyDept));
-    });
 
 
     const templates = [
@@ -631,6 +612,16 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 subtitle: "Check out what's happening in our department.",
                 badge: "Events"
             }
+        },
+        {
+            key: 'design_thirty_four',
+            name: 'Research Papers List',
+            description: 'List display of research papers with filtering support.',
+            demoData: {
+                title: "Research & Publications",
+                subtitle: "Explore our latest research contributions.",
+                badge: "Research"
+            }
         }
     ];
 
@@ -654,6 +645,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentIndex, currentTemplate]); // Re-bind when index changes to capture current state if needed, though simpler ref usage is also possible.
 
     return (

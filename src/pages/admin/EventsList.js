@@ -9,8 +9,19 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 // Helper Components for Array Management
 
-const SpeakerManager = ({ speakers, onChange }) => {
+const SpeakerManager = ({ speakers, onChange, onUpload }) => {
     const [newSpeaker, setNewSpeaker] = useState({ name: '', designation: '', image: '', bio: '' });
+    const [uploading, setUploading] = useState(false);
+
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        const url = await onUpload(file);
+        if (url) setNewSpeaker({ ...newSpeaker, image: url });
+        setUploading(false);
+        e.target.value = null;
+    };
 
     const addSpeaker = () => {
         if (!newSpeaker.name) return alert('Name is required');
@@ -29,7 +40,13 @@ const SpeakerManager = ({ speakers, onChange }) => {
             <div className="grid grid-cols-2 gap-2">
                 <input type="text" placeholder="Name" className="border p-2 rounded" value={newSpeaker.name} onChange={e => setNewSpeaker({ ...newSpeaker, name: e.target.value })} />
                 <input type="text" placeholder="Designation" className="border p-2 rounded" value={newSpeaker.designation} onChange={e => setNewSpeaker({ ...newSpeaker, designation: e.target.value })} />
-                <input type="text" placeholder="Image URL" className="border p-2 rounded" value={newSpeaker.image} onChange={e => setNewSpeaker({ ...newSpeaker, image: e.target.value })} />
+                <div className="flex gap-2">
+                    <input type="text" placeholder="Image URL" className="border p-2 rounded w-full" value={newSpeaker.image} onChange={e => setNewSpeaker({ ...newSpeaker, image: e.target.value })} />
+                    <label className="cursor-pointer bg-white px-3 py-2 border rounded shadow-sm text-sm hover:bg-gray-50">
+                        {uploading ? '...' : 'Up'}
+                        <input type="file" className="hidden" accept="image/*" onChange={handleUpload} />
+                    </label>
+                </div>
                 <input type="text" placeholder="Bio" className="border p-2 rounded" value={newSpeaker.bio} onChange={e => setNewSpeaker({ ...newSpeaker, bio: e.target.value })} />
             </div>
             <button type="button" onClick={addSpeaker} className="px-3 py-1 bg-blue-600 text-white rounded text-sm">Add Speaker</button>
@@ -37,7 +54,8 @@ const SpeakerManager = ({ speakers, onChange }) => {
             <ul className="space-y-2 mt-2">
                 {speakers.map((s, i) => (
                     <li key={i} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
-                        <div className="text-sm">
+                        <div className="text-sm flex items-center">
+                            {s.image && <img src={s.image} alt={s.name} className="w-8 h-8 rounded-full mr-2 object-cover" />}
                             <span className="font-bold">{s.name}</span> - <span className="text-gray-500">{s.designation}</span>
                         </div>
                         <button type="button" onClick={() => removeSpeaker(i)} className="text-red-500"><XMarkIcon className="h-4 w-4" /></button>
@@ -87,8 +105,23 @@ const AgendaManager = ({ agenda, onChange }) => {
     );
 };
 
-const GalleryManager = ({ gallery, onChange }) => {
+const GalleryManager = ({ gallery, onChange, onUpload }) => {
     const [newItem, setNewItem] = useState({ url: '', caption: '', type: 'image', category: 'event', isPublished: true });
+    const [uploading, setUploading] = useState(false);
+
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        const url = await onUpload(file);
+        if (url) {
+            // Determine type
+            const type = file.type.startsWith('video') ? 'video' : 'image';
+            setNewItem({ ...newItem, url: url, type: type });
+        }
+        setUploading(false);
+        e.target.value = null;
+    };
 
     const addItem = () => {
         if (!newItem.url) return alert('URL is required');
@@ -140,6 +173,10 @@ const GalleryManager = ({ gallery, onChange }) => {
                     <span>Publish</span>
                 </label>
                 <button type="button" onClick={addItem} className="px-3 py-1 bg-blue-600 text-white rounded text-sm">Add</button>
+                <label className="cursor-pointer px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm">
+                    {uploading ? '...' : 'Upload'}
+                    <input type="file" className="hidden" accept="image/*,video/*" onChange={handleUpload} />
+                </label>
             </div>
 
             <DragDropContext onDragEnd={onDragEnd}>
@@ -185,8 +222,23 @@ const GalleryManager = ({ gallery, onChange }) => {
     );
 };
 
-const ResourcesManager = ({ resources, onChange }) => {
+const ResourcesManager = ({ resources, onChange, onUpload }) => {
     const [newItem, setNewItem] = useState({ title: '', url: '' });
+    const [uploading, setUploading] = useState(false);
+
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        const url = await onUpload(file);
+        if (url) {
+            // Try to set title from filename if empty
+            const title = newItem.title || file.name;
+            setNewItem({ ...newItem, url: url, title: title });
+        }
+        setUploading(false);
+        e.target.value = null;
+    };
 
     const addItem = () => {
         if (!newItem.title || !newItem.url) return alert('Title and URL are required');
@@ -204,7 +256,13 @@ const ResourcesManager = ({ resources, onChange }) => {
             <h4 className="font-medium text-gray-900">Resources</h4>
             <div className="flex gap-2">
                 <input type="text" placeholder="Title" className="border p-2 rounded flex-1" value={newItem.title} onChange={e => setNewItem({ ...newItem, title: e.target.value })} />
-                <input type="text" placeholder="URL (PDF/Link)" className="border p-2 rounded flex-1" value={newItem.url} onChange={e => setNewItem({ ...newItem, url: e.target.value })} />
+                <div className="flex-1 flex gap-2">
+                    <input type="text" placeholder="URL (PDF/Link)" className="border p-2 rounded w-full" value={newItem.url} onChange={e => setNewItem({ ...newItem, url: e.target.value })} />
+                    <label className="cursor-pointer bg-white px-3 py-2 border rounded shadow-sm text-sm hover:bg-gray-50 flex items-center justify-center">
+                        {uploading ? '...' : 'Up'}
+                        <input type="file" className="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" onChange={handleUpload} />
+                    </label>
+                </div>
                 <button type="button" onClick={addItem} className="px-3 py-1 bg-blue-600 text-white rounded text-sm">Add</button>
             </div>
 
@@ -222,10 +280,21 @@ const ResourcesManager = ({ resources, onChange }) => {
     );
 };
 
-const EventTestimonialManager = ({ eventId, departmentId }) => {
+const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
     const [testimonials, setTestimonials] = useState([]);
     const [loading, setLoading] = useState(false);
     const [newItem, setNewItem] = useState({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event' });
+    const [uploading, setUploading] = useState(false);
+
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        const url = await onUpload(file);
+        if (url) setNewItem({ ...newItem, image: url });
+        setUploading(false);
+        e.target.value = null;
+    };
 
     const fetchTestimonials = useCallback(async () => {
         setLoading(true);
@@ -291,7 +360,13 @@ const EventTestimonialManager = ({ eventId, departmentId }) => {
                 <input type="text" placeholder="Role (e.g. Student)" className="border p-2 rounded" value={newItem.role} onChange={e => setNewItem({ ...newItem, role: e.target.value })} />
                 <input type="text" placeholder="Message" className="border p-2 rounded col-span-2" value={newItem.message} onChange={e => setNewItem({ ...newItem, message: e.target.value })} />
                 <input type="number" placeholder="Rating (1-5)" className="border p-2 rounded" min="1" max="5" value={newItem.rating} onChange={e => setNewItem({ ...newItem, rating: parseInt(e.target.value) })} />
-                <input type="text" placeholder="Image URL" className="border p-2 rounded" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} />
+                <div className="flex gap-2">
+                    <input type="text" placeholder="Image URL" className="border p-2 rounded w-full" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} />
+                    <label className="cursor-pointer bg-white px-3 py-2 border rounded shadow-sm text-sm hover:bg-gray-50 flex items-center justify-center">
+                        {uploading ? '...' : 'Up'}
+                        <input type="file" className="hidden" accept="image/*" onChange={handleUpload} />
+                    </label>
+                </div>
 
                 <select className="border p-2 rounded bg-white" value={newItem.type} onChange={e => setNewItem({ ...newItem, type: e.target.value })}>
                     <option value="text">Text Only</option>
@@ -539,6 +614,30 @@ const EventsList = () => {
         }
     };
 
+    const handleGenericUpload = async (file) => {
+        if (!file) return null;
+        const form = new FormData();
+        form.append('file', file);
+
+        try {
+            const { access_token } = getToken();
+            const res = await fetch('http://localhost:5000/api/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': access_token ? `Bearer ${access_token}` : ''
+                },
+                body: form
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Upload failed');
+            return data.data.url;
+        } catch (error) {
+            console.error(error);
+            alert("Upload failed: " + error.message);
+            return null;
+        }
+    };
+
     const [uploading, setUploading] = useState(false);
 
     const handleImageUpload = async (e) => {
@@ -781,7 +880,7 @@ const EventsList = () => {
                                                                 type="file"
                                                                 className="hidden"
                                                                 accept="image/*"
-                                                                onChange={handleImageUpload}
+                                                                onChange={(e) => handleImageUpload(e)}
                                                             />
                                                         </label>
                                                         {uploading && <span className="text-sm text-gray-500">Uploading...</span>}
@@ -818,7 +917,11 @@ const EventsList = () => {
                                         )}
 
                                         {activeTab === 'Speakers' && (
-                                            <SpeakerManager speakers={formData.speakers} onChange={val => setFormData({ ...formData, speakers: val })} />
+                                            <SpeakerManager
+                                                speakers={formData.speakers}
+                                                onChange={val => setFormData({ ...formData, speakers: val })}
+                                                onUpload={handleGenericUpload}
+                                            />
                                         )}
 
                                         {activeTab === 'Agenda' && (
@@ -826,16 +929,28 @@ const EventsList = () => {
                                         )}
 
                                         {activeTab === 'Gallery' && (
-                                            <GalleryManager gallery={formData.gallery} onChange={val => setFormData({ ...formData, gallery: val })} />
+                                            <GalleryManager
+                                                gallery={formData.gallery}
+                                                onChange={val => setFormData({ ...formData, gallery: val })}
+                                                onUpload={handleGenericUpload}
+                                            />
                                         )}
 
                                         {activeTab === 'Resources' && (
-                                            <ResourcesManager resources={formData.resources} onChange={val => setFormData({ ...formData, resources: val })} />
+                                            <ResourcesManager
+                                                resources={formData.resources}
+                                                onChange={val => setFormData({ ...formData, resources: val })}
+                                                onUpload={handleGenericUpload}
+                                            />
                                         )}
 
                                         {activeTab === 'Testimonials' && (
                                             editingId ? (
-                                                <EventTestimonialManager eventId={editingId} departmentId={formData.department} />
+                                                <EventTestimonialManager
+                                                    eventId={editingId}
+                                                    departmentId={formData.department}
+                                                    onUpload={handleGenericUpload}
+                                                />
                                             ) : (
                                                 <div className="text-center py-8 text-gray-500 bg-gray-50 rounded">
                                                     <p>Please save the event first to add testimonials.</p>

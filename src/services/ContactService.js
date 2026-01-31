@@ -3,9 +3,10 @@ import { getToken } from './LocalStorageService';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const ContactService = {
-    async getContacts() {
+    async getContacts(params = {}) {
         const { access_token } = getToken();
-        const response = await fetch(`${API_BASE_URL}/contacts`, {
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_BASE_URL}/contacts${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

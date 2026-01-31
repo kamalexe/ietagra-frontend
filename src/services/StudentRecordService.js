@@ -11,8 +11,9 @@ const getAuthHeaders = () => {
 };
 
 const StudentRecordService = {
-    async getRecords(category) {
-        const response = await fetch(`${API_BASE_URL}/student-records?category=${category}`, {
+    async getRecords(category, params = {}) {
+        const queryString = new URLSearchParams({ category, ...params }).toString();
+        const response = await fetch(`${API_BASE_URL}/student-records?${queryString}`, {
             method: 'GET',
             headers: getAuthHeaders()
         });

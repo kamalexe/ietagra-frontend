@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { PlusIcon, TrashIcon, PencilIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
+import DepartmentService from '../../services/DepartmentService';
 
 const CATEGORIES = [
     { id: 'gate', label: 'GATE Qualified' },
@@ -26,7 +27,20 @@ const StudentDataManager = () => {
     const [activeTab, setActiveTab] = useState('gate');
     const [records, setRecords] = useState([]);
     const [filteredRecords, setFilteredRecords] = useState([]);
+    const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const data = await DepartmentService.getAllDepartments();
+                setDepartments(data);
+            } catch (error) {
+                console.error("Failed to fetch departments", error);
+            }
+        };
+        fetchDepartments();
+    }, []);
 
     // Search & Selection
     const [searchQuery, setSearchQuery] = useState('');
@@ -81,12 +95,25 @@ const StudentDataManager = () => {
 
     const downloadSample = () => {
         const headers = SAMPLE_HEADERS[activeTab] || ['studentName', 'batch', 'branch'];
+
+        // Create Data Sheet
         const ws = XLSX.utils.json_to_sheet([
-            headers.reduce((acc, curr) => ({ ...acc, [curr]: "" }), {}), // Empty row for structure
-            headers.reduce((acc, curr) => ({ ...acc, [curr]: `sample_${curr}` }), {}) // Sample row
-        ], { header: headers, skipHeader: false });
+            headers.reduce((acc, curr) => ({ ...acc, [curr]: "" }), {}), // Empty row
+            headers.reduce((acc, curr) => ({ ...acc, [curr]: `sample_${curr}` }), {}) // Sample
+        ], { header: headers });
+
+        // Create Instructions Sheet
+        const branches = departments.map(d => `${d.name} -> ${d.slug.toUpperCase()}`).join('\n');
+        const instructionData = [
+            { "Field": "department", "Notes": "If Admin: Use Department ID. If Dept Admin: Leave empty (auto-assigned)." },
+            { "Field": "branch", "Notes": `Valid Branch Codes:\n${branches}` },
+            { "Field": "batch", "Notes": "e.g., 2024, 2025" }
+        ];
+        const wsInfo = XLSX.utils.json_to_sheet(instructionData);
+
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Template");
+        XLSX.utils.book_append_sheet(wb, wsInfo, "Instructions");
         XLSX.writeFile(wb, `${activeTab}_template.xlsx`);
     };
 
@@ -130,7 +157,9 @@ const StudentDataManager = () => {
                 enrollmentNo,
                 batch,
                 branch,
-                department: role === 'department_admin' ? userDept?._id : (meta.department || ''),
+                department: role === 'department_admin'
+                    ? (userDept?._id || userDept)
+                    : (meta.department || ''),
                 metadata: meta
             };
         });
@@ -231,7 +260,7 @@ const StudentDataManager = () => {
                 enrollmentNo: formData.enrollmentNo,
                 batch: formData.batch,
                 branch: formData.branch,
-                department: role === 'department_admin' ? userDept?._id : formData.department,
+                department: role === 'department_admin' ? (userDept?._id || userDept) : formData.department,
                 metadata: { ...formData.metadata }
             };
 
@@ -272,8 +301,17 @@ const StudentDataManager = () => {
                 ...record.metadata
             });
         } else {
+            const defaultDeptId = role === 'department_admin' ? (userDept?._id || userDept) : '';
+            // Auto-determine branch for Dept Admin
+            let defaultBranch = '';
+            if (role === 'department_admin' && departments.length > 0) {
+                const myDept = departments.find(d => d._id === defaultDeptId);
+                if (myDept) defaultBranch = myDept.slug.toUpperCase();
+            }
+
             setFormData({
-                department: role === 'department_admin' ? userDept?._id : ''
+                department: defaultDeptId,
+                branch: defaultBranch
             });
         }
         setIsModalOpen(true);
@@ -301,10 +339,17 @@ const StudentDataManager = () => {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Branch</label>
-                        <input type="text" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            value={formData.branch || ''}
-                            onChange={e => setFormData({ ...formData, branch: e.target.value })}
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2 pr-8"
+                                value={formData.branch || ''}
+                                onChange={e => setFormData({ ...formData, branch: e.target.value.toUpperCase() })}
+                                placeholder="Auto-filled or Select"
+                            />
+                            {/* Optional: Add a small dropdown trigger if manually editing is allowed but they want to pick from list */}
+                        </div>
+                        {/* Helper text or pill to show it comes from Dept */}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Enrollment No</label>
@@ -316,11 +361,26 @@ const StudentDataManager = () => {
                     {role === 'admin' && (
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-700">Department</label>
-                            <input type="text" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                placeholder="Department ID (optional)"
+                            <select
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 value={formData.department || ''}
-                                onChange={e => setFormData({ ...formData, department: e.target.value })}
-                            />
+                                onChange={e => {
+                                    const selectedDeptId = e.target.value;
+                                    const selectedDept = departments.find(d => d._id === selectedDeptId);
+                                    setFormData({
+                                        ...formData,
+                                        department: selectedDeptId,
+                                        branch: selectedDept ? selectedDept.slug.toUpperCase() : ''
+                                    });
+                                }}
+                            >
+                                <option value="">Select Department (Optional)</option>
+                                {departments.map(dept => (
+                                    <option key={dept._id} value={dept._id}>
+                                        {dept.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     )}
                 </div>

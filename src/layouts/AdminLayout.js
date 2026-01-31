@@ -27,7 +27,7 @@ const AdminLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { access_token } = useSelector((state) => state.auth);
-  const { role, name, department, email } = useSelector((state) => state.user);
+  const { role, name, email } = useSelector((state) => state.user);
 
   // Fetch user info if access_token is present
   // Fetch user info if access_token is present

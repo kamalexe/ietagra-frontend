@@ -11,8 +11,9 @@ const getAuthHeaders = () => {
 };
 
 const TestimonialService = {
-    async getAllTestimonials() {
-        const response = await fetch(`${API_BASE_URL}/testimonials`, {
+    async getAllTestimonials(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_BASE_URL}/testimonials${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: getAuthHeaders()
         });

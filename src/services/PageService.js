@@ -69,15 +69,7 @@ const PageService = {
         return resData.data;
     },
 
-    async getAllPages() {
-        const response = await fetch(`${PAGES_URL}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-        if (!response.ok) throw new Error(`Failed to fetch pages (${response.status} ${response.statusText})`);
-        const resData = await response.json();
-        return resData.data;
-    },
+
 
     async deletePage(slug) {
         const response = await fetch(`${PAGES_URL}/${encodeURIComponent(slug)}`, {
@@ -97,6 +89,21 @@ const PageService = {
     // For keeping compatibility if needed, though getPageBySlug is the main one used
     async getPage(slug) {
         return this.getPageBySlug(slug);
+    },
+
+    async getAllPages(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`${PAGES_URL}${queryString ? `?${queryString}` : ''}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch pages');
+        }
+
+        const resData = await response.json();
+        return resData.data;
     }
 };
 

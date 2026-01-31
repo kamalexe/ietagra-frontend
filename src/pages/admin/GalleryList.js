@@ -53,7 +53,7 @@ const GalleryList = () => {
 
     const [filterDepartment, setFilterDepartment] = useState('all'); // 'all', 'common', or departmentId
 
-    const loadImages = async () => {
+    const loadImages = React.useCallback(async () => {
         try {
             setLoading(true);
             let params = {};
@@ -72,28 +72,27 @@ const GalleryList = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filterDepartment]);
 
     // Rerun loadImages when filter changes
     useEffect(() => {
         loadImages();
-    }, [filterDepartment]);
+    }, [loadImages]);
 
+    // Load departments only for admin
     useEffect(() => {
-        loadImages();
         if (role === 'admin') {
-            loadDepartments();
+            const fetchDepts = async () => {
+                try {
+                    const data = await DepartmentService.getAllDepartments();
+                    setDepartments(data);
+                } catch (err) {
+                    console.error("Failed to load departments:", err);
+                }
+            };
+            fetchDepts();
         }
     }, [role]);
-
-    const loadDepartments = async () => {
-        try {
-            const data = await DepartmentService.getAllDepartments();
-            setDepartments(data);
-        } catch (err) {
-            console.error("Failed to load departments:", err);
-        }
-    };
 
     const handleOpenModal = (image = null) => {
         if (image) {
@@ -112,7 +111,7 @@ const GalleryList = () => {
                 category: 'Others',
                 description: '',
                 imageUrl: '',
-                department: role === 'department_admin' ? department?._id : ''
+                department: role === 'department_admin' ? (department?._id || department) : ''
             });
         }
         setIsModalOpen(true);

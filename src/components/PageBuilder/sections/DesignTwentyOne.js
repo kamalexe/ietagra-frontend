@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import EventService from '../../../services/EventService';
 import TestimonialService from '../../../services/TestimonialService';
-import DesignThirtyOne from './DesignThirtyOne';
+
 
 const DesignTwentyOne = () => {
     const { id } = useParams();

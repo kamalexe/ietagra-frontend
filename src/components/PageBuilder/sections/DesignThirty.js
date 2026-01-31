@@ -166,28 +166,34 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
                                 animate={{ opacity: 1, scale: 1, x: 0 }}
                                 className="w-full max-w-5xl h-full flex flex-col items-center justify-center"
                             >
-                                {selectedAlbum.media[activeMediaIndex].type === 'video' ? (
-                                    <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
-                                        <iframe
-                                            src={selectedAlbum.media[activeMediaIndex].videoUrl.replace('watch?v=', 'embed/')}
-                                            className="w-full h-full border-none"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                            title="Album Video"
-                                        />
-                                    </div>
+                                {selectedAlbum.media && selectedAlbum.media[activeMediaIndex] ? (
+                                    <>
+                                        {selectedAlbum.media[activeMediaIndex].type === 'video' ? (
+                                            <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
+                                                <iframe
+                                                    src={selectedAlbum.media[activeMediaIndex].videoUrl.replace('watch?v=', 'embed/')}
+                                                    className="w-full h-full border-none"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                    title="Album Video"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <img
+                                                src={selectedAlbum.media[activeMediaIndex].src}
+                                                alt="Gallery Detail"
+                                                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                                            />
+                                        )}
+
+                                        {selectedAlbum.media[activeMediaIndex].caption && (
+                                            <div className="mt-6 bg-white/5 px-6 py-3 rounded-full backdrop-blur-xl border border-white/10">
+                                                <p className="text-white text-sm italic">"{selectedAlbum.media[activeMediaIndex].caption}"</p>
+                                            </div>
+                                        )}
+                                    </>
                                 ) : (
-                                    <img 
-                                        src={selectedAlbum.media[activeMediaIndex].src} 
-                                        alt="Gallery Detail"
-                                        className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-                                    />
-                                )}
-                                
-                                {selectedAlbum.media[activeMediaIndex].caption && (
-                                    <div className="mt-6 bg-white/5 px-6 py-3 rounded-full backdrop-blur-xl border border-white/10">
-                                        <p className="text-white text-sm italic">"{selectedAlbum.media[activeMediaIndex].caption}"</p>
-                                    </div>
+                                    <div className="text-white text-xl">No media available</div>
                                 )}
                             </motion.div>
 

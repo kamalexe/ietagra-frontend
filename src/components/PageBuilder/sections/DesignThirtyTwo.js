@@ -4,7 +4,7 @@ import { fadeIn, staggerContainer } from '../../../utils/animations';
 import GalleryService from '../../../services/GalleryService';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline';
 
-const DesignThirtyTwo = ({ id, title, subtitle, badge, eventId }) => {
+const DesignThirtyTwo = ({ id, title, subtitle, badge, eventId, departmentId }) => {
     const [images, setImages] = useState([]);
     const [filteredImages, setFilteredImages] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,25 +14,29 @@ const DesignThirtyTwo = ({ id, title, subtitle, badge, eventId }) => {
     const categories = ["All", "Events", "Campus", "Academic", "Sports", "Others"];
 
     useEffect(() => {
-        const fetchCommonGallery = async () => {
+        const fetchGallery = async () => {
             try {
                 let params = {};
                 if (eventId) {
                     params.event = eventId;
+                } else if (departmentId) {
+                    // Filter by specific department
+                    params.department = departmentId;
                 } else {
+                    // Default to Common (University-wide)
                     params.common = true;
                 }
                 const data = await GalleryService.getGalleryImages(params);
                 setImages(data);
                 setFilteredImages(data);
             } catch (error) {
-                console.error("DesignThirtyTwo: Failed to load common gallery images", error);
+                console.error("DesignThirtyTwo: Failed to load gallery images", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchCommonGallery();
-    }, [eventId]);
+        fetchGallery();
+    }, [eventId, departmentId]);
 
     const openLightbox = (index) => {
         setSelectedImageIndex(index);
@@ -100,7 +104,7 @@ const DesignThirtyTwo = ({ id, title, subtitle, badge, eventId }) => {
                     )}
                 </div>
 
-                {/* Category Filter - Only show if NO eventId is present */}
+                {/* Category Filter - Only show if NO eventId is present. Valid for Dept and Common. */}
                 {!eventId && (
                     <div className="flex flex-wrap justify-center gap-2 mb-10">
                         {categories.map((cat) => (

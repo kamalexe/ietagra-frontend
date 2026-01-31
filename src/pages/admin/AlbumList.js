@@ -1,6 +1,9 @@
+// AlbumList - Admin Interface for Gallery Albums
 import React, { useEffect, useState } from 'react';
 import AlbumService from '../../services/AlbumService';
+import DepartmentService from '../../services/DepartmentService';
 import { getToken } from '../../services/LocalStorageService';
+import { useSelector } from 'react-redux';
 import { 
     PencilIcon, 
     TrashIcon, 
@@ -11,6 +14,7 @@ import {
     PlayCircleIcon,
     ChevronLeftIcon
 } from '@heroicons/react/24/outline';
+import Modal from '../../components/common/Modal';
 
 const AlbumList = () => {
     const [albums, setAlbums] = useState([]);
@@ -29,10 +33,16 @@ const AlbumList = () => {
     const [loadingMedia, setLoadingMedia] = useState(false);
     
     // Form States
-    const [albumFormData, setAlbumFormData] = useState({ title: '', category: 'Others', description: '', coverImage: '' });
+    const [albumFormData, setAlbumFormData] = useState({ title: '', category: 'Others', description: '', coverImage: '', department: '' });
     const [mediaFormData, setMediaFormData] = useState({ src: '', type: 'image', caption: '', videoUrl: '' });
     const [editingAlbumId, setEditingAlbumId] = useState(null);
     const [uploading, setUploading] = useState(false);
+
+    // Departments & Role
+    const [departments, setDepartments] = useState([]);
+
+    // Get user info from Redux
+    const { role: userRole, department: userDept } = useSelector(state => state.user);
 
     const categories = ['Events', 'Campus', 'Academic', 'Sports', 'Others'];
 
@@ -52,7 +62,17 @@ const AlbumList = () => {
 
     useEffect(() => {
         loadAlbums();
+        loadDepartments();
     }, []);
+
+    const loadDepartments = async () => {
+        try {
+            const data = await DepartmentService.getAllDepartments();
+            setDepartments(data);
+        } catch (err) {
+            console.error("Failed to load departments", err);
+        }
+    };
 
     // Album Actions
     const handleOpenAlbumModal = (album = null) => {
@@ -62,11 +82,20 @@ const AlbumList = () => {
                 title: album.title,
                 category: album.category,
                 description: album.description || '',
-                coverImage: album.coverImage
+                coverImage: album.coverImage,
+                department: album.department || '' // Keep existing or empty
             });
         } else {
             setEditingAlbumId(null);
-            setAlbumFormData({ title: '', category: 'Others', description: '', coverImage: '' });
+            // Auto-fill department for department_admin
+            const defaultDept = userRole === 'department_admin' ? (userDept?._id || userDept || '') : '';
+            setAlbumFormData({
+                title: '',
+                category: 'Others',
+                description: '',
+                coverImage: '',
+                department: defaultDept
+            });
         }
         setIsAlbumModalOpen(true);
     };
@@ -112,7 +141,7 @@ const AlbumList = () => {
 
     const handleMediaSubmit = async (e) => {
         e.preventDefault();
-        const updatedMedia = [...currentAlbum.media, mediaFormData];
+        const updatedMedia = [...(currentAlbum.media || []), mediaFormData];
         try {
             const updated = await AlbumService.updateAlbum(currentAlbum._id, { media: updatedMedia });
             setCurrentAlbum(updated);
@@ -125,7 +154,7 @@ const AlbumList = () => {
 
     const handleRemoveMedia = async (index) => {
         if (window.confirm("Remove this item from the album?")) {
-            const updatedMedia = currentAlbum.media.filter((_, i) => i !== index);
+            const updatedMedia = (currentAlbum.media || []).filter((_, i) => i !== index);
             try {
                 const updated = await AlbumService.updateAlbum(currentAlbum._id, { media: updatedMedia });
                 setCurrentAlbum(updated);
@@ -287,7 +316,7 @@ const AlbumList = () => {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {currentAlbum.media.map((item, idx) => (
+                            {(currentAlbum.media || []).map((item, idx) => (
                             <div key={idx} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 border border-gray-200 group">
                                 {item.type === 'video' ? (
                                     <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900">
@@ -313,7 +342,7 @@ const AlbumList = () => {
                                 )}
                             </div>
                         ))}
-                        {currentAlbum.media.length === 0 && (
+                            {(currentAlbum.media || []).length === 0 && (
                             <div className="col-span-full text-center py-20 text-gray-400 border-2 border-dashed rounded-lg">
                                 This album is empty. Add some media!
                             </div>
@@ -323,138 +352,155 @@ const AlbumList = () => {
             )}
 
             {/* CREATE/EDIT ALBUM MODAL */}
-            {isAlbumModalOpen && (
-                <div className="fixed inset-0 overflow-y-auto" style={{ zIndex: 1000 }}>
-                    <div className="flex items-center justify-center min-h-screen px-4 py-12 text-center pointer-events-none">
-                        <div className="fixed inset-0 bg-black/60 transition-opacity pointer-events-auto" onClick={() => setIsAlbumModalOpen(false)}></div>
-                        <div className="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl pointer-events-auto">
-                            <h3 className="text-xl font-bold text-gray-900 mb-6">{editingAlbumId ? 'Edit Album' : 'Create New Album'}</h3>
-                            <form onSubmit={handleAlbumSubmit} className="space-y-4">
+            <Modal
+                isOpen={isAlbumModalOpen}
+                onClose={() => setIsAlbumModalOpen(false)}
+                title={editingAlbumId ? 'Edit Album' : 'Create New Album'}
+                zIndex={50}
+            >
+                <form onSubmit={handleAlbumSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Album Title</label>
+                        <input type="text" value={albumFormData.title} onChange={(e) => setAlbumFormData({ ...albumFormData, title: e.target.value })} required className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Graduation Day 2024" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Category</label>
+                            <select value={albumFormData.category} onChange={(e) => setAlbumFormData({ ...albumFormData, category: e.target.value })} className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm">
+                                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            {userRole === 'admin' ? (
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Album Title</label>
-                                    <input type="text" value={albumFormData.title} onChange={(e) => setAlbumFormData({...albumFormData, title: e.target.value})} required className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Graduation Day 2024" />
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Department</label>
+                                    <select
+                                        value={albumFormData.department}
+                                        onChange={e => setAlbumFormData({ ...albumFormData, department: e.target.value })}
+                                        className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm"
+                                    >
+                                        <option value="">Common (University Wide)</option>
+                                        {departments.map(dept => (
+                                            <option key={dept._id} value={dept._id}>{dept.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Category</label>
-                                        <select value={albumFormData.category} onChange={(e) => setAlbumFormData({...albumFormData, category: e.target.value})} className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm">
-                                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                                        </select>
-                                    </div>
-                                </div>
+                            ) : (
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cover Image</label>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-20 h-14 bg-gray-100 rounded border overflow-hidden">
-                                            {albumFormData.coverImage ? <img src={albumFormData.coverImage} className="w-full h-full object-cover" /> : <PhotoIcon className="w-full h-full p-3 text-gray-300" />}
-                                        </div>
-                                        <button type="button" onClick={() => handleOpenLibrary('coverImage')} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-md">Library</button>
-                                        <label className="text-xs font-bold text-gray-600 hover:text-gray-800 bg-gray-100 px-3 py-1.5 rounded-md cursor-pointer">
-                                            Upload
-                                            <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'coverImage')} />
-                                        </label>
-                                    </div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Department</label>
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={userDept?.name || 'My Department'}
+                                        className="w-full border-gray-200 bg-gray-50 rounded-lg py-2 px-3 text-sm text-gray-500 cursor-not-allowed"
+                                    />
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Description</label>
-                                    <textarea value={albumFormData.description} onChange={(e) => setAlbumFormData({...albumFormData, description: e.target.value})} rows={3} className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm" placeholder="Optional brief about the album"></textarea>
-                                </div>
-                                <div className="flex justify-end gap-3 pt-4 border-t mt-6">
-                                    <button type="button" onClick={() => setIsAlbumModalOpen(false)} className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-800">Cancel</button>
-                                    <button type="submit" disabled={uploading} className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">
-                                        {uploading ? 'Processing...' : (editingAlbumId ? 'Save Changes' : 'Create Album')}
-                                    </button>
-                                </div>
-                            </form>
+                            )}
                         </div>
                     </div>
-                </div>
-            )}
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cover Image</label>
+                        <div className="flex items-center gap-3">
+                            <div className="w-20 h-14 bg-gray-100 rounded border overflow-hidden">
+                                {albumFormData.coverImage ? <img src={albumFormData.coverImage} alt="Cover Preview" className="w-full h-full object-cover" /> : <PhotoIcon className="w-full h-full p-3 text-gray-300" />}
+                            </div>
+                            <button type="button" onClick={() => handleOpenLibrary('coverImage')} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-md">Library</button>
+                            <label className="text-xs font-bold text-gray-600 hover:text-gray-800 bg-gray-100 px-3 py-1.5 rounded-md cursor-pointer">
+                                Upload
+                                <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'coverImage')} />
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Description</label>
+                        <textarea value={albumFormData.description} onChange={(e) => setAlbumFormData({ ...albumFormData, description: e.target.value })} rows={3} className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm" placeholder="Optional brief about the album"></textarea>
+                    </div>
+                    <div className="flex justify-end gap-3 pt-4 border-t mt-6">
+                        <button type="button" onClick={() => setIsAlbumModalOpen(false)} className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-800">Cancel</button>
+                        <button type="submit" disabled={uploading} className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">
+                            {uploading ? 'Processing...' : (editingAlbumId ? 'Save Changes' : 'Create Album')}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
 
             {/* ADD MEDIA MODAL */}
-            {isMediaModalOpen && (
-                <div className="fixed inset-0 overflow-y-auto" style={{ zIndex: 1000 }}>
-                    <div className="flex items-center justify-center min-h-screen px-4 text-center pointer-events-none">
-                        <div className="fixed inset-0 bg-black/60 pointer-events-auto" onClick={() => setIsMediaModalOpen(false)}></div>
-                        <div className="inline-block w-full max-w-md p-6 overflow-hidden text-left align-middle bg-white shadow-2xl rounded-2xl pointer-events-auto">
-                            <h3 className="text-xl font-bold text-gray-900 mb-6">Add Item to Album</h3>
-                            <form onSubmit={handleMediaSubmit} className="space-y-4">
-                                <div className="flex gap-4 p-1 bg-gray-100 rounded-lg">
-                                    <button type="button" onClick={() => setMediaFormData({...mediaFormData, type: 'image'})} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${mediaFormData.type === 'image' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}>PHOTO</button>
-                                    <button type="button" onClick={() => setMediaFormData({...mediaFormData, type: 'video'})} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${mediaFormData.type === 'video' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}>VIDEO</button>
-                                </div>
-
-                                {mediaFormData.type === 'image' ? (
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Photo</label>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-20 h-20 bg-gray-100 rounded border overflow-hidden">
-                                                {mediaFormData.src ? <img src={mediaFormData.src} className="w-full h-full object-cover" /> : <PhotoIcon className="w-full h-full p-4 text-gray-300" />}
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <button type="button" onClick={() => handleOpenLibrary('mediaSrc')} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-4 py-2 rounded-md">From Library</button>
-                                                <label className="text-xs font-bold text-gray-600 hover:text-gray-800 bg-gray-100 px-4 py-2 rounded-md cursor-pointer text-center">
-                                                    Upload New
-                                                    <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'mediaSrc')} />
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">YouTube Video URL</label>
-                                        <input type="url" value={mediaFormData.videoUrl} onChange={(e) => setMediaFormData({...mediaFormData, videoUrl: e.target.value})} required className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm" placeholder="https://www.youtube.com/watch?v=..." />
-                                    </div>
-                                )}
-
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Caption</label>
-                                    <input type="text" value={mediaFormData.caption} onChange={(e) => setMediaFormData({...mediaFormData, caption: e.target.value})} className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm" placeholder="Optional short note" />
-                                </div>
-
-                                <div className="flex justify-end gap-3 pt-4 border-t mt-6">
-                                    <button type="button" onClick={() => setIsMediaModalOpen(false)} className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-800">Cancel</button>
-                                    <button type="submit" disabled={!mediaFormData.src && !mediaFormData.videoUrl} className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm disabled:opacity-50">
-                                        Add to Album
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+            <Modal
+                isOpen={isMediaModalOpen}
+                onClose={() => setIsMediaModalOpen(false)}
+                title="Add Item to Album"
+                maxWidth="max-w-md"
+                zIndex={50}
+            >
+                <form onSubmit={handleMediaSubmit} className="space-y-4">
+                    <div className="flex gap-4 p-1 bg-gray-100 rounded-lg">
+                        <button type="button" onClick={() => setMediaFormData({ ...mediaFormData, type: 'image' })} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${mediaFormData.type === 'image' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}>PHOTO</button>
+                        <button type="button" onClick={() => setMediaFormData({ ...mediaFormData, type: 'video' })} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${mediaFormData.type === 'video' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}>VIDEO</button>
                     </div>
-                </div>
-            )}
+
+                    {mediaFormData.type === 'image' ? (
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Photo</label>
+                            <div className="flex items-center gap-3">
+                                <div className="w-20 h-20 bg-gray-100 rounded border overflow-hidden">
+                                    {mediaFormData.src ? <img src={mediaFormData.src} alt="Media Preview" className="w-full h-full object-cover" /> : <PhotoIcon className="w-full h-full p-4 text-gray-300" />}
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <button type="button" onClick={() => handleOpenLibrary('mediaSrc')} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-4 py-2 rounded-md">From Library</button>
+                                    <label className="text-xs font-bold text-gray-600 hover:text-gray-800 bg-gray-100 px-4 py-2 rounded-md cursor-pointer text-center">
+                                        Upload New
+                                        <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'mediaSrc')} />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">YouTube Video URL</label>
+                            <input type="url" value={mediaFormData.videoUrl} onChange={(e) => setMediaFormData({ ...mediaFormData, videoUrl: e.target.value })} required className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm" placeholder="https://www.youtube.com/watch?v=..." />
+                        </div>
+                    )}
+
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Caption</label>
+                        <input type="text" value={mediaFormData.caption} onChange={(e) => setMediaFormData({ ...mediaFormData, caption: e.target.value })} className="w-full border-gray-200 rounded-lg py-2 px-3 text-sm" placeholder="Optional short note" />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4 border-t mt-6">
+                        <button type="button" onClick={() => setIsMediaModalOpen(false)} className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-800">Cancel</button>
+                        <button type="submit" disabled={!mediaFormData.src && !mediaFormData.videoUrl} className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm disabled:opacity-50">
+                            Add to Album
+                        </button>
+                    </div>
+                </form>
+            </Modal>
 
             {/* SHARED MEDIA LIBRARY MODAL */}
-            {isLibraryModalOpen && (
-                <div className="fixed inset-0 overflow-y-auto" style={{ zIndex: 1100 }}>
-                    <div className="flex items-center justify-center min-h-screen px-4 py-12 pointer-events-none">
-                        <div className="fixed inset-0 bg-black/70 pointer-events-auto" onClick={() => setIsLibraryModalOpen(false)}></div>
-                        <div className="inline-block w-full max-w-4xl overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl pointer-events-auto">
-                            <div className="flex justify-between items-center px-6 py-4 border-b">
-                                <h3 className="text-xl font-bold text-gray-900">Media Library</h3>
-                                <button onClick={() => setIsLibraryModalOpen(false)} className="text-gray-400 hover:text-gray-600"><XMarkIcon className="h-6 w-6" /></button>
-                            </div>
-                            <div className="px-6 py-6 h-96 overflow-y-auto bg-gray-50">
-                                {loadingMedia ? (
-                                    <div className="flex justify-center items-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
-                                ) : (
-                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                                        {mediaFiles.map((file, idx) => (
-                                            <div key={idx} onClick={() => selectFromLibrary(file.url)} className="relative aspect-square rounded-lg overflow-hidden bg-white border border-gray-200 cursor-pointer hover:ring-2 hover:ring-indigo-500 hover:scale-95 transition-all group">
-                                                <img src={file.url} className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="px-6 py-3 bg-gray-100 text-right">
-                                <button onClick={() => setIsLibraryModalOpen(false)} className="text-sm font-bold text-gray-600">Close</button>
-                            </div>
+            <Modal
+                isOpen={isLibraryModalOpen}
+                onClose={() => setIsLibraryModalOpen(false)}
+                title="Media Library"
+                maxWidth="max-w-4xl"
+                zIndex={60}
+            >
+                <div className="h-96 overflow-y-auto bg-gray-50 p-4 border rounded-lg">
+                    {loadingMedia ? (
+                        <div className="flex justify-center items-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+                    ) : (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                            {mediaFiles.map((file, idx) => (
+                                <div key={idx} onClick={() => selectFromLibrary(file.url)} className="relative aspect-square rounded-lg overflow-hidden bg-white border border-gray-200 cursor-pointer hover:ring-2 hover:ring-indigo-500 hover:scale-95 transition-all group">
+                                    <img src={file.url} alt={`Library item ${idx}`} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
+                <div className="mt-4 flex justify-end">
+                    <button onClick={() => setIsLibraryModalOpen(false)} className="text-sm font-bold text-gray-600 hover:text-gray-800 px-4 py-2 bg-gray-100 rounded">Close</button>
+                </div>
+            </Modal>
         </div>
     );
 };

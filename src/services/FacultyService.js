@@ -11,8 +11,9 @@ const getAuthHeaders = () => {
 };
 
 const FacultyService = {
-    async getAllFaculty() {
-        const response = await fetch(`${API_BASE_URL}/faculty`, {
+    async getAllFaculty(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_BASE_URL}/faculty${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: getAuthHeaders()
         });
