@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import EventService from '../../../services/EventService';
+import TestimonialService from '../../../services/TestimonialService';
 import DesignThirtyOne from './DesignThirtyOne';
 
 const DesignTwentyOne = () => {
     const { id } = useParams();
     const [event, setEvent] = useState(null);
+    const [testimonials, setTestimonials] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [registering, setRegistering] = useState(false);
@@ -24,6 +26,16 @@ const DesignTwentyOne = () => {
                     data = await EventService.getEventBySlug(id);
                 }
                 setEvent(data);
+
+                // Fetch testimonials if event exists
+                if (data && data._id) {
+                    try {
+                        const testimonialData = await TestimonialService.getTestimonialsByEvent(data._id);
+                        setTestimonials(testimonialData);
+                    } catch (tErr) {
+                        console.error("Failed to load testimonials", tErr);
+                    }
+                }
             } catch (err) {
                 console.error("Failed to load event", err);
                 setError("Event not found");
@@ -178,6 +190,32 @@ const DesignTwentyOne = () => {
                                                 {item.caption}
                                             </div>
                                         )}
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Testimonials Section */}
+                    {testimonials && testimonials.length > 0 && (
+                        <section>
+                            <h3 className="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-yellow-500 pl-4">What People Say</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {testimonials.map((item, idx) => (
+                                    <div key={idx} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col">
+                                        <div className="flex items-center mb-4">
+                                            <img src={item.image || 'https://via.placeholder.com/50'} alt={item.name} className="w-12 h-12 rounded-full object-cover mr-4" />
+                                            <div>
+                                                <h4 className="font-bold text-gray-900">{item.name}</h4>
+                                                <p className="text-sm text-gray-500">{item.role}</p>
+                                            </div>
+                                        </div>
+                                        <p className="text-gray-600 italic flex-grow">"{item.message}"</p>
+                                        <div className="mt-4 flex text-yellow-400 text-sm">
+                                            {[...Array(item.rating || 5)].map((_, i) => (
+                                                <i key={i} className="fas fa-star"></i>
+                                            ))}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
