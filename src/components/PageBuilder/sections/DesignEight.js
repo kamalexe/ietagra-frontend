@@ -6,7 +6,7 @@ import * as FaIcons from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignEight = ({ title, content, images, features, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
+const DesignEight = ({ id, title, content, images, features, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Auto-rotate images
@@ -24,7 +24,7 @@ const DesignEight = ({ title, content, images, features, badge, underlineColor, 
   };
 
   return (
-    <SectionWrapper
+    <SectionWrapper id={id}
       badge={badge}
       title={title}
       underlineColor={underlineColor || 'from-green-500 to-teal-600'}
@@ -99,7 +99,7 @@ const DesignEight = ({ title, content, images, features, badge, underlineColor, 
                         {features.map((feat, i) => {
                              const Icon = FaIcons[feat.icon] || FaIcons['FaInfoCircle'];
                              return (
-                                <div key={i} className="flex items-start">
+                                <div id={id} key={i} className="flex items-start">
                                     <div className="flex-shrink-0 mt-1">
                                     <Icon className="text-green-500" />
                                     </div>

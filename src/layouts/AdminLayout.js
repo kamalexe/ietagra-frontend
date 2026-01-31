@@ -19,12 +19,14 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { useGetLoggedUserQuery } from '../services/userAuthApi';
 import { setUserInfo } from '../features/userSlice';
+import { getToken, registerAccount } from '../services/LocalStorageService';
+import AccountSwitcher from '../components/dashboard/AccountSwitcher';
 
 const AdminLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { access_token } = useSelector((state) => state.auth);
-  const { role, name, department } = useSelector((state) => state.user);
+  const { role, name, department, email } = useSelector((state) => state.user);
 
   // Fetch user info if access_token is present
   const { data, isSuccess } = useGetLoggedUserQuery(access_token, {
@@ -40,6 +42,10 @@ const AdminLayout = () => {
         department: data.user.department,
         id: data.user._id
       }));
+
+      // Auto-register account for switching
+      const tokens = getToken();
+      registerAccount(tokens, { ...data.user, user_type: data.user.role === 'admin' ? 1 : 4 }); // Map role to type if needed, or just pass object if consistent
     }
   }, [data, isSuccess, dispatch]);
 
@@ -107,13 +113,7 @@ const AdminLayout = () => {
             {navigation.find(n => location.pathname.startsWith(n.href))?.name || 'Admin Panel'}
           </h2>
           <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{name || 'Admin User'}</p>
-              <p className="text-xs text-gray-500 capitalize">{department?.name || role || 'Access Level'}</p>
-            </div>
-            <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold">
-              {name ? name[0].toUpperCase() : 'A'}
-            </div>
+            <AccountSwitcher currentUser={{ name, email, user_type: role === 'admin' ? 1 : 4 }} />
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-8">

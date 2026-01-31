@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon, TrophyIcon, CurrencyRupeeIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
 
-const DesignTwentyFive = ({ title, description, subtitle, items = [] }) => {
+const DesignTwentyFive = ({ id, title, description, subtitle, items = [] }) => {
     // State for filters
     const [filters, setFilters] = useState({
         company: '',
@@ -61,7 +61,7 @@ const DesignTwentyFive = ({ title, description, subtitle, items = [] }) => {
     };
 
     return (
-        <section className="py-16 bg-gradient-to-br from-blue-50 to-white">
+        <section id={id} className="py-16 bg-gradient-to-br from-blue-50 to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12">

@@ -6,7 +6,7 @@ import { FaAward } from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignFour = ({ title, description, facultyMembers, members, items, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
+const DesignFour = ({ id, title, description, facultyMembers, members, items, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
   const dataItems = facultyMembers || members || items || [];
 
   const itemVariants = {
@@ -19,7 +19,7 @@ const DesignFour = ({ title, description, facultyMembers, members, items, badge,
   };
 
   return (
-    <SectionWrapper
+    <SectionWrapper id={id}
       badge={badge}
       title={title}
       underlineColor={underlineColor || 'from-green-500 to-teal-600'}

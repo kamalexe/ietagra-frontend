@@ -6,7 +6,7 @@ import * as FaIcons from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignNine = ({ title, variant = 'simple', items, cards, columns = 2, badge, underlineColor, description, backgroundImage, buttons, gradient }) => {
+const DesignNine = ({ id, title, variant = 'simple', items, cards, columns = 2, badge, underlineColor, description, backgroundImage, buttons, gradient }) => {
     const dataItems = items || cards || [];
 
     const itemVariants = {
@@ -23,7 +23,7 @@ const DesignNine = ({ title, variant = 'simple', items, cards, columns = 2, badg
     };
 
     return (
-        <SectionWrapper
+        <SectionWrapper id={id}
             badge={badge}
             title={title}
             underlineColor={underlineColor}

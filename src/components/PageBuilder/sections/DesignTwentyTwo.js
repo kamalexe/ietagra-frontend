@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const DesignTwentyTwo = ({
+const DesignTwentyTwo = ({ id,
     title = "Feedback/Query Form",
     subtitle,
     buttonText = "Send",
@@ -51,7 +51,7 @@ const DesignTwentyTwo = ({
     };
 
     return (
-        <section className={`py-12 px-4 md:px-8 bg-white ${backgroundImage ? 'bg-cover bg-center' : ''}`} style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}}>
+        <section id={id} className={`py-12 px-4 md:px-8 bg-white ${backgroundImage ? 'bg-cover bg-center' : ''}`} style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}}>
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row gap-12">
                     {/* Venue Column */}

@@ -5,7 +5,7 @@ import * as FaIcons from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignTwo = ({ items, cards, badge, title, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
+const DesignTwo = ({ id, items, cards, badge, title, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
     const dataItems = items || cards || [];
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
@@ -20,7 +20,7 @@ const DesignTwo = ({ items, cards, badge, title, underlineColor, description, va
     };
 
     return (
-        <SectionWrapper
+        <SectionWrapper id={id}
             badge={badge}
             title={title}
             underlineColor={underlineColor}

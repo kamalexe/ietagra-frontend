@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const DesignTwentySeven = ({
+const DesignTwentySeven = ({ id,
     title1 = "HOW IT",
     title2 = "WORKS?",
     cards = []
@@ -55,7 +55,7 @@ const DesignTwentySeven = ({
     });
 
     return (
-        <section className="bg-[#F6F6F6] text-[#3C172A] font-sans">
+        <section id={id} className="bg-[#F6F6F6] text-[#3C172A] font-sans">
 
             {/* ---------------- MOBILE ---------------- */}
             <div className="block sm:hidden py-10 overflow-hidden">

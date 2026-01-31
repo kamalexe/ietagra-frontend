@@ -4,7 +4,7 @@ import { fadeIn, staggerContainer } from '../../../utils/animations';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignFourteen = ({ title, items, badge, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
+const DesignFourteen = ({ id, title, items, badge, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
     // Expected Item Properties:
     // - title: string
     // - description: string
@@ -15,7 +15,7 @@ const DesignFourteen = ({ title, items, badge, underlineColor, description, vari
     const dataItems = items || [];
 
     return (
-        <SectionWrapper
+        <SectionWrapper id={id}
             badge={badge}
             title={title}
             underlineColor={underlineColor}

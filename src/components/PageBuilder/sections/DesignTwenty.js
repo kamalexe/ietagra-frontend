@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import EventService from '../../../services/EventService';
 
-const DesignTwenty = ({
+const DesignTwenty = ({ id,
     title = "Events 2023",
     subtitle = "",
     content = "",
@@ -31,7 +31,7 @@ const DesignTwenty = ({
     if (loading) return <div className="text-center py-10">Loading events...</div>;
 
     return (
-        <section className="bg-white pb-20">
+        <section id={id} className="bg-white pb-20">
             {/* Header Section */}
             <div className="relative h-64 bg-cover bg-center flex items-center justify-center mb-16" style={{ backgroundImage: `url(${backgroundImage})` }}>
                 <div className="absolute inset-0 bg-black opacity-50"></div>

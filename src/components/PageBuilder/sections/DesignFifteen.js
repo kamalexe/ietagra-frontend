@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const DesignFifteen = ({ items = [] }) => {
+const DesignFifteen = ({ id, items = [] }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
@@ -23,7 +23,7 @@ const DesignFifteen = ({ items = [] }) => {
     }
 
     return (
-        <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <section id={id} className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-2xl shadow-xl mb-4 bg-gray-100">
                 <AnimatePresence mode="popLayout">
                     {items.map((item, index) => (

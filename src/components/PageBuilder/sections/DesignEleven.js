@@ -2,9 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 
-const DesignEleven = ({ title, description, image, buttonText, buttonLink, reverse = false, bgColor = 'bg-white' }) => {
+const DesignEleven = ({ id, title, description, image, buttonText, buttonLink, reverse = false, bgColor = 'bg-white' }) => {
     return (
-        <section className={`py-16 ${bgColor} overflow-hidden`}>
+        <section id={id} className={`py-16 ${bgColor} overflow-hidden`}>
             <div className="container mx-auto px-4">
                 <div className={`flex flex-col ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-12`}>
                     

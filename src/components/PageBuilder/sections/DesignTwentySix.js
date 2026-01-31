@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon, StarIcon, AcademicCapIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
-const DesignTwentySix = ({ title, description, subtitle, items = [] }) => {
+const DesignTwentySix = ({ id, title, description, subtitle, items = [] }) => {
     // State for filters
     const [filters, setFilters] = useState({
         batch: '',
@@ -31,7 +31,7 @@ const DesignTwentySix = ({ title, description, subtitle, items = [] }) => {
     };
 
     return (
-        <section className="py-16 bg-white">
+        <section id={id} className="py-16 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-16">

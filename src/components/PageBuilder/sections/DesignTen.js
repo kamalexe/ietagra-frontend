@@ -4,9 +4,9 @@ import { fadeIn, staggerContainer } from '../../../utils/animations';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignTen = ({ title, description, features = [], bgColor, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
+const DesignTen = ({ id, title, description, features = [], bgColor, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
     return (
-        <SectionWrapper
+        <SectionWrapper id={id}
             badge={badge}
             title={title}
             underlineColor={underlineColor}

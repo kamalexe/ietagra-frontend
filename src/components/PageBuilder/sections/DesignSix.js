@@ -6,10 +6,10 @@ import * as FaIcons from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignSix = ({ title, items, cards, badge, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
+const DesignSix = ({ id, title, items, cards, badge, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
     const dataItems = items || cards || [];
     return (
-        <SectionWrapper
+        <SectionWrapper id={id}
             badge={badge}
             title={title}
             underlineColor={underlineColor}
@@ -33,7 +33,7 @@ const DesignSix = ({ title, items, cards, badge, underlineColor, description, va
                     {dataItems.map((item, index) => {
                         const Icon = FaIcons[item.icon] || FaIcons['FaInfoCircle'];
                         return (
-                            <div key={index} className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300 hover:transform hover:scale-105">
+                            <div id={id} key={index} className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300 hover:transform hover:scale-105">
                                 <div className="bg-white/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Icon className="text-2xl" />
                                 </div>

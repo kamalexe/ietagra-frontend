@@ -61,7 +61,7 @@ const DesignTwentyOne = () => {
     if (!displayEvent) return null;
 
     return (
-        <div className="bg-gray-50 min-h-screen">
+        <div id={id} className="bg-gray-50 min-h-screen">
             {/* Banner Header */}
             <div className="relative h-96 bg-cover bg-center" style={{ backgroundImage: displayEvent.image ? `url(${displayEvent.image})` : 'none', backgroundColor: '#333' }}>
                 <div className="absolute inset-0 bg-black opacity-50"></div>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PhotoIcon, PlayIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import AlbumService from '../../../services/AlbumService';
 
-const DesignThirty = ({ title, subtitle, limit = 6, category = "All" }) => {
+const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
     const [albums, setAlbums] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedAlbum, setSelectedAlbum] = useState(null);
@@ -47,7 +47,7 @@ const DesignThirty = ({ title, subtitle, limit = 6, category = "All" }) => {
     };
 
     if (loading) return (
-        <div className="py-20 flex justify-center">
+        <div id={id} className="py-20 flex justify-center">
             <div className="animate-pulse flex flex-col items-center">
                 <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div>
                 <div className="h-4 w-48 bg-gray-200 rounded"></div>
@@ -56,7 +56,7 @@ const DesignThirty = ({ title, subtitle, limit = 6, category = "All" }) => {
     );
 
     return (
-        <section className="py-20 bg-white overflow-hidden">
+        <section id={id} className="py-20 bg-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <motion.h2 

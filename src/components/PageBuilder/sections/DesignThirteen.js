@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { fadeIn, staggerContainer } from '../../../utils/animations';
 import DepartmentService from '../../../services/DepartmentService';
 
-const DesignThirteen = ({ title }) => {
+const DesignThirteen = ({ id, title }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -30,14 +30,14 @@ const DesignThirteen = ({ title }) => {
 
     if (loading) {
         return (
-            <div className="py-20 flex justify-center items-center">
+            <div id={id} className="py-20 flex justify-center items-center">
                 <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     return (
-        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <section id={id} className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             {title && (
                 <motion.h2 
                     initial={{ opacity: 0, y: -20 }}

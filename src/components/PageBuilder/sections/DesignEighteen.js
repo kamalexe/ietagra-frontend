@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DesignEighteen = ({
+const DesignEighteen = ({ id,
     title = "Computer Science & Engineering",
     subtitle = "Institute of Engineering and Technology, Swami Vivekanand Campus, Dr. Bhimrao Ambedkar University, Agra",
     stats = [
@@ -14,7 +14,7 @@ const DesignEighteen = ({
     ]
 }) => {
     return (
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-800 via-blue-700 to-indigo-800 text-white">
+        <section id={id} className="relative overflow-hidden bg-gradient-to-br from-blue-800 via-blue-700 to-indigo-800 text-white">
             {/* Background Patterns */}
             <div className="absolute inset-0 overflow-hidden z-0" style={{ opacity: 0.07 }}>
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/binary.png')] opacity-40"></div>

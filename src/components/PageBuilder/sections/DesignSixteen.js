@@ -53,7 +53,7 @@ const COLUMN_CONFIG = {
     ]
 };
 
-const DesignSixteen = ({ title, description, projects, dataSource }) => {
+const DesignSixteen = ({ id, title, description, projects, dataSource }) => {
     // State
     const [fetchedData, setFetchedData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -119,7 +119,7 @@ const DesignSixteen = ({ title, description, projects, dataSource }) => {
     if (loading) return <div className="p-12 text-center text-gray-500 animate-pulse">Loading Data...</div>;
 
     return (
-        <section className="py-12 bg-white">
+        <section id={id} className="py-12 bg-white">
             <div className="container mx-auto px-4">
                 {(title || description) && (
                     <div className="text-center mb-8">

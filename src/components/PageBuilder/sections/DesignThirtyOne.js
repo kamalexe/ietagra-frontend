@@ -5,7 +5,7 @@ import TestimonialService from '../../../services/TestimonialService';
 import SectionWrapper from '../SectionWrapper';
 import { StarIcon } from '@heroicons/react/24/solid';
 
-const DesignThirtyOne = ({ title, subtitle, badge, departmentId, items: initialItems = [] }) => {
+const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, items: initialItems = [] }) => {
     const [testimonials, setTestimonials] = useState(initialItems);
     const [loading, setLoading] = useState(false);
 
@@ -40,7 +40,7 @@ const DesignThirtyOne = ({ title, subtitle, badge, departmentId, items: initialI
             // Basic YouTube URL to Embed conversion
             const videoId = item.videoUrl.split('v=')[1]?.split('&')[0] || item.videoUrl.split('/').pop();
             return (
-                <div className="aspect-video w-full rounded-lg overflow-hidden mb-4 shadow-inner bg-black">
+                <div id={id} className="aspect-video w-full rounded-lg overflow-hidden mb-4 shadow-inner bg-black">
                     <iframe
                         width="100%"
                         height="100%"
@@ -55,7 +55,7 @@ const DesignThirtyOne = ({ title, subtitle, badge, departmentId, items: initialI
         }
         if (item.type === 'image' && item.image) {
             return (
-                <div className="w-full h-48 rounded-lg overflow-hidden mb-4 shadow-inner">
+                <div id={id} className="w-full h-48 rounded-lg overflow-hidden mb-4 shadow-inner">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
             );
@@ -64,7 +64,7 @@ const DesignThirtyOne = ({ title, subtitle, badge, departmentId, items: initialI
     };
 
     return (
-        <SectionWrapper
+        <SectionWrapper id={id}
             title={title || "What Our Students Say"}
             description={subtitle}
             badge={badge || "Testimonials"}

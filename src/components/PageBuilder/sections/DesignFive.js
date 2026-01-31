@@ -6,10 +6,10 @@ import { FaChartLine } from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignFive = ({ title, description, swotData, data, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
+const DesignFive = ({ id, title, description, swotData, data, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
   const finalData = swotData || data || {};
   return (
-    <SectionWrapper
+    <SectionWrapper id={id}
       badge={badge}
       title={title}
       underlineColor={underlineColor || 'from-green-500 to-teal-600'}

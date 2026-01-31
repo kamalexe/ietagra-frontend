@@ -7,7 +7,7 @@ import * as FaIcons from 'react-icons/fa';
 // However, relying on the fact that imports are cached objects.
 import SectionRegistry from '../SectionRegistry';
 
-const DesignSeven = ({ tabs }) => {
+const DesignSeven = ({ id, tabs }) => {
   const [activeTabId, setActiveTabId] = useState(tabs[0]?.id);
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
@@ -18,14 +18,14 @@ const DesignSeven = ({ tabs }) => {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 mb-16">
+    <div id={id} className="container mx-auto max-w-6xl px-4 mb-16">
        {/* Tab Buttons */}
        <div className="flex justify-center mb-10 overflow-x-auto">
           <div className="inline-flex bg-white rounded-xl shadow-md p-1.5">
             {tabs.map((tab) => {
               const Icon = FaIcons[tab.icon];
               return (
-                <button
+                <button id={id}
                   key={tab.id}
                   onClick={() => setActiveTabId(tab.id)}
                   className={`px-4 py-2.5 rounded-lg transition-all duration-300 whitespace-nowrap flex items-center ${

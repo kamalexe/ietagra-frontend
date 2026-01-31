@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { getToken } from '../../services/LocalStorageService';
+import { getToken, removeToken, registerAccount, getAccounts } from '../../services/LocalStorageService';
 import NavbarService from '../../services/NavbarService';
+import AccountSwitcher from '../dashboard/AccountSwitcher';
+import { useGetLoggedUserQuery } from '../../services/userAuthApi';
 
 const DEFAULT_LINKS = [
   { label: 'Home', path: '/' },
@@ -57,7 +60,26 @@ const DEFAULT_LINKS = [
 ];
 
 const Navbar = () => {
-  const { access_token } = getToken();
+  const { access_token } = useSelector(state => state.auth);
+  // Fetch logged user data for the navbar
+  const { data: currentUser, isSuccess } = useGetLoggedUserQuery(access_token, {
+    skip: !access_token,
+  });
+
+  useEffect(() => {
+    if (currentUser && isSuccess && access_token) {
+      // Auto-register account for switching whenever Navbar loads a logged-in user
+      const tokens = getToken();
+      // Note: getToken() reads from localStorage, which should be updated by whatever mechanism updates Redux state.
+      // If Redux updates first, we might need to rely on that. 
+      // But typically auth slice syncs to localStorage. 
+      // To be safe, let's construct the token object if we can, or just trust getToken() is fresh enough or pass access_token directly if valid.
+      // Better: if we have access_token from Redux, use it. But we need refresh_token too.
+      // Let's rely on getToken() but trigger this effect when access_token changes.
+      registerAccount(tokens, currentUser);
+    }
+  }, [currentUser, isSuccess, access_token]);
+
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -66,6 +88,11 @@ const Navbar = () => {
     logoUrl: './images/institute-of-engineering-and-technology-logo.png',
     navLinks: DEFAULT_LINKS
   });
+
+  const handleAddAccount = () => {
+    removeToken();
+    window.location.href = "/login";
+  };
 
   useEffect(() => {
     const fetchNavbar = async () => {
@@ -166,22 +193,60 @@ const Navbar = () => {
           {/* Action Buttons */}
           <div className="hidden md:flex md:items-center gap-4">
             {access_token ? (
-              <Link
-                to="/dashboard"
-                className="group relative inline-flex items-center justify-center overflow-hidden rounded-full p-0.5 font-bold"
-              >
-                <span className="absolute h-full w-full bg-gradient-to-br from-[#1e40af] via-[#3b82f6] to-[#60a5fa] group-hover:from-[#1e3a8a] group-hover:to-[#2563eb]"></span>
-                <span className="relative rounded-full bg-white px-6 py-2 transition-all duration-200 group-hover:bg-opacity-0">
-                  <span className="relative text-blue-700 group-hover:text-white transition-colors duration-300 text-sm">Dashboard</span>
-                </span>
-              </Link>
+              <div className="relative group z-50">
+                <button className="flex items-center gap-2 group-hover:opacity-100 transition-opacity">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md">
+                    {/* Initial or User Icon */}
+                    {currentUser?.name ? (
+                      <span className="text-sm">{currentUser.name.charAt(0).toUpperCase()}</span>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      </svg>
+                    )}
+                  </div>
+                </button>
+
+                <div className="absolute right-0 top-full pt-2 w-72 origin-top-right transition-all opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0">
+                  <div className="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
+                    <div className="p-2 space-y-1">
+                      <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                        </svg>
+                        Dashboard
+                      </Link>
+                    </div>
+
+                    <div className="border-t border-gray-100 p-2">
+                      <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
+                      <AccountSwitcher currentUser={currentUser} />
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : (
+              getAccounts().length > 0 ? (
+                <div className="relative group z-50">
+                  {/* Show switcher for logged-out users with saved accounts */}
+                  <AccountSwitcher currentUser={null} />
+                  <div className="absolute right-0 top-full pt-2 w-72 origin-top-right transition-all opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0">
+                    <div className="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
+                      <div className="p-2">
+                        <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Saved Accounts</p>
+                        <AccountSwitcher currentUser={null} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                ) : (
               <Link
                 to="/login"
                   className="inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_-10px_rgba(0,0,0,0.5)] transition-all duration-300 hover:bg-blue-600 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0"
               >
                   Sign In
               </Link>
+                  )
             )}
           </div>
 

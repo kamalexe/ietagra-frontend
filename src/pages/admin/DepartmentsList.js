@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, AcademicCapIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Combobox } from '@headlessui/react';
@@ -17,6 +17,18 @@ const DepartmentsList = () => {
   // Faculty Autocomplete State
   const [facultyMembers, setFacultyMembers] = useState([]);
   const [query, setQuery] = useState('');
+  const location = useLocation();
+
+  React.useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, [location]);
 
   React.useEffect(() => {
     loadDepartments();
@@ -141,7 +153,7 @@ const DepartmentsList = () => {
     <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Departments</h1>
+          <h1 className="text-2xl font-bold text-gray-900" id="departments">Departments</h1>
           <p className="mt-1 text-sm text-gray-500">Manage department pages and content.</p>
         </div>
         <button

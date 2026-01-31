@@ -6,10 +6,10 @@ import * as FaIcons from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignThree = ({ cards, items, badge, title, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
+const DesignThree = ({ id, cards, items, badge, title, underlineColor, description, variant, backgroundImage, buttons, gradient }) => {
   const dataItems = cards || items || [];
   return (
-    <SectionWrapper
+    <SectionWrapper id={id}
       badge={badge}
       title={title}
       underlineColor={underlineColor}

@@ -3,11 +3,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 
-const DesignOne = ({ badge, title, underlineColor, description, variant = 'simple', backgroundImage, buttons, gradient }) => {
+const DesignOne = ({ id, badge, title, underlineColor, description, variant = 'simple', backgroundImage, buttons, gradient }) => {
     // Hero Variant (Rich Banner)
     if (variant === 'hero') {
         return (
-            <div className={`relative overflow-hidden ${gradient || 'bg-gradient-to-r from-gray-900 to-gray-800'} text-white mb-12`}>
+            <div id={id} className={`relative overflow-hidden ${gradient || 'bg-gradient-to-r from-gray-900 to-gray-800'} text-white mb-12`}>
                 {backgroundImage && (
                     <div className="absolute inset-0 opacity-20">
                         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${backgroundImage}')` }}></div>
@@ -57,7 +57,7 @@ const DesignOne = ({ badge, title, underlineColor, description, variant = 'simpl
 
     // Default Simple Variant
     return (
-        <div className="container mx-auto max-w-6xl relative z-10 px-4 pt-16 pb-8">
+        <div id={id} className="container mx-auto max-w-6xl relative z-10 px-4 pt-16 pb-8">
             <motion.div
                 initial="hidden"
                 whileInView="visible"

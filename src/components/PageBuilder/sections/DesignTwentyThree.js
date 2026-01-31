@@ -4,7 +4,7 @@ import { fadeIn } from '../../../utils/animations';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon, PlayCircleIcon, PhotoIcon, FolderIcon } from '@heroicons/react/24/outline';
 import AlbumService from '../../../services/AlbumService';
 
-const DesignTwentyThree = ({ title, subtitle, layout = 'grid', albums: initialAlbums = [] }) => {
+const DesignTwentyThree = ({ id, title, subtitle, layout = 'grid', albums: initialAlbums = [] }) => {
     const [albums, setAlbums] = useState(initialAlbums);
     const [loading, setLoading] = useState(initialAlbums.length === 0);
     const [currentAlbum, setCurrentAlbum] = useState(null);
@@ -46,7 +46,7 @@ const DesignTwentyThree = ({ title, subtitle, layout = 'grid', albums: initialAl
     if (loading) return <div className="py-20 text-center">Loading gallery...</div>;
 
     return (
-        <section className="py-16 bg-white overflow-hidden">
+        <section id={id} className="py-16 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
                     {title && <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{title}</h2>}

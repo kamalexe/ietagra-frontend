@@ -8,7 +8,7 @@ import ViewCourseTeacher from "./DashboardComponent/Teacher/ViewCourseTeacher";
 import ViewPlacementTeacher from "./DashboardComponent/Teacher/ViewPlacementTeacher";
 
 import { useDispatch } from 'react-redux';
-import { getToken } from '../../services/LocalStorageService';
+import { getToken, registerAccount } from '../../services/LocalStorageService';
 import { useGetLoggedUserQuery } from '../../services/userAuthApi';
 import { setUserInfo } from '../../features/userSlice';
 
@@ -39,6 +39,14 @@ const SideNavDashboard = () => {
             dispatch(setUserInfo({
                 user_type: data.user_type,
             }))
+            // Auto-register account for switching
+            // We need the token here.
+            const tokens = getToken();
+            const { access_token } = tokens;
+            // We also need the user's email/name which is in 'data'
+            if (data.email) {
+                registerAccount(tokens, data);
+            }
         }
     }, [data, isSuccess, dispatch])
 
@@ -215,6 +223,7 @@ const SideNavDashboard = () => {
                         <SideNavItemDashboard
                             sidebarData={sidebarData}
                             onItemClick={handleItemClick}
+                            currentUser={data}
                         />
                     </div>
                     <div>

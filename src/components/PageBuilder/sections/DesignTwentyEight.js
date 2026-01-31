@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DesignTwentyEight = ({
+const DesignTwentyEight = ({ id,
     title = "Message from the Director",
     name = "Prof. V. Kamakoti",
     designation = "Director - IIT Madras",
@@ -10,7 +10,7 @@ const DesignTwentyEight = ({
     themeColor = "blue-600"
 }) => {
     return (
-        <section className="py-16 bg-white overflow-hidden" id="director-message">
+        <section id={id} className="py-16 bg-white overflow-hidden" id="director-message">
             <div className="container mx-auto px-4">
                 {/* Section Heading */}
                 <div className="mb-12 text-center lg:text-left">

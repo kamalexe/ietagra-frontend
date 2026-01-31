@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
 import FacultyService from '../../../services/FacultyService';
 
-const DesignTwelve = ({ title, items: initialItems = [], departmentId }) => {
+const DesignTwelve = ({ id, title, items: initialItems = [], departmentId }) => {
     const [items, setItems] = useState(initialItems);
     const [loading, setLoading] = useState(false);
 
@@ -39,14 +39,14 @@ const DesignTwelve = ({ title, items: initialItems = [], departmentId }) => {
 
     if (loading) {
         return (
-            <div className="py-20 flex justify-center items-center">
+            <div id={id} className="py-20 flex justify-center items-center">
                 <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     return (
-        <section className="container mx-auto max-w-7xl px-4 py-12">
+        <section id={id} className="container mx-auto max-w-7xl px-4 py-12">
              {title && (
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold text-gray-900 mb-4">{title}</h2>
