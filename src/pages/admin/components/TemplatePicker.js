@@ -633,8 +633,9 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
         setCurrentIndex((prev) => (prev - 1 + templates.length) % templates.length);
     };
 
-    const currentTemplate = templates[currentIndex];
+    const currentTemplate = templates[currentIndex]; 
     const Component = SectionRegistry[currentTemplate.key];
+    const currentDept = departments.find(d => d.slug === currentSlug);
 
     // Handle keyboard navigation
     React.useEffect(() => {

@@ -1,48 +1,26 @@
-import axios from 'axios';
-import { getToken } from './LocalStorageService';
+import axiosInstance from '../api/axiosConfig';
 
-const API_URL = 'http://localhost:5000/api/gallery';
+const ENDPOINT = '/gallery';
 
 class GalleryService {
     getGalleryImages(params = {}) {
-        const { access_token } = getToken();
-        return axios.get(API_URL, {
-            headers: {
-                Authorization: access_token ? `Bearer ${access_token}` : ''
-            },
-            params: params
-        }).then(res => res.data.data);
+        return axiosInstance.get(ENDPOINT, { params }).then(res => res.data.data);
     }
 
     getGalleryImage(id) {
-        return axios.get(`${API_URL}/${id}`).then(res => res.data.data);
+        return axiosInstance.get(`${ENDPOINT}/${id}`).then(res => res.data.data);
     }
 
     createGalleryImage(data) {
-        const { access_token } = getToken();
-        return axios.post(API_URL, data, {
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        }).then(res => res.data.data);
+        return axiosInstance.post(ENDPOINT, data).then(res => res.data.data);
     }
 
     updateGalleryImage(id, data) {
-        const { access_token } = getToken();
-        return axios.put(`${API_URL}/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        }).then(res => res.data.data);
+        return axiosInstance.put(`${ENDPOINT}/${id}`, data).then(res => res.data.data);
     }
 
     deleteGalleryImage(id) {
-        const { access_token } = getToken();
-        return axios.delete(`${API_URL}/${id}`, {
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        }).then(res => res.data);
+        return axiosInstance.delete(`${ENDPOINT}/${id}`).then(res => res.data);
     }
 }
 

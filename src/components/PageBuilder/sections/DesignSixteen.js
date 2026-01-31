@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FaGithub, FaFilePowerpoint, FaSearch, FaFilter } from 'react-icons/fa';
+import axiosInstance from '../../../api/axiosConfig';
 
 // Configuration for different data sources
 const COLUMN_CONFIG = {
@@ -67,8 +68,8 @@ const DesignSixteen = ({ id, title, description, projects, dataSource }) => {
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const response = await fetch(`http://localhost:5000/api/student-records?category=${dataSource}`);
-                    const resData = await response.json();
+                    const response = await axiosInstance.get(`/student-records?category=${dataSource}`);
+                    const resData = response.data;
                     if (resData.success) {
                         // Flatten metadata into the row object for easier table rendering
                         const transformed = resData.data.map(rec => ({

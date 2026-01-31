@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { TrashIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import axiosInstance from '../../api/axiosConfig';
 
 const ContactSubmissions = () => {
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { access_token } = useSelector((state) => state.auth);
 
     const fetchContacts = async () => {
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`
-                }
-            };
-            const response = await axios.get('http://localhost:5000/api/contacts', config);
+            const response = await axiosInstance.get('/contacts');
             setContacts(response.data.data);
             setLoading(false);
         } catch (err) {
@@ -30,12 +24,7 @@ const ContactSubmissions = () => {
         if (!window.confirm('Are you sure you want to delete this message?')) return;
 
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`
-                }
-            };
-            await axios.delete(`http://localhost:5000/api/contacts/${id}`, config);
+            await axiosInstance.delete(`/contacts/${id}`);
             setContacts(contacts.filter(contact => contact._id !== id));
         } catch (err) {
             alert('Failed to delete message');

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
+import axiosInstance from '../../api/axiosConfig';
 import { PlusIcon, TrashIcon, PencilIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
 import DepartmentService from '../../services/DepartmentService';
@@ -22,7 +22,7 @@ const SAMPLE_HEADERS = {
 };
 
 const StudentDataManager = () => {
-    const { access_token } = useSelector((state) => state.auth);
+    // access_token is handled by axiosInstance interceptor
     const { role, department: userDept } = useSelector((state) => state.user);
     const [activeTab, setActiveTab] = useState('gate');
     const [records, setRecords] = useState([]);
@@ -59,9 +59,7 @@ const StudentDataManager = () => {
     const fetchRecords = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`http://localhost:5000/api/student-records?category=${activeTab}`, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            const res = await axiosInstance.get(`/student-records?category=${activeTab}`);
             setRecords(res.data.data);
             setFilteredRecords(res.data.data);
             setSelectedIds([]);
@@ -71,7 +69,7 @@ const StudentDataManager = () => {
         } finally {
             setLoading(false);
         }
-    }, [activeTab, access_token]);
+    }, [activeTab]);
 
     useEffect(() => {
         fetchRecords();
@@ -171,11 +169,9 @@ const StudentDataManager = () => {
 
         setUploading(true);
         try {
-            await axios.post('http://localhost:5000/api/student-records/bulk-json', {
+            await axiosInstance.post('/student-records/bulk-json', {
                 records: validRecords,
                 category: activeTab
-            }, {
-                headers: { Authorization: `Bearer ${access_token}` }
             });
             alert(`Successfully uploaded ${validRecords.length} records!`);
             setIsPreviewOpen(false);
@@ -192,9 +188,7 @@ const StudentDataManager = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this record?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/student-records/${id}`, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            await axiosInstance.delete(`/student-records/${id}`);
             setRecords(records.filter(r => r._id !== id));
         } catch (error) {
             console.error(error);
@@ -205,9 +199,7 @@ const StudentDataManager = () => {
     const handleDeleteSelected = async () => {
         if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} records?`)) return;
         try {
-            await axios.post('http://localhost:5000/api/student-records/delete-many', { ids: selectedIds }, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            await axiosInstance.post('/student-records/delete-many', { ids: selectedIds });
             fetchRecords();
             setSelectedIds([]);
         } catch (error) {
@@ -271,13 +263,9 @@ const StudentDataManager = () => {
             });
 
             if (editRecord) {
-                await axios.put(`http://localhost:5000/api/student-records/${editRecord._id}`, payload, {
-                    headers: { Authorization: `Bearer ${access_token}` }
-                });
+                await axiosInstance.put(`/student-records/${editRecord._id}`, payload);
             } else {
-                await axios.post('http://localhost:5000/api/student-records', payload, {
-                    headers: { Authorization: `Bearer ${access_token}` }
-                });
+                await axiosInstance.post('/student-records', payload);
             }
             setIsModalOpen(false);
             setEditRecord(null);

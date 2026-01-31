@@ -4,6 +4,7 @@ import { getToken } from '../../services/LocalStorageService';
 import { useSelector } from 'react-redux';
 import DepartmentService from '../../services/DepartmentService';
 import TestimonialService from '../../services/TestimonialService';
+import axiosInstance from '../../api/axiosConfig';
 import { PencilIcon, TrashIcon, PlusIcon, ShareIcon, XMarkIcon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
@@ -423,7 +424,7 @@ const EventsList = () => {
     const { role } = useSelector(state => state.user);
 
     const shareEvent = (event, platform) => {
-        const backendUrl = 'http://localhost:5000/api'; // Or use process.env.REACT_APP_API_BASE_URL
+        const backendUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'; 
         const shareBridgeUrl = `${backendUrl}/events/share/event/${event._id}`;
 
         // Helper to strip HTML and get clean text
@@ -620,20 +621,15 @@ const EventsList = () => {
         form.append('file', file);
 
         try {
-            const { access_token } = getToken();
-            const res = await fetch('http://localhost:5000/api/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': access_token ? `Bearer ${access_token}` : ''
-                },
-                body: form
+            // axiosInstance handles Authorization and Content-Type? 
+            // Actually axios auto-detects form-data and removes content-type to let browser set boundary
+            const res = await axiosInstance.post('/upload', form, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Upload failed');
-            return data.data.url;
+            return res.data.data.url;
         } catch (error) {
             console.error(error);
-            alert("Upload failed: " + error.message);
+            alert("Upload failed: " + (error.response?.data?.message || error.message));
             return null;
         }
     };
@@ -649,25 +645,13 @@ const EventsList = () => {
 
         setUploading(true);
         try {
-            // Needed service method or direct fetch.
-            // Using direct fetch to the new endpoint matching EventService base URL
-            const { access_token } = getToken();
-
-            const res = await fetch('http://localhost:5000/api/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': access_token ? `Bearer ${access_token}` : ''
-                },
-                body: formData
+            const res = await axiosInstance.post('/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const data = await res.json();
-
-            if (!res.ok) throw new Error(data.message || 'Upload failed');
-
-            setFormData(prev => ({ ...prev, image: data.data.url }));
+            setFormData(prev => ({ ...prev, image: res.data.data.url }));
         } catch (error) {
             console.error(error);
-            alert("Image upload failed: " + error.message);
+            alert("Image upload failed: " + (error.response?.data?.message || error.message));
         } finally {
             setUploading(false);
             e.target.value = null;

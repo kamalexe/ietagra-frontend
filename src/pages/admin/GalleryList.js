@@ -3,6 +3,7 @@ import GalleryService from '../../services/GalleryService';
 import { getToken } from '../../services/LocalStorageService';
 import { useSelector } from 'react-redux';
 import DepartmentService from '../../services/DepartmentService';
+import axiosInstance from '../../api/axiosConfig';
 import { PencilIcon, TrashIcon, PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const GalleryList = () => {
@@ -24,13 +25,14 @@ const GalleryList = () => {
     const fetchUploadedFiles = async () => {
         setLoadingMedia(true);
         try {
-            const { access_token } = getToken();
-            const res = await fetch('http://localhost:5000/api/upload/files', {
-                headers: {
-                    'Authorization': access_token ? `Bearer ${access_token}` : ''
-                }
-            });
-            const data = await res.json();
+            const res = await axiosInstance.get('/upload/files');
+            // Check if axios response structure is raw or handled. 
+            // axiosInstance returns 'response'. data is in response.data.
+            // My services usually return res.data.data.
+            // But here I'm using axiosInstance directly.
+            // The existing code expects data.success and data.data.
+            // So:
+            const data = res.data; 
             if (data.success) {
                 setMediaFiles(data.data);
             }
@@ -135,22 +137,13 @@ const GalleryList = () => {
 
         setUploading(true);
         try {
-            const { access_token } = getToken();
-            const res = await fetch('http://localhost:5000/api/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': access_token ? `Bearer ${access_token}` : ''
-                },
-                body: formDataUpload
+            const res = await axiosInstance.post('/upload', formDataUpload, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const data = await res.json();
-
-            if (!res.ok) throw new Error(data.message || 'Upload failed');
-
-            setFormData(prev => ({ ...prev, imageUrl: data.data.url }));
+            setFormData(prev => ({ ...prev, imageUrl: res.data.data.url }));
         } catch (error) {
             console.error(error);
-            alert("Image upload failed: " + error.message);
+            alert("Image upload failed: " + (error.response?.data?.message || error.message));
         } finally {
             setUploading(false);
             e.target.value = null;

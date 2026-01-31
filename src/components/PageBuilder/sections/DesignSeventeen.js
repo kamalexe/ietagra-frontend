@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import axiosInstance from '../../../api/axiosConfig';
 
 const DesignSeventeen = ({ id, title, description }) => {
     const [gateData, setGateData] = useState([]);
@@ -14,8 +15,8 @@ const DesignSeventeen = ({ id, title, description }) => {
     useEffect(() => {
         const fetchGateData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/student-records?category=gate');
-                const result = await response.json();
+                const response = await axiosInstance.get('/student-records?category=gate');
+                const result = response.data;
                 if (result.success) {
                     setGateData(result.data);
                     setFilteredData(result.data);

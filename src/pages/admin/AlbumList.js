@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import AlbumService from '../../services/AlbumService';
 import DepartmentService from '../../services/DepartmentService';
-import { getToken } from '../../services/LocalStorageService';
 import { useSelector } from 'react-redux';
+import axiosInstance from '../../api/axiosConfig';
 import { 
     PencilIcon, 
     TrashIcon, 
@@ -27,6 +27,7 @@ const AlbumList = () => {
     const [isAlbumModalOpen, setIsAlbumModalOpen] = useState(false);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
+    const [confirmationModal, setConfirmationModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
     
     // Library/Media Loading
     const [mediaFiles, setMediaFiles] = useState([]);
@@ -74,6 +75,10 @@ const AlbumList = () => {
         }
     };
 
+    const openConfirmation = (title, message, onConfirm) => {
+        setConfirmationModal({ isOpen: true, title, message, onConfirm });
+    };
+
     // Album Actions
     const handleOpenAlbumModal = (album = null) => {
         if (album) {
@@ -102,30 +107,37 @@ const AlbumList = () => {
 
     const handleAlbumSubmit = async (e) => {
         e.preventDefault();
+
+        // Prepare payload: sanitize department if empty string (prevents CastError on backend)
+        const payload = { ...albumFormData };
+        if (!payload.department) {
+            delete payload.department;
+        }
+
         try {
             if (editingAlbumId) {
-                await AlbumService.updateAlbum(editingAlbumId, albumFormData);
-                alert("Album updated successfully!");
+                await AlbumService.updateAlbum(editingAlbumId, payload);
             } else {
-                await AlbumService.createAlbum(albumFormData);
-                alert("Album created successfully!");
+                await AlbumService.createAlbum(payload);
             }
             setIsAlbumModalOpen(false);
             loadAlbums();
         } catch (err) {
-            alert(err.message);
+            console.error(err);
+            alert(err.message); // Keep error alert for now or cleaner? Let's keep error alert as fallback but removing success alert is key.
         }
     };
 
-    const handleDeleteAlbum = async (id) => {
-        if (window.confirm("Are you sure you want to delete this album? This will NOT delete the actual images from the server.")) {
+    const handleDeleteAlbum = (id) => {
+        openConfirmation("Delete Album", "Are you sure you want to delete this album? This will NOT delete the actual images from the server.", async () => {
             try {
                 await AlbumService.deleteAlbum(id);
                 loadAlbums();
             } catch (err) {
+                console.error(err);
                 alert(err.message);
             }
-        }
+        });
     };
 
     // Manage Media Actions
@@ -148,34 +160,32 @@ const AlbumList = () => {
             setIsMediaModalOpen(false);
             loadAlbums();
         } catch (err) {
+            console.error(err);
             alert("Failed to add media: " + err.message);
         }
     };
 
-    const handleRemoveMedia = async (index) => {
-        if (window.confirm("Remove this item from the album?")) {
+    const handleRemoveMedia = (index) => {
+        openConfirmation("Remove Item", "Remove this item from the album?", async () => {
             const updatedMedia = (currentAlbum.media || []).filter((_, i) => i !== index);
             try {
                 const updated = await AlbumService.updateAlbum(currentAlbum._id, { media: updatedMedia });
                 setCurrentAlbum(updated);
                 loadAlbums();
             } catch (err) {
+                console.error(err);
                 alert("Failed to remove media: " + err.message);
             }
-        }
+        });
     };
 
     // Media Library
     const fetchUploadedFiles = async () => {
         setLoadingMedia(true);
         try {
-            const { access_token } = getToken();
-            const res = await fetch('http://localhost:5000/api/upload/files', {
-                headers: {
-                    'Authorization': access_token ? `Bearer ${access_token}` : ''
-                }
-            });
-            const data = await res.json();
+            const res = await axiosInstance.get('/upload/files');
+            // axiosInstance returns 'response'. data is in response.data.
+            const data = res.data;
             if (data.success) {
                 setMediaFiles(data.data);
             }
@@ -209,24 +219,17 @@ const AlbumList = () => {
 
         setUploading(true);
         try {
-            const { access_token } = getToken();
-            const res = await fetch('http://localhost:5000/api/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': access_token ? `Bearer ${access_token}` : ''
-                },
-                body: formData
+            const res = await axiosInstance.post('/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Upload failed');
             
             if (target === 'coverImage') {
-                setAlbumFormData(prev => ({ ...prev, coverImage: data.data.url }));
+                setAlbumFormData(prev => ({ ...prev, coverImage: res.data.data.url }));
             } else {
-                setMediaFormData(prev => ({ ...prev, src: data.data.url }));
+                setMediaFormData(prev => ({ ...prev, src: res.data.data.url }));
             }
         } catch (error) {
-            alert("Upload failed: " + error.message);
+            alert("Upload failed: " + (error.response?.data?.message || error.message));
         } finally {
             setUploading(false);
         }
@@ -499,6 +502,34 @@ const AlbumList = () => {
                 </div>
                 <div className="mt-4 flex justify-end">
                     <button onClick={() => setIsLibraryModalOpen(false)} className="text-sm font-bold text-gray-600 hover:text-gray-800 px-4 py-2 bg-gray-100 rounded">Close</button>
+                </div>
+            </Modal>
+
+            {/* CONFIRMATION MODAL */}
+            <Modal
+                isOpen={confirmationModal.isOpen}
+                onClose={() => setConfirmationModal({ ...confirmationModal, isOpen: false })}
+                title={confirmationModal.title}
+                zIndex={60}
+                maxWidth="max-w-sm"
+            >
+                <p className="text-sm text-gray-500 mb-6">{confirmationModal.message}</p>
+                <div className="flex justify-end gap-3">
+                    <button
+                        onClick={() => setConfirmationModal({ ...confirmationModal, isOpen: false })}
+                        className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-800 bg-gray-100 rounded-lg"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (confirmationModal.onConfirm) confirmationModal.onConfirm();
+                            setConfirmationModal({ ...confirmationModal, isOpen: false });
+                        }}
+                        className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm"
+                    >
+                        Confirm
+                    </button>
                 </div>
             </Modal>
         </div>

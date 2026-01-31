@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../../api/axiosConfig';
 
 const DesignTwentyTwo = ({ id,
     title = "Feedback/Query Form",
@@ -32,13 +32,7 @@ const DesignTwentyTwo = ({ id,
         setStatus({ type: '', message: '' });
 
         try {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            };
-
-            await axios.post('http://localhost:5000/api/contacts', formData, config);
+            await axiosInstance.post('/contacts', formData);
 
             setStatus({ type: 'success', message: 'Thank you! Your message has been sent successfully.' });
             setFormData({ name: '', email: '', phone: '', address: '', subject: '', message: '' });
