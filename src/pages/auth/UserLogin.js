@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { setUserToken } from '../../features/authSlice';
-import { getToken, storeToken } from '../../services/LocalStorageService';
+import { getToken, storeToken, registerAccount } from '../../services/LocalStorageService';
 import { useLoginUserMutation } from '../../services/userAuthApi';
 
 const UserLogin = () => {
@@ -27,7 +27,8 @@ const UserLogin = () => {
     if (res.data) {
       console.log(typeof (res.data))
       console.log(res.data)
-      storeToken(res.data.token)
+      storeToken(res.data) // Fixed: pass the whole object containing access_token
+      registerAccount(res.data, res.data.user) // Added: register account for switcher
       let { access_token } = getToken()
       dispatch(setUserToken({ access_token: access_token }))
       navigate('/admin/dashboard')
@@ -46,7 +47,7 @@ const UserLogin = () => {
     <Box component='form' noValidate sx={{ mt: 1, p: 4 }} id='login-form' onSubmit={handleSubmit}>
       <TextField margin='normal' required fullWidth id='email' name='email' label='Email Address' />
       {server_error.email ? <Typography style={{ fontSize: 12, color: 'red', paddingLeft: 10 }}>{server_error.email[0]}</Typography> : ""}
-      <TextField margin='normal' required fullWidth id='password' name='password' label='Password' type='password' />
+      <TextField margin='normal' required fullWidth id='password' name='password' label='Password' type='password' autoComplete='current-password' />
       {server_error.password ? <Typography style={{ fontSize: 12, color: 'red', paddingLeft: 10 }}>{server_error.password[0]}</Typography> : ""}
       <Box textAlign='center'>
         {isLoading ? <CircularProgress /> : <Button type='submit' variant='contained' sx={{ mt: 3, mb: 2, px: 5 }}>Login</Button>}

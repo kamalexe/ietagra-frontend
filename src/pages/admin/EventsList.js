@@ -1,16 +1,347 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import EventService from '../../services/EventService';
 import { getToken } from '../../services/LocalStorageService';
 import { useSelector } from 'react-redux';
 import DepartmentService from '../../services/DepartmentService';
-import { PencilIcon, TrashIcon, PlusIcon, ShareIcon } from '@heroicons/react/24/outline';
+import TestimonialService from '../../services/TestimonialService';
+import { PencilIcon, TrashIcon, PlusIcon, ShareIcon, XMarkIcon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+
+// Helper Components for Array Management
+
+const SpeakerManager = ({ speakers, onChange }) => {
+    const [newSpeaker, setNewSpeaker] = useState({ name: '', designation: '', image: '', bio: '' });
+
+    const addSpeaker = () => {
+        if (!newSpeaker.name) return alert('Name is required');
+        onChange([...speakers, newSpeaker]);
+        setNewSpeaker({ name: '', designation: '', image: '', bio: '' });
+    };
+
+    const removeSpeaker = (index) => {
+        const updated = speakers.filter((_, i) => i !== index);
+        onChange(updated);
+    };
+
+    return (
+        <div className="space-y-4 border p-4 rounded-md bg-gray-50">
+            <h4 className="font-medium text-gray-900">Speakers</h4>
+            <div className="grid grid-cols-2 gap-2">
+                <input type="text" placeholder="Name" className="border p-2 rounded" value={newSpeaker.name} onChange={e => setNewSpeaker({ ...newSpeaker, name: e.target.value })} />
+                <input type="text" placeholder="Designation" className="border p-2 rounded" value={newSpeaker.designation} onChange={e => setNewSpeaker({ ...newSpeaker, designation: e.target.value })} />
+                <input type="text" placeholder="Image URL" className="border p-2 rounded" value={newSpeaker.image} onChange={e => setNewSpeaker({ ...newSpeaker, image: e.target.value })} />
+                <input type="text" placeholder="Bio" className="border p-2 rounded" value={newSpeaker.bio} onChange={e => setNewSpeaker({ ...newSpeaker, bio: e.target.value })} />
+            </div>
+            <button type="button" onClick={addSpeaker} className="px-3 py-1 bg-blue-600 text-white rounded text-sm">Add Speaker</button>
+
+            <ul className="space-y-2 mt-2">
+                {speakers.map((s, i) => (
+                    <li key={i} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
+                        <div className="text-sm">
+                            <span className="font-bold">{s.name}</span> - <span className="text-gray-500">{s.designation}</span>
+                        </div>
+                        <button type="button" onClick={() => removeSpeaker(i)} className="text-red-500"><XMarkIcon className="h-4 w-4" /></button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+const AgendaManager = ({ agenda, onChange }) => {
+    const [newItem, setNewItem] = useState({ time: '', title: '', description: '', speakerName: '' });
+
+    const addItem = () => {
+        if (!newItem.time || !newItem.title) return alert('Time and Title are required');
+        onChange([...agenda, newItem]);
+        setNewItem({ time: '', title: '', description: '', speakerName: '' });
+    };
+
+    const removeItem = (index) => {
+        const updated = agenda.filter((_, i) => i !== index);
+        onChange(updated);
+    };
+
+    return (
+        <div className="space-y-4 border p-4 rounded-md bg-gray-50">
+            <h4 className="font-medium text-gray-900">Agenda</h4>
+            <div className="grid grid-cols-2 gap-2">
+                <input type="text" placeholder="Time (e.g. 10:00 AM)" className="border p-2 rounded" value={newItem.time} onChange={e => setNewItem({ ...newItem, time: e.target.value })} />
+                <input type="text" placeholder="Title" className="border p-2 rounded" value={newItem.title} onChange={e => setNewItem({ ...newItem, title: e.target.value })} />
+                <input type="text" placeholder="Description" className="border p-2 rounded" value={newItem.description} onChange={e => setNewItem({ ...newItem, description: e.target.value })} />
+                <input type="text" placeholder="Speaker Name (Optional)" className="border p-2 rounded" value={newItem.speakerName} onChange={e => setNewItem({ ...newItem, speakerName: e.target.value })} />
+            </div>
+            <button type="button" onClick={addItem} className="px-3 py-1 bg-blue-600 text-white rounded text-sm">Add Agenda Item</button>
+
+            <ul className="space-y-2 mt-2">
+                {agenda.map((item, i) => (
+                    <li key={i} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
+                        <div className="text-sm">
+                            <span className="font-bold text-blue-600">{item.time}</span>: <span className="font-medium">{item.title}</span>
+                        </div>
+                        <button type="button" onClick={() => removeItem(i)} className="text-red-500"><XMarkIcon className="h-4 w-4" /></button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+const GalleryManager = ({ gallery, onChange }) => {
+    const [newItem, setNewItem] = useState({ url: '', caption: '', type: 'image', category: 'event', isPublished: true });
+
+    const addItem = () => {
+        if (!newItem.url) return alert('URL is required');
+        // Ensure default sequence is array length (append to end)
+        const itemWithDefaults = { ...newItem, sequence: gallery.length };
+        onChange([...gallery, itemWithDefaults]);
+        setNewItem({ url: '', caption: '', type: 'image', category: 'event', isPublished: true });
+    };
+
+    const removeItem = (index) => {
+        const updated = gallery.filter((_, i) => i !== index);
+        onChange(updated);
+    };
+
+    const togglePublish = (index) => {
+        const updated = [...gallery];
+        updated[index].isPublished = !updated[index].isPublished;
+        onChange(updated);
+    };
+
+    const onDragEnd = (result) => {
+        if (!result.destination) return;
+        const items = Array.from(gallery);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        // Update sequence based on new index
+        const sequencedItems = items.map((item, index) => ({ ...item, sequence: index }));
+        onChange(sequencedItems);
+    };
+
+    return (
+        <div className="space-y-4 border p-4 rounded-md bg-gray-50">
+            <h4 className="font-medium text-gray-900">Gallery (Drag to Reorder)</h4>
+            <div className="flex gap-2 items-center flex-wrap">
+                <select className="border p-2 rounded bg-white text-sm" value={newItem.type} onChange={e => setNewItem({ ...newItem, type: e.target.value })}>
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                </select>
+                <select className="border p-2 rounded bg-white text-sm" value={newItem.category} onChange={e => setNewItem({ ...newItem, category: e.target.value })}>
+                    <option value="event">Event Only</option>
+                    <option value="department">Department</option>
+                    <option value="university">University</option>
+                </select>
+                <input type="text" placeholder="URL" className="border p-2 rounded flex-1 text-sm" value={newItem.url} onChange={e => setNewItem({ ...newItem, url: e.target.value })} />
+                <input type="text" placeholder="Caption" className="border p-2 rounded flex-1 text-sm" value={newItem.caption} onChange={e => setNewItem({ ...newItem, caption: e.target.value })} />
+                <label className="flex items-center space-x-1 text-sm">
+                    <input type="checkbox" checked={newItem.isPublished} onChange={e => setNewItem({ ...newItem, isPublished: e.target.checked })} />
+                    <span>Publish</span>
+                </label>
+                <button type="button" onClick={addItem} className="px-3 py-1 bg-blue-600 text-white rounded text-sm">Add</button>
+            </div>
+
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="gallery">
+                    {(provided) => (
+                        <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2"
+                        >
+                            {gallery.map((item, index) => (
+                                <Draggable key={index} draggableId={`item-${index}`} index={index}>
+                                    {(provided) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            className={`relative group border rounded overflow-hidden bg-white shadow-sm ${!item.isPublished ? 'opacity-60 grayscale' : ''}`}
+                                        >
+                                            <div className="absolute top-0 left-0 bg-white/80 p-1 rounded-br z-10 cursor-move">
+                                                <ArrowsUpDownIcon className="h-4 w-4 text-gray-600" />
+                                            </div>
+                                            <img src={item.url} alt={item.caption} className="h-24 w-full object-cover" />
+                                            <div className="p-2 text-xs">
+                                                <p className="truncate font-medium">{item.category}</p>
+                                                <div className="flex justify-between items-center mt-1">
+                                                    <button type="button" onClick={() => togglePublish(index)} className={`px-1 rounded border ${item.isPublished ? 'text-green-600 border-green-200 bg-green-50' : 'text-gray-500 border-gray-200'}`}>
+                                                        {item.isPublished ? 'Live' : 'Hidden'}
+                                                    </button>
+                                                    <button type="button" onClick={() => removeItem(index)} className="text-red-500 hover:bg-red-50 p-1 rounded"><XMarkIcon className="h-4 w-4" /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        </div>
+    );
+};
+
+const ResourcesManager = ({ resources, onChange }) => {
+    const [newItem, setNewItem] = useState({ title: '', url: '' });
+
+    const addItem = () => {
+        if (!newItem.title || !newItem.url) return alert('Title and URL are required');
+        onChange([...resources, newItem]);
+        setNewItem({ title: '', url: '' });
+    };
+
+    const removeItem = (index) => {
+        const resourcesUpdated = resources.filter((_, i) => i !== index);
+        onChange(resourcesUpdated);
+    };
+
+    return (
+        <div className="space-y-4 border p-4 rounded-md bg-gray-50">
+            <h4 className="font-medium text-gray-900">Resources</h4>
+            <div className="flex gap-2">
+                <input type="text" placeholder="Title" className="border p-2 rounded flex-1" value={newItem.title} onChange={e => setNewItem({ ...newItem, title: e.target.value })} />
+                <input type="text" placeholder="URL (PDF/Link)" className="border p-2 rounded flex-1" value={newItem.url} onChange={e => setNewItem({ ...newItem, url: e.target.value })} />
+                <button type="button" onClick={addItem} className="px-3 py-1 bg-blue-600 text-white rounded text-sm">Add</button>
+            </div>
+
+            <ul className="space-y-2 mt-2">
+                {resources.map((item, i) => (
+                    <li key={i} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
+                        <div className="text-sm truncate">
+                            <a href={item.url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{item.title}</a>
+                        </div>
+                        <button type="button" onClick={() => removeItem(i)} className="text-red-500"><XMarkIcon className="h-4 w-4" /></button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+const EventTestimonialManager = ({ eventId, departmentId }) => {
+    const [testimonials, setTestimonials] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [newItem, setNewItem] = useState({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event' });
+
+    const fetchTestimonials = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await TestimonialService.getTestimonialsByEvent(eventId);
+            setTestimonials(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [eventId]);
+
+    useEffect(() => {
+        if (eventId) fetchTestimonials();
+    }, [eventId, fetchTestimonials]);
+
+    const addItem = async () => {
+        if (!newItem.name || !newItem.message || !newItem.role) return alert('Name, Role and Message are required');
+
+        try {
+            // If departmentId is not passed (e.g. General event), we might need to handle this. 
+            // For now assuming even General events might have a "General" department or the user needs to select one?
+            // HACK: If no departmentId, we'll try to find one or alert.
+            // Ideally, we should allow selecting department if it's null.
+            // Assuming current simple case: Use passed departmentId. 
+            if (!departmentId) {
+                // Fallback or Alert?
+                // Let's alert for now if critical.
+                // OR hardcode a department? Let's assume the user MUST link it to a department.
+                // We'll add a department selector if needed later.
+                alert("Event must belong to a department to add testimonials (Backend requirement).");
+                return;
+            }
+
+            await TestimonialService.createTestimonial({
+                ...newItem,
+                event: eventId,
+                department: departmentId
+            });
+            setNewItem({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event' });
+            fetchTestimonials();
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    const removeItem = async (id) => {
+        if (!window.confirm("Are you sure?")) return;
+        try {
+            await TestimonialService.deleteTestimonial(id);
+            setTestimonials(testimonials.filter(t => t._id !== id));
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    return (
+        <div className="space-y-4 border p-4 rounded-md bg-gray-50">
+            <h4 className="font-medium text-gray-900">Event Testimonials</h4>
+            <div className="grid grid-cols-2 gap-2">
+                <input type="text" placeholder="Name" className="border p-2 rounded" value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })} />
+                <input type="text" placeholder="Role (e.g. Student)" className="border p-2 rounded" value={newItem.role} onChange={e => setNewItem({ ...newItem, role: e.target.value })} />
+                <input type="text" placeholder="Message" className="border p-2 rounded col-span-2" value={newItem.message} onChange={e => setNewItem({ ...newItem, message: e.target.value })} />
+                <input type="number" placeholder="Rating (1-5)" className="border p-2 rounded" min="1" max="5" value={newItem.rating} onChange={e => setNewItem({ ...newItem, rating: parseInt(e.target.value) })} />
+                <input type="text" placeholder="Image URL" className="border p-2 rounded" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} />
+
+                <select className="border p-2 rounded bg-white" value={newItem.type} onChange={e => setNewItem({ ...newItem, type: e.target.value })}>
+                    <option value="text">Text Only</option>
+                    <option value="image">With Image</option>
+                    <option value="video">Video Testimonial</option>
+                </select>
+                {newItem.type === 'video' && (
+                    <input type="text" placeholder="Video URL" className="border p-2 rounded" value={newItem.videoUrl} onChange={e => setNewItem({ ...newItem, videoUrl: e.target.value })} />
+                )}
+            </div>
+            <button type="button" onClick={addItem} className="px-3 py-1 bg-green-600 text-white rounded text-sm">Add Testimonial</button>
+
+            {loading ? <p>Loading...</p> : (
+                <ul className="space-y-2 mt-2 max-h-60 overflow-y-auto">
+                    {testimonials.map((item) => (
+                        <li key={item._id} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
+                            <div className="text-sm">
+                                <span className="font-bold">{item.name}</span>: <span className="text-gray-600 truncate">{item.message.substring(0, 30)}...</span>
+                            </div>
+                            <button type="button" onClick={() => removeItem(item._id)} className="text-red-500"><XMarkIcon className="h-4 w-4" /></button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+};
 
 const EventsList = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({ title: '', date: '', place: '', description: '', image: '' });
+    const [formData, setFormData] = useState({
+        title: '',
+        subtitle: '',
+        date: '',
+        place: '',
+        description: '',
+        image: '',
+        department: '',
+        joinLink: '',
+        registrationDeadline: '',
+        isRegistrationOpen: false,
+        speakers: [],
+        agenda: [],
+        gallery: [],
+        resources: []
+    });
+    const [activeTab, setActiveTab] = useState('Basic Info');
     const [editingId, setEditingId] = useState(null);
     const [activeShareMenu, setActiveShareMenu] = useState(null);
     const [departments, setDepartments] = useState([]);
@@ -51,7 +382,7 @@ const EventsList = () => {
     const loadEvents = async () => {
         try {
             setLoading(true);
-            const data = await EventService.getAllEvents();
+            const data = await EventService.getAdminEvents();
             setEvents(data);
             setError(null);
         } catch (err) {
@@ -88,12 +419,35 @@ const EventsList = () => {
                 place: event.place,
                 description: event.description,
                 image: event.image,
-                department: event.department?._id || event.department || ''
+                department: event.department?._id || event.department || '',
+                joinLink: event.joinLink || '',
+                registrationDeadline: event.registrationDeadline ? new Date(event.registrationDeadline).toISOString().split('T')[0] : '',
+                isRegistrationOpen: event.isRegistrationOpen || false,
+                speakers: Array.isArray(event.speakers) ? event.speakers : [],
+                agenda: Array.isArray(event.agenda) ? event.agenda : [],
+                gallery: Array.isArray(event.gallery) ? event.gallery : [],
+                resources: Array.isArray(event.resources) ? event.resources : []
             });
         } else {
             setEditingId(null);
-            setFormData({ title: '', subtitle: '', date: '', place: '', description: '', image: '', department: '' });
+            setFormData({
+                title: '',
+                subtitle: '',
+                date: '',
+                place: '',
+                description: '',
+                image: '',
+                department: '',
+                joinLink: '',
+                registrationDeadline: '',
+                isRegistrationOpen: false,
+                speakers: [],
+                agenda: [],
+                gallery: [],
+                resources: []
+            });
         }
+        setActiveTab('Basic Info');
         setIsModalOpen(true);
     };
 
@@ -103,23 +457,43 @@ const EventsList = () => {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        setFormData({ ...formData, [e.target.name]: value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validation
+        if (!formData.title || !formData.date || !formData.place || !formData.description) {
+            alert("Please fill in all required fields: Title, Date, Place, and Description.");
+            return;
+        }
+
         try {
-            if (editingId) {
-                await EventService.updateEvent(editingId, formData);
-                alert("Event updated successfully!");
-            } else {
-                await EventService.createEvent(formData);
-                alert("Event created successfully!");
+            const dataToSubmit = { ...formData };
+
+            // Sanitize Department
+            if (!dataToSubmit.department) {
+                dataToSubmit.department = null;
             }
-            handleCloseModal();
-            loadEvents();
+
+            // No need to parse JSON fields manually as they are already objects/arrays
+
+            if (editingId) {
+                await EventService.updateEvent(editingId, dataToSubmit);
+                alert("Event updated successfully!");
+                handleCloseModal(); // Close ONLY on success
+                loadEvents();
+            } else {
+                await EventService.createEvent(dataToSubmit);
+                alert("Event created successfully!");
+                handleCloseModal(); // Close ONLY on success
+                loadEvents();
+            }
         } catch (err) {
-            alert(err.message);
+            console.error("Submit Error:", err);
+            alert("Failed to save event: " + (err.message || "Unknown error"));
         }
     };
 
@@ -243,7 +617,7 @@ const EventsList = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {events.map((event) => (
+                        {Array.isArray(events) && events.length > 0 && events.map((event) => (
                             <tr key={event._id}>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
@@ -304,9 +678,9 @@ const EventsList = () => {
                                 </td>
                             </tr>
                         ))}
-                        {events.length === 0 && (
+                        {(!Array.isArray(events) || events.length === 0) && (
                             <tr>
-                                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No events found.</td>
+                                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">No events found.</td>
                             </tr>
                         )}
                     </tbody>
@@ -315,93 +689,163 @@ const EventsList = () => {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 overflow-hidden z-[1000]" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
                         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={handleCloseModal}></div>
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <form onSubmit={handleSubmit}>
-                                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
-                                        {editingId ? 'Edit Event' : 'Add New Event'}
-                                    </h3>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Title</label>
-                                            <input type="text" name="title" value={formData.title} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Subtitle</label>
-                                            <input type="text" name="subtitle" value={formData.subtitle} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Optional subtitle" />
-                                        </div>
-                                        {role === 'admin' && (
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Department</label>
-                                                <select
-                                                    name="department"
-                                                    value={formData.department}
-                                                    onChange={handleChange}
-                                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+
+                        <div className="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 w-full max-w-4xl max-h-[90vh] flex flex-col">
+                            <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
+                                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 flex-shrink-0">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                            {editingId ? 'Edit Event' : 'Add New Event'}
+                                        </h3>
+                                        <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-gray-500">
+                                            <XMarkIcon className="h-6 w-6" />
+                                        </button>
+                                    </div>
+                                    <div className="border-b border-gray-200">
+                                        <nav className="-mb-px flex space-x-4 overflow-x-auto" aria-label="Tabs">
+                                            {['Basic Info', 'Speakers', 'Agenda', 'Gallery', 'Resources', 'Testimonials'].map((tab) => (
+                                                <button
+                                                    key={tab}
+                                                    type="button"
+                                                    onClick={() => setActiveTab(tab)}
+                                                    className={`${activeTab === tab
+                                                        ? 'border-indigo-500 text-indigo-600'
+                                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
                                                 >
-                                                    <option value="">General (No Department)</option>
-                                                    {departments.map(dept => (
-                                                        <option key={dept._id} value={dept._id}>{dept.name}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        )}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Date</label>
-                                            <input type="date" name="date" value={formData.date} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Place</label>
-                                            <input type="text" name="place" value={formData.place} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Image</label>
-                                            <div className="mt-1 flex items-center space-x-4">
-                                                {formData.image && (
-                                                    <img src={formData.image} alt="Preview" className="h-20 w-32 object-cover rounded border" />
-                                                )}
-                                                <div className="flex-1">
-                                                    <input
-                                                        type="text"
-                                                        name="image"
-                                                        value={formData.image}
-                                                        onChange={handleChange}
-                                                        placeholder="Enter Image URL or Upload"
-                                                        className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                    />
+                                                    {tab}
+                                                </button>
+                                            ))}
+                                        </nav>
+                                    </div>
+
+                                </div>
+                                <div className="flex-1 overflow-y-auto px-4 sm:px-6">
+                                    <div className="space-y-4 pb-4">
+                                        {activeTab === 'Basic Info' && (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                                                    <input type="text" name="title" value={formData.title} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                                                 </div>
-                                                <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                                    <span>Upload</span>
-                                                    <input
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept="image/*"
-                                                        onChange={handleImageUpload}
-                                                    />
-                                                </label>
-                                                {uploading && <span className="text-sm text-gray-500">Uploading...</span>}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Description (HTML Content)</label>
-                                            <textarea
-                                                name="description"
-                                                value={formData.description}
-                                                onChange={handleChange}
-                                                required
-                                                rows={10}
-                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono text-sm"
-                                                placeholder="<p>Enter your event details here...</p>"
-                                            ></textarea>
-                                            <p className="mt-1 text-xs text-gray-500">HTML is supported. Use &lt;br&gt; for line breaks and &lt;p&gt; for paragraphs.</p>
-                                        </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Subtitle</label>
+                                                    <input type="text" name="subtitle" value={formData.subtitle} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Optional subtitle" />
+                                                </div>
+                                                {role === 'admin' && (
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Department</label>
+                                                        <select
+                                                            name="department"
+                                                            value={formData.department}
+                                                            onChange={handleChange}
+                                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                        >
+                                                            <option value="">General (No Department)</option>
+                                                            {Array.isArray(departments) && departments.map(dept => (
+                                                                <option key={dept._id} value={dept._id}>{dept.name}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Date</label>
+                                                    <input type="date" name="date" value={formData.date} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Place</label>
+                                                    <input type="text" name="place" value={formData.place} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Image</label>
+                                                    <div className="mt-1 flex items-center space-x-4">
+                                                        {formData.image && (
+                                                            <img src={formData.image} alt="Preview" className="h-20 w-32 object-cover rounded border" />
+                                                        )}
+                                                        <div className="flex-1">
+                                                            <input
+                                                                type="text"
+                                                                name="image"
+                                                                value={formData.image}
+                                                                onChange={handleChange}
+                                                                placeholder="Enter Image URL or Upload"
+                                                                className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                            />
+                                                        </div>
+                                                        <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                            <span>Upload</span>
+                                                            <input
+                                                                type="file"
+                                                                className="hidden"
+                                                                accept="image/*"
+                                                                onChange={handleImageUpload}
+                                                            />
+                                                        </label>
+                                                        {uploading && <span className="text-sm text-gray-500">Uploading...</span>}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Description (HTML Content)</label>
+                                                    <textarea
+                                                        name="description"
+                                                        value={formData.description}
+                                                        onChange={handleChange}
+                                                        required
+                                                        rows={5}
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono text-sm"
+                                                    ></textarea>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Join Link (Virtual)</label>
+                                                        <input type="url" name="joinLink" value={formData.joinLink} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="https://..." />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Registration Deadline</label>
+                                                        <input type="date" name="registrationDeadline" value={formData.registrationDeadline} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <input type="checkbox" name="isRegistrationOpen" checked={formData.isRegistrationOpen} onChange={handleChange} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                                                    <label className="ml-2 block text-sm text-gray-900">Open Registration</label>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {activeTab === 'Speakers' && (
+                                            <SpeakerManager speakers={formData.speakers} onChange={val => setFormData({ ...formData, speakers: val })} />
+                                        )}
+
+                                        {activeTab === 'Agenda' && (
+                                            <AgendaManager agenda={formData.agenda} onChange={val => setFormData({ ...formData, agenda: val })} />
+                                        )}
+
+                                        {activeTab === 'Gallery' && (
+                                            <GalleryManager gallery={formData.gallery} onChange={val => setFormData({ ...formData, gallery: val })} />
+                                        )}
+
+                                        {activeTab === 'Resources' && (
+                                            <ResourcesManager resources={formData.resources} onChange={val => setFormData({ ...formData, resources: val })} />
+                                        )}
+
+                                        {activeTab === 'Testimonials' && (
+                                            editingId ? (
+                                                <EventTestimonialManager eventId={editingId} departmentId={formData.department} />
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded">
+                                                    <p>Please save the event first to add testimonials.</p>
+                                                    <p className="text-xs mt-2 text-gray-400">Testimonials are linked to existing events.</p>
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                 </div>
-                                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse flex-shrink-0 border-t border-gray-200">
                                     <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
                                         Save
                                     </button>

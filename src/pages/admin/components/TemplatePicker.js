@@ -611,6 +611,26 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 badge: "Voices of IET",
                 items: []
             }
+        },
+        {
+            key: 'design_thirty_two',
+            name: 'Common Image Gallery',
+            description: 'Displays a grid of all images tagged as "Common" (University-wide).',
+            demoData: {
+                title: "Campus Gallery",
+                subtitle: "Glimpses of our vibrant campus life.",
+                badge: "Gallery"
+            }
+        },
+        {
+            key: 'design_thirty_three',
+            name: 'Department Events Grid',
+            description: 'Displays a grid of upcoming events for the department.',
+            demoData: {
+                title: "Upcoming Events",
+                subtitle: "Check out what's happening in our department.",
+                badge: "Events"
+            }
         }
     ];
 

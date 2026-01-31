@@ -119,7 +119,31 @@ export const userAuthApi = createApi({
         }
       }
     }),
+    getAllUsers: builder.query({
+      query: (access_token) => {
+        return {
+          url: 'users/',
+          method: 'GET',
+          headers: {
+            'authorization': `Bearer ${access_token}`,
+          }
+        }
+      }
+    }),
+    updateUserRole: builder.mutation({
+      query: ({ id, access_token, data }) => {
+        return {
+          url: `users/${id}/role`,
+          method: 'PUT',
+          body: data,
+          headers: {
+            'authorization': `Bearer ${access_token}`,
+            'Content-type': 'application/json',
+          }
+        }
+      }
+    }),
   }),
 })
 
-export const { useRegisterUserMutation, useLoginUserMutation, useGetLoggedUserQuery, useChangeUserPasswordMutation, useSendPasswordResetEmailMutation, useResetPasswordMutation } = userAuthApi
+export const { useRegisterUserMutation, useLoginUserMutation, useGetLoggedUserQuery, useChangeUserPasswordMutation, useSendPasswordResetEmailMutation, useResetPasswordMutation, useGetAllUsersQuery, useUpdateUserRoleMutation } = userAuthApi

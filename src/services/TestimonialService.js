@@ -43,6 +43,20 @@ const TestimonialService = {
         return resData.data;
     },
 
+    async getTestimonialsByEvent(eventId) {
+        const response = await fetch(`${API_BASE_URL}/testimonials?event=${eventId}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch testimonials');
+        }
+
+        const resDataEvent = await response.json();
+        return resDataEvent.data;
+    },
+
     async createTestimonial(data) {
         const response = await fetch(`${API_BASE_URL}/testimonials`, {
             method: 'POST',

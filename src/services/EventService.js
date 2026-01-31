@@ -11,15 +11,36 @@ const getAuthHeaders = () => {
 };
 
 const EventService = {
-    async getAllEvents() {
+    async getAllEvents(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const url = `${API_BASE_URL}/events${queryString ? `?${queryString}` : ''}`;
+
         // Passing auth headers to allow backend to filter by department for department_admin
-        const response = await fetch(`${API_BASE_URL}/events`, {
+        const response = await fetch(url, {
             method: 'GET',
             headers: getAuthHeaders()
         });
 
         if (!response.ok) {
             throw new Error('Failed to fetch events');
+        }
+
+        const resData = await response.json();
+        return resData.data;
+    },
+
+    async getAdminEvents(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        // Use the protected route for admin management
+        const url = `${API_BASE_URL}/admin/events/managed-list${queryString ? `?${queryString}` : ''}`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch admin events');
         }
 
         const resData = await response.json();
@@ -115,6 +136,21 @@ const EventService = {
         }
 
         return await response.json();
+    },
+
+    async registerEvent(id) {
+        const response = await fetch(`${API_BASE_URL}/events/${id}/register`, {
+            method: 'POST',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to register for event');
+        }
+
+        const resData = await response.json();
+        return resData.data;
     }
 };
 

@@ -4,8 +4,8 @@ import { getToken } from './LocalStorageService';
 const API_URL = 'http://localhost:5000/api/albums';
 
 class AlbumService {
-    getAlbums() {
-        return axios.get(API_URL).then(res => res.data.data);
+    getAlbums(params = {}) {
+        return axios.get(API_URL, { params }).then(res => res.data.data);
     }
 
     getAlbum(id) {

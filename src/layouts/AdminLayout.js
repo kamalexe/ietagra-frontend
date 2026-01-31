@@ -14,7 +14,8 @@ import {
   PhotoIcon,
   FolderIcon,
   ClipboardDocumentCheckIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  UsersIcon
 } from '@heroicons/react/24/outline';
 import { useSelector, useDispatch } from 'react-redux';
 import { useGetLoggedUserQuery } from '../services/userAuthApi';
@@ -29,11 +30,13 @@ const AdminLayout = () => {
   const { role, name, department, email } = useSelector((state) => state.user);
 
   // Fetch user info if access_token is present
-  const { data, isSuccess } = useGetLoggedUserQuery(access_token, {
+  // Fetch user info if access_token is present
+  const { data, isSuccess, isLoading } = useGetLoggedUserQuery(access_token, {
     skip: !access_token
   });
 
   useEffect(() => {
+    // ... same effect
     if (data && isSuccess) {
       dispatch(setUserInfo({
         email: data.user.email,
@@ -45,9 +48,15 @@ const AdminLayout = () => {
 
       // Auto-register account for switching
       const tokens = getToken();
-      registerAccount(tokens, { ...data.user, user_type: data.user.role === 'admin' ? 1 : 4 }); // Map role to type if needed, or just pass object if consistent
+      registerAccount(tokens, { ...data.user, user_type: data.user.role === 'admin' ? 1 : 4 }); 
     }
   }, [data, isSuccess, dispatch]);
+
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center bg-gray-100">
+      <div className="text-xl text-blue-600 font-semibold">Loading Dashboard...</div>
+    </div>;
+  }
 
   if (!access_token) {
     return <Navigate to="/login" replace />;
@@ -70,10 +79,14 @@ const AdminLayout = () => {
     { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon, roles: ['admin'] },
     { name: 'Footer', href: '/admin/footer', icon: SwatchIcon, roles: ['admin'] },
     { name: 'Navbar', href: '/admin/navbar', icon: MapIcon, roles: ['admin'] },
+    { name: 'User Management', href: '/admin/users', icon: UsersIcon, roles: ['admin'] },
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon, roles: ['admin', 'department_admin'] },
   ];
 
   const navigation = allNavigation.filter(item => item.roles.includes(role));
+
+  console.log('Current User Role:', role);
+  console.log('Navigation Items:', navigation.length);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -85,6 +98,13 @@ const AdminLayout = () => {
         </div>
         <nav className="mt-6 px-4">
           <ul className="space-y-2">
+            {navigation.length === 0 && (
+              <li className="px-4 py-3 text-sm text-red-500 bg-red-50 rounded-lg">
+                No menu items found for role: <strong>{role || 'None'}</strong>.
+                <br />
+                <span className="text-xs text-gray-500">Please contact super admin to assign 'department_admin' role.</span>
+              </li>
+            )}
             {navigation.map((item) => {
               const isActive = location.pathname.startsWith(item.href);
               return (

@@ -4,12 +4,13 @@ import { getToken } from './LocalStorageService';
 const API_URL = 'http://localhost:5000/api/gallery';
 
 class GalleryService {
-    getGalleryImages() {
+    getGalleryImages(params = {}) {
         const { access_token } = getToken();
         return axios.get(API_URL, {
             headers: {
                 Authorization: access_token ? `Bearer ${access_token}` : ''
-            }
+            },
+            params: params
         }).then(res => res.data.data);
     }
 

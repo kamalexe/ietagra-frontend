@@ -5,7 +5,7 @@ import TestimonialService from '../../../services/TestimonialService';
 import SectionWrapper from '../SectionWrapper';
 import { StarIcon } from '@heroicons/react/24/solid';
 
-const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, items: initialItems = [] }) => {
+const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, eventId, items: initialItems = [] }) => {
     const [testimonials, setTestimonials] = useState(initialItems);
     const [loading, setLoading] = useState(false);
 
@@ -19,7 +19,11 @@ const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, items: init
                 setLoading(true);
                 try {
                     let data;
-                    if (departmentId) {
+                    if (eventId) {
+                        // Assuming TestimonialService has this method, if not I need to add it.
+                        // For now let's assume I'll add getTestimonialsByEvent
+                        data = await TestimonialService.getTestimonialsByEvent(eventId);
+                    } else if (departmentId) {
                         data = await TestimonialService.getTestimonialsByDepartment(departmentId);
                     } else {
                         data = await TestimonialService.getAllTestimonials();
@@ -33,7 +37,7 @@ const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, items: init
             };
             fetchTestimonials();
         }
-    }, [initialItems, departmentId]);
+    }, [initialItems, departmentId, eventId]);
 
     const renderMedia = (item) => {
         if (item.type === 'video' && item.videoUrl) {

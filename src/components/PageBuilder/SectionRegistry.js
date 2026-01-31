@@ -30,6 +30,8 @@ import DesignTwentyEight from './sections/DesignTwentyEight';
 import DesignTwentyNine from './sections/DesignTwentyNine';
 import DesignThirty from './sections/DesignThirty';
 import DesignThirtyOne from './sections/DesignThirtyOne';
+import DesignThirtyTwo from './sections/DesignThirtyTwo';
+import DesignThirtyThree from './sections/DesignThirtyThree';
 import DesignFifteen from './sections/DesignFifteen';
 
 // Adapters for new documentation-based templates
@@ -96,6 +98,8 @@ const SectionRegistry = {
     design_twenty_nine: DesignTwentyNine,
     design_thirty: DesignThirty,
     design_thirty_one: DesignThirtyOne,
+    design_thirty_two: DesignThirtyTwo,
+    design_thirty_three: DesignThirtyThree,
 
     // New Aliases
     hero_section: HeroSection,
@@ -106,7 +110,9 @@ const SectionRegistry = {
     stats_grid: StatsGrid,
     director_message: DesignTwentyEight,
     announcement_board: DesignTwentyNine,
-    university_media_gallery: DesignThirty
+    university_media_gallery: DesignThirty,
+    common_image_gallery: DesignThirtyTwo,
+    department_events_grid: DesignThirtyThree
 };
 
 export default SectionRegistry;

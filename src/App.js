@@ -30,6 +30,7 @@ import DynamicPage from './pages/DynamicPage';
 import GalleryPage from './pages/GalleryPage';
 import ResearchList from './pages/admin/ResearchList';
 import TestimonialsList from './pages/admin/TestimonialsList';
+import UserManagement from './pages/admin/UserManagement';
 
 function App() {
   const { access_token } = useSelector((state) => state.auth);
@@ -57,6 +58,7 @@ function App() {
             <Route path="albums" element={<AlbumList />} />
             <Route path="research" element={<ResearchList />} />
             <Route path="testimonials" element={<TestimonialsList />} />
+            <Route path="users" element={<UserManagement />} />
             <Route path="settings" element={<div>Settings Page</div>} />
             <Route path="settings" element={<div>Settings Page</div>} />
           </Route>
