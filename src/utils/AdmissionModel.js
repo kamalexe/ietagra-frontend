@@ -120,7 +120,7 @@ const AdmissionModal = ({ config }) => {
           >
             {/* Close button */}
             <motion.button
-              className="absolute top-2 right-2 md:-top-4 md:-right-4 bg-white/90 md:bg-red-600 text-gray-800 md:text-white p-2 rounded-full z-50 shadow-lg backdrop-blur-sm transition-transform"
+              className="absolute top-2 right-2 md:-top-4 md:-right-4 bg-white text-gray-800 p-2 rounded-full z-50 shadow-lg transition-transform"
               onClick={closeModal}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -129,7 +129,7 @@ const AdmissionModal = ({ config }) => {
             </motion.button>
 
             {/* Poster display */}
-            <div className="relative overflow-hidden rounded-lg shadow-2xl bg-gray-100 flex justify-center items-center">
+            <div className="relative overflow-hidden rounded-lg flex justify-center items-center">
               {/* Image */}
               <motion.div
                 className="relative w-full flex justify-center"
@@ -140,7 +140,7 @@ const AdmissionModal = ({ config }) => {
                 <img
                   src={posterImages[currentPoster]}
                   alt={`IET Agra Admissions 2025-26 Poster ${currentPoster + 1}`}
-                  className="w-auto h-auto max-w-full max-h-[60vh] md:max-h-[75vh] object-contain rounded-lg"
+                  className="w-auto h-auto max-w-full max-h-[70vh] md:max-h-[80vh] object-contain rounded-lg shadow-2xl"
                 />
               </motion.div>
 
@@ -148,7 +148,7 @@ const AdmissionModal = ({ config }) => {
               {posterImages.length > 1 && (
                 <>
                   <motion.button
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
                     onClick={prevPoster}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -157,7 +157,7 @@ const AdmissionModal = ({ config }) => {
                   </motion.button>
 
                   <motion.button
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
                     onClick={nextPoster}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -170,7 +170,7 @@ const AdmissionModal = ({ config }) => {
                     {posterImages.map((_, index) => (
                       <button
                         key={index}
-                        className={`w-3 h-3 rounded-full ${
+                        className={`w-3 h-3 rounded-full shadow-sm ${
                           currentPoster === index ? 'bg-white' : 'bg-gray-400'
                         }`}
                         onClick={(e) => {
@@ -186,19 +186,19 @@ const AdmissionModal = ({ config }) => {
 
             {/* Call to action button */}
             <motion.div
-              className="text-center py-4 bg-white md:bg-transparent md:mt-6 rounded-b-lg md:rounded-none shrink-0"
+              className="text-center py-4 bg-transparent mt-2 shrink-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
               <motion.a
                 href={applyLink}
-                className="bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-3 px-8 rounded-lg inline-block shadow-lg"
+                className="bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-3 px-8 rounded-full inline-block shadow-lg border border-white/30"
                 target="_blank"
-                rel="noopener noreferrer" // Security best practice
+                rel="noopener noreferrer" 
                 whileHover={{
                   scale: 1.05,
-                  boxShadow: '0px 8px 15px rgba(0,0,0,0.2)',
+                  boxShadow: '0px 8px 15px rgba(0,0,0,0.3)',
                 }}
                 whileTap={{ scale: 0.98 }}
               >
