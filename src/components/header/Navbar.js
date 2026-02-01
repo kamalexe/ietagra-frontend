@@ -85,7 +85,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [navConfig, setNavConfig] = useState({
-    logoUrl: './images/institute-of-engineering-and-technology-logo.png',
+    logoUrl: './images/iet_logo.png',
     navLinks: DEFAULT_LINKS
   });
 
@@ -132,7 +132,7 @@ const Navbar = () => {
                 <div className="absolute -inset-1 bg-blue-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity blur"></div>
                 <img
                   className="h-12 w-auto relative transform transition-transform duration-500 group-hover:rotate-[360deg]"
-                  src={navConfig.logoUrl || './images/institute-of-engineering-and-technology-logo.png'}
+                  src={navConfig.logoUrl || './images/iet_logo.png'}
                   alt="IET AGRA Logo"
                 />
               </div>
