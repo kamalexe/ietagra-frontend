@@ -2,17 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 
-const AdmissionModal = () => {
+const AdmissionModal = ({ config }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentPoster, setCurrentPoster] = useState(0);
 
-  // Array of admission poster images
-  const posterImages = [
-    '/images/admissionPoster.jpg', // Front side of brochure
-    '/images/admissionPosterI.jpg', // Back side of brochure
+  // Default images if not provided in config
+  const defaultImages = [
+    '/images/admissionPoster.jpg',
+    '/images/admissionPosterI.jpg',
   ];
 
+  const posterImages = config?.posters?.length > 0 ? config.posters : defaultImages;
+  const applyLink = config?.link || 'https://dbrauadm.samarth.edu.in/';
+
   useEffect(() => {
+    // If explicitly disabled in config, don't show
+    if (config?.enabled === false) {
+      setIsVisible(false);
+      return;
+    }
     // Check if the modal should be shown based on expiration date
     const shouldShowModal = () => {
       // Get expiration timestamp from localStorage
@@ -103,7 +111,7 @@ const AdmissionModal = () => {
           onClick={closeModal}
         >
           <motion.div
-            className="relative max-w-4xl w-11/12 mx-auto"
+            className="relative max-w-4xl w-11/12 mx-auto flex flex-col max-h-[95vh]"
             variants={modalVariants}
             initial="hidden"
             animate="visible"
@@ -112,7 +120,7 @@ const AdmissionModal = () => {
           >
             {/* Close button */}
             <motion.button
-              className="absolute -top-4 -right-4 bg-red-600 text-white p-2 rounded-full z-50 shadow-lg"
+              className="absolute top-2 right-2 md:-top-4 md:-right-4 bg-white/90 md:bg-red-600 text-gray-800 md:text-white p-2 rounded-full z-50 shadow-lg backdrop-blur-sm transition-transform"
               onClick={closeModal}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -121,10 +129,10 @@ const AdmissionModal = () => {
             </motion.button>
 
             {/* Poster display */}
-            <div className="relative overflow-hidden rounded-lg shadow-2xl">
+            <div className="relative overflow-hidden rounded-lg shadow-2xl bg-gray-100 flex justify-center items-center">
               {/* Image */}
               <motion.div
-                className="relative aspect-[1/1.4] sm:aspect-[4/3] md:aspect-auto"
+                className="relative w-full flex justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -132,30 +140,30 @@ const AdmissionModal = () => {
                 <img
                   src={posterImages[currentPoster]}
                   alt={`IET Agra Admissions 2025-26 Poster ${currentPoster + 1}`}
-                  className="w-full h-full object-contain bg-transparent md:bg-white rounded-lg"
+                  className="w-auto h-auto max-w-full max-h-[60vh] md:max-h-[75vh] object-contain rounded-lg"
                 />
               </motion.div>
 
               {/* Navigation buttons */}
               {posterImages.length > 1 && (
                 <>
-                  <button
+                  <motion.button
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full"
                     onClick={prevPoster}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
                     <FaChevronLeft />
-                  </button>
+                  </motion.button>
 
-                  <button
+                  <motion.button
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-60 text-white p-3 rounded-full"
                     onClick={nextPoster}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
                     <FaChevronRight />
-                  </button>
+                  </motion.button>
 
                   {/* Pagination indicators */}
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
@@ -178,13 +186,13 @@ const AdmissionModal = () => {
 
             {/* Call to action button */}
             <motion.div
-              className="text-center mt-6"
+              className="text-center py-4 bg-white md:bg-transparent md:mt-6 rounded-b-lg md:rounded-none shrink-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
               <motion.a
-                href="https://dbrauadm.samarth.edu.in/"
+                href={applyLink}
                 className="bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-3 px-8 rounded-lg inline-block shadow-lg"
                 target="_blank"
                 rel="noopener noreferrer" // Security best practice

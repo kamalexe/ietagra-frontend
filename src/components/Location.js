@@ -10,6 +10,8 @@ const Location = () => {
                     title="map"
                     src="https://maps.google.com/maps?width=600&amp;height=400&amp;hl=en&amp;q=iet khandari agra&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
                     className=' shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] rounded-lg'
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
                 ></iframe>
             </div>
             <div className="container px-5 py-24 mx-auto flex">

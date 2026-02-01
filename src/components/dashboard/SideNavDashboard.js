@@ -8,7 +8,7 @@ import ViewCourseTeacher from "./DashboardComponent/Teacher/ViewCourseTeacher";
 import ViewPlacementTeacher from "./DashboardComponent/Teacher/ViewPlacementTeacher";
 
 import { useDispatch } from 'react-redux';
-import { getToken } from '../../services/LocalStorageService';
+import { getToken, registerAccount } from '../../services/LocalStorageService';
 import { useGetLoggedUserQuery } from '../../services/userAuthApi';
 import { setUserInfo } from '../../features/userSlice';
 
@@ -39,6 +39,14 @@ const SideNavDashboard = () => {
             dispatch(setUserInfo({
                 user_type: data.user_type,
             }))
+            // Auto-register account for switching
+            // We need the token here.
+            const tokens = getToken();
+            const { access_token } = tokens;
+            // We also need the user's email/name which is in 'data'
+            if (data.email) {
+                registerAccount(tokens, data);
+            }
         }
     }, [data, isSuccess, dispatch])
 
@@ -65,7 +73,7 @@ const SideNavDashboard = () => {
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-6 h-6"
+                    className="w-6 h-6"
                 >
                     <path
                         stroke-linecap="round"
@@ -88,7 +96,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -112,7 +120,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -136,7 +144,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -160,7 +168,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -185,7 +193,7 @@ const SideNavDashboard = () => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="w-6 h-6"
+                            className="w-6 h-6"
                         >
                             <path
                                 stroke-linecap="round"
@@ -208,13 +216,14 @@ const SideNavDashboard = () => {
 
     return (
         <section className="bg-white dark:bg-gray-900">
-            <div class="container mx-auto p-8">
+            <div className="container mx-auto p-8">
                 <div className="flex">
                     <div>
                         {/* Pass all SidebarData to the SideNavItemDashboard component */}
                         <SideNavItemDashboard
                             sidebarData={sidebarData}
                             onItemClick={handleItemClick}
+                            currentUser={data}
                         />
                     </div>
                     <div>

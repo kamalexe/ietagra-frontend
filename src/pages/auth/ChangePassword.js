@@ -18,7 +18,7 @@ const ChangePassword = () => {
     const res = await changeUserPassword({ actualData, access_token })
     if (res.error) {
       setServerMsg({})
-      setServerError(res.error.data.errors)
+      setServerError(res.error.data?.errors || {})
     }
     if (res.data) {
       console.log(res.data)

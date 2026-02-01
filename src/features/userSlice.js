@@ -4,7 +4,8 @@ const initialState = {
   email: "",
   name: "",
   phone: "",
-  user_type: "",
+  role: "",
+  department: null,
   id: null
 }
 
@@ -16,15 +17,17 @@ export const userSlice = createSlice({
       state.email = action.payload.email
       state.name = action.payload.name
       state.phone = action.payload.phone
-      state.user_type = action.payload.user_type
+      state.role = action.payload.role
+      state.department = action.payload.department
       state.id = action.payload.id
     },
     unsetUserInfo: (state, action) => {
-      state.email = action.payload.email
-      state.name = action.payload.name
-      state.phone = action.payload.phone
-      state.user_type = action.payload.user_type
-      state.id = action.payload.id
+      state.email = ""
+      state.name = ""
+      state.phone = ""
+      state.role = ""
+      state.department = null
+      state.id = null
     },
   }
 })

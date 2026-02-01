@@ -2,7 +2,7 @@ import { Button, Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { unSetUserToken } from '../../../features/authSlice';
-import { getToken, removeToken } from '../../../services/LocalStorageService';
+import { getToken, removeToken, removeAccount } from '../../../services/LocalStorageService';
 import { useGetLoggedUserQuery } from '../../../services/userAuthApi';
 import { useEffect, useState } from 'react';
 import { setUserInfo, unsetUserInfo } from '../../../features/userSlice';
@@ -11,7 +11,9 @@ const Profile = () => {
     const handleLogout = () => {
         dispatch(unsetUserInfo({ name: "", email: "", phone: "", user_type: "", id: null }))
         dispatch(unSetUserToken({ access_token: null }))
-        removeToken()
+        // Remove this specific account from the switcher list
+        removeAccount(userData.email);
+        removeToken();
         navigate('/login')
     }
     const navigate = useNavigate()

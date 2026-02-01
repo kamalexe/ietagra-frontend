@@ -46,9 +46,9 @@ function AddCourse() {
         <div>
                 <script src="https://static.airtable.com/js/embed/embed_snippet_v1.js"></script>
                 <iframe 
-                    class="airtable-embed airtable-dynamic-height" 
+                className="airtable-embed airtable-dynamic-height" 
                     src="https://airtable.com/embed/appZduFY0weOWiejW/shr1vyd4U6kgV6hm5?backgroundColor=cyan" 
-                    frameborder="0" 
+                frameBorder="0" 
                     onmousewheel="" 
                     width="1000px"
                     height="1533" 

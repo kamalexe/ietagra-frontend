@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import AccountSwitcher from "./AccountSwitcher";
 
-const SideNavItemDashboard = ({ sidebarData }) => {
+const SideNavItemDashboard = ({ sidebarData, currentUser }) => {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
 
   const handleItemClick = (index) => {
@@ -9,7 +10,8 @@ const SideNavItemDashboard = ({ sidebarData }) => {
 
   return (
     <div className="flex">
-      <div className="bg-gray-200 p-4 ">
+      <div className="bg-gray-200 p-4 min-h-screen flex flex-col gap-4">
+        <AccountSwitcher currentUser={currentUser} />
         <ul>
           {sidebarData.map((item, index) => (
             <li
@@ -18,8 +20,8 @@ const SideNavItemDashboard = ({ sidebarData }) => {
                 }`}
               onClick={() => handleItemClick(index)}
             >
-              <div class="flex items-center " >
-                <div class="mr-2">
+              <div className="flex items-center " >
+                <div className="mr-2">
                   {item.icon}
                 </div>
                 <span className="block whitespace-nowrap">{item.title}</span>
