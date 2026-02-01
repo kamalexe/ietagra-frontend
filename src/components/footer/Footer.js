@@ -174,7 +174,7 @@ function Footer() {
                     <div className="flex items-center space-x-1">
                         <span>{credits?.text?.split('IOTA')[0] || 'Designed and Developed by'}</span>
                         <a
-                            href="#"
+                            href="/"
                             className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
                         >
                             IOTA

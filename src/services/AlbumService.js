@@ -24,4 +24,5 @@ class AlbumService {
     }
 }
 
-export default new AlbumService();
+const albumService = new AlbumService();
+export default albumService;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import GalleryService from '../../services/GalleryService';
-import { getToken } from '../../services/LocalStorageService';
+
 import { useSelector } from 'react-redux';
 import DepartmentService from '../../services/DepartmentService';
 import axiosInstance from '../../api/axiosConfig';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { getToken, removeToken, registerAccount, getAccounts } from '../../services/LocalStorageService';
+import { getToken, registerAccount, getAccounts } from '../../services/LocalStorageService';
 import NavbarService from '../../services/NavbarService';
 import AccountSwitcher from '../dashboard/AccountSwitcher';
 import { useGetLoggedUserQuery } from '../../services/userAuthApi';
@@ -89,10 +89,7 @@ const Navbar = () => {
     navLinks: DEFAULT_LINKS
   });
 
-  const handleAddAccount = () => {
-    removeToken();
-    window.location.href = "/login";
-  };
+
 
   useEffect(() => {
     const fetchNavbar = async () => {

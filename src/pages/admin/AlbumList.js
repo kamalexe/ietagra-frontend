@@ -10,7 +10,6 @@ import {
     PlusIcon, 
     FolderIcon, 
     PhotoIcon, 
-    XMarkIcon,
     PlayCircleIcon,
     ChevronLeftIcon
 } from '@heroicons/react/24/outline';

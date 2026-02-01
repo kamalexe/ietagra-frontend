@@ -1,7 +1,7 @@
 // src/components/PageBuilder/sections/DesignNine.js
 import React from 'react';
 import { motion } from 'framer-motion';
-import { fadeIn } from '../../../utils/animations';
+// import { fadeIn } from '../../../utils/animations';
 import * as FaIcons from 'react-icons/fa';
 
 import SectionWrapper from '../SectionWrapper';

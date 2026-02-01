@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { FaGithub, FaFilePowerpoint, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaGithub, FaFilePowerpoint, FaSearch } from 'react-icons/fa';
 import axiosInstance from '../../../api/axiosConfig';
 
 // Configuration for different data sources

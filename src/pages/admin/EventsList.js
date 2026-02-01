@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import EventService from '../../services/EventService';
-import { getToken } from '../../services/LocalStorageService';
+
 import { useSelector } from 'react-redux';
 import DepartmentService from '../../services/DepartmentService';
 import TestimonialService from '../../services/TestimonialService';

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { getDeviceId, registerAccount } from './LocalStorageService';
+import { getDeviceId } from './LocalStorageService';
 
 // Define a service using a base URL and expected endpoints
 const baseQuery = fetchBaseQuery({ baseUrl: `${process.env.REACT_APP_API_BASE_URL}/account/` });

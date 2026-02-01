@@ -10,7 +10,7 @@ const DesignTwentyNine = ({ id,
     speed = "20s"
 }) => {
     return (
-        <section id={id} className="bg-white border-y border-gray-100 shadow-sm overflow-hidden" id="announcement-marquee">
+        <section id={id} className="bg-white border-y border-gray-100 shadow-sm overflow-hidden">
             <div className="flex items-stretch h-12 md:h-14">
                 {/* Fixed Label/Icon Side */}
                 <div className={`${themeColor} text-white flex items-center px-4 md:px-6 relative z-10 shadow-lg shrink-0`}>

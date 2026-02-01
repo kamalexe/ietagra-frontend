@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+
 import { TrashIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 import axiosInstance from '../../api/axiosConfig';
 

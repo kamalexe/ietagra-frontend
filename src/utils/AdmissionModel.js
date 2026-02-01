@@ -42,7 +42,7 @@ const AdmissionModal = ({ config }) => {
 
     // Set visibility based on expiration check
     setIsVisible(shouldShowModal());
-  }, []);
+  }, [config]);
 
   const closeModal = () => {
     setIsVisible(false);

@@ -7,7 +7,7 @@ import { FaChartLine } from 'react-icons/fa';
 import SectionWrapper from '../SectionWrapper';
 
 const DesignFive = ({ id, title, description, swotData, data, badge, underlineColor, variant, backgroundImage, buttons, gradient }) => {
-  const finalData = swotData || data || {};
+  // const finalData = swotData || data || {};
   return (
     <SectionWrapper id={id}
       badge={badge}

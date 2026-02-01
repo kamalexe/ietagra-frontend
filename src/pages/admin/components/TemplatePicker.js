@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import SectionRegistry from '../../../components/PageBuilder/SectionRegistry';
 import DepartmentService from '../../../services/DepartmentService';
-import FacultyService from '../../../services/FacultyService';
+
 import StudentRecordService from '../../../services/StudentRecordService';
 
 const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [departments, setDepartments] = useState([]);
-    const [faculty, setFaculty] = useState([]);
+
     const [projects, setProjects] = useState([]);
     const [moocs, setMoocs] = useState([]);
     const [placements, setPlacements] = useState([]);
@@ -17,16 +17,14 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
     React.useEffect(() => {
         const fetchData = async () => {
             try {
-                const [deptData, facultyData, projectData, moocData, placementData, achievementData] = await Promise.all([
+                const [deptData, projectData, moocData, placementData, achievementData] = await Promise.all([
                     DepartmentService.getAllDepartments(),
-                    FacultyService.getAllFaculty(),
                     StudentRecordService.getRecords('project'),
                     StudentRecordService.getRecords('mooc'),
                     StudentRecordService.getRecords('placement'),
                     StudentRecordService.getRecords('achievement')
                 ]);
                 setDepartments(deptData);
-                setFaculty(facultyData);
 
                 // Helper to flatten metadata
                 const processRecords = (records) => records.map(record => ({

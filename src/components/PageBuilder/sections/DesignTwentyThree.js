@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
-import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon, PlayCircleIcon, PhotoIcon, FolderIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ChevronLeftIcon, PlayCircleIcon, FolderIcon } from '@heroicons/react/24/outline';
 import AlbumService from '../../../services/AlbumService';
 
 const DesignTwentyThree = ({ id, title, subtitle, layout = 'grid', albums: initialAlbums = [] }) => {

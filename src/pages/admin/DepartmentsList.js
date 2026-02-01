@@ -10,8 +10,7 @@ import FacultyService from '../../services/FacultyService';
 const DepartmentsList = () => {
   // State
   const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
   const [editingId, setEditingId] = useState(null);
 
   // Faculty Autocomplete State
@@ -37,14 +36,10 @@ const DepartmentsList = () => {
 
   const loadDepartments = async () => {
     try {
-      setLoading(true);
       const data = await DepartmentService.getAllDepartments();
       setDepartments(data);
     } catch (err) {
       console.error("Failed to load departments", err);
-      setError("Failed to load departments");
-    } finally {
-      setLoading(false);
     }
   };
 

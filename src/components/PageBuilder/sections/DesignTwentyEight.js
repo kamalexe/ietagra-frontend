@@ -10,7 +10,7 @@ const DesignTwentyEight = ({ id,
     themeColor = "blue-600"
 }) => {
     return (
-        <section id={id} className="py-16 bg-white overflow-hidden" id="director-message">
+        <section id={id} className="py-16 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
                 {/* Section Heading */}
                 <div className="mb-12 text-center lg:text-left">

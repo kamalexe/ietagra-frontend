@@ -1,6 +1,6 @@
 import { useState } from 'react';
 // import Dr_B_R_Ambedkar_University_Logo from '../../images/Dr_B_R_Ambedkar_University_Logo.png'
-import Registration from './Registration';
+// import Registration from './Registration';
 import UserLogin from './UserLogin';
 
 const TabPanel = (props) => {

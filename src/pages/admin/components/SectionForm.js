@@ -7,7 +7,7 @@ const SectionForm = ({ section, onClose, onSave }) => {
   const [formData, setFormData] = useState({});
   const [jsonInputs, setJsonInputs] = useState({});
   const [jsonErrors, setJsonErrors] = useState({});
-  const [uploadingField, setUploadingField] = useState(null);
+
 
   useEffect(() => {
     if (section && section.data) {
@@ -50,8 +50,6 @@ const SectionForm = ({ section, onClose, onSave }) => {
     if (!file) return;
 
     try {
-      const uploadKey = parentIndex !== null ? `${grandParentName}-${parentIndex}-${fieldName}` : fieldName;
-      setUploadingField(uploadKey);
 
       const data = await FileService.uploadFile(file);
 
@@ -70,7 +68,6 @@ const SectionForm = ({ section, onClose, onSave }) => {
     } catch (err) {
       alert("Image upload failed: " + err.message);
     } finally {
-      setUploadingField(null);
       e.target.value = null;
     }
   };

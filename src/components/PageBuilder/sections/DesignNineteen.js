@@ -9,7 +9,7 @@ const DesignNineteen = ({ id,
     content 
 }) => {
     return (
-        <section id={id} className="py-12 bg-white" id="chairman-speak">
+        <section id={id} className="py-12 bg-white">
             <div className="relative min-h-[250px] bg-[#b9292f] flex items-center justify-center mb-10 overflow-hidden">
                 {/* Background Overlay */}
                 <div className="absolute inset-0 bg-[url('https://smslucknow.ac.in/assets/images/bg/bg-do2.png')] bg-cover bg-center opacity-30"></div>

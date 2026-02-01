@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useGetAllUsersQuery, useUpdateUserRoleMutation } from '../../services/userAuthApi';
 import DepartmentService from '../../services/DepartmentService';
 import { useSelector } from 'react-redux';
-import { getToken } from '../../services/LocalStorageService';
+
 
 const UserManagement = () => {
     const { access_token } = useSelector((state) => state.auth);

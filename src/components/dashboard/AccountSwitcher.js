@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Avatar, Typography, IconButton, Menu, MenuItem, Divider, Tooltip } from '@mui/material';
-import { getAccounts, switchAccount, removeAccount, removeToken, registerAccount } from '../../services/LocalStorageService';
+import { getAccounts, switchAccount, removeAccount, removeToken } from '../../services/LocalStorageService';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
@@ -41,7 +41,7 @@ const AccountSwitcher = ({ currentUser }) => {
                 fetchAccounts();
             }
         }
-    }, [currentUser, accounts.length]);
+    }, [currentUser, accounts]);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
