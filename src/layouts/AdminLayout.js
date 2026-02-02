@@ -80,6 +80,8 @@ const AdminLayout = () => {
     { name: 'Footer', href: '/admin/footer', icon: SwatchIcon, roles: ['admin'] },
     { name: 'Navbar', href: '/admin/navbar', icon: MapIcon, roles: ['admin'] },
     { name: 'User Management', href: '/admin/users', icon: UsersIcon, roles: ['admin'] },
+    { name: 'Uploads', href: '/admin/uploads', icon: UsersIcon, roles: ['admin', 'department_admin'] },
+
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon, roles: ['admin', 'department_admin'] },
   ];
 

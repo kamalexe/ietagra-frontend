@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import EventService from '../../../services/EventService';
 
 const DesignTwenty = ({ id,
-    title = "Events 2023",
+    title = "Our Events",
     subtitle = "",
     content = "",
     backgroundImage = "https://picsum.photos/200/300",
