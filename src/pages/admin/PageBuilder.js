@@ -13,7 +13,10 @@ import {
 import { Link } from 'react-router-dom';
 import PageService from '../../services/PageService';
 import TemplatePicker from './components/TemplatePicker';
+
 import SectionForm from './components/SectionForm';
+import PageSettingsModal from './components/PageSettingsModal';
+import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 // Mock initial data
 const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
@@ -21,7 +24,13 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
     const slug = propSlug || params.slug; // Use prop if available, else param
     const [sections, setSections] = useState([]);
     const [pageTitle, setPageTitle] = useState('');
+    const [seoData, setSeoData] = useState({
+        metaTitle: '',
+        metaDescription: '',
+        metaKeywords: ''
+    });
     const [isPickerOpen, setIsPickerOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [editingSection, setEditingSection] = useState(null);
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState('draft');
@@ -37,6 +46,11 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                 if (pageData) {
                     setSections(pageData.sections || []);
                     setPageTitle(pageData.title || slug);
+                    setSeoData({
+                        metaTitle: pageData.metaTitle || '',
+                        metaDescription: pageData.metaDescription || '',
+                        metaKeywords: pageData.metaKeywords || ''
+                    });
                     setStatus(pageData.status || 'draft');
                 }
             } catch (err) {
@@ -104,6 +118,15 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
         setEditingSection(null);
     };
 
+    const handleSaveSettings = (data) => {
+        setPageTitle(data.title);
+        setSeoData({
+            metaTitle: data.metaTitle,
+            metaDescription: data.metaDescription,
+            metaKeywords: data.metaKeywords
+        });
+    };
+
     const handleSavePage = async () => {
         setIsSaving(true);
         try {
@@ -112,7 +135,8 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                 title: pageTitle || slug,
                 slug: slug,
                 sections: sections,
-                status: status
+                status: status,
+                ...seoData
             };
 
             await PageService.updatePage(slug, pageData);
@@ -178,6 +202,13 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                             Published
                         </button>
                     </div>
+                    <button
+                        onClick={() => setIsSettingsOpen(true)}
+                        className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
+                        title="Page Settings"
+                    >
+                        <Cog6ToothIcon className="h-6 w-6" />
+                    </button>
                     <button
                         onClick={() => window.open(`/${slug}`, '_blank')}
                         className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -284,6 +315,15 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                     section={editingSection}
                     onClose={() => setEditingSection(null)}
                     onSave={handleSaveSection}
+                />
+            )}
+
+            {isSettingsOpen && (
+                <PageSettingsModal
+                    isOpen={isSettingsOpen}
+                    onClose={() => setIsSettingsOpen(false)}
+                    initialData={{ title: pageTitle, ...seoData }}
+                    onSave={handleSaveSettings}
                 />
             )}
         </div>
