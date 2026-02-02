@@ -119,7 +119,7 @@ const UploadsManager = () => {
 
             {error && (
                 <div className="bg-red-50 p-4 rounded-md mb-6">
-                    <p className="text-red-700">{error}</p>
+                    <p className="text-red-700">{typeof error === 'object' ? (error.message || JSON.stringify(error)) : String(error)}</p>
                 </div>
             )}
 
@@ -160,7 +160,7 @@ const UploadsManager = () => {
                                 </div>
                             </div>
                             <div className="p-4">
-                                <p className="text-xs text-gray-500 truncate mb-1" title={file.filename}>{file.filename}</p>
+                                <p className="text-xs text-gray-500 truncate mb-1" title={String(file.filename || '')}>{String(file.filename || 'Unknown')}</p>
                                 <div className="flex justify-between items-center mt-2">
                                     <button 
                                         onClick={() => copyToClipboard(file.url)}
