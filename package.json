@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cloudinary/react": "^1.14.3",
+    "@cloudinary/url-gen": "^1.22.0",
     "@coreui/icons": "^3.0.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
