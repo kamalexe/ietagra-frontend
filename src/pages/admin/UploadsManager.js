@@ -14,11 +14,7 @@ const UploadsManager = () => {
     const [error, setError] = useState(null);
     const [notification, setNotification] = useState(null);
 
-    useEffect(() => {
-        fetchFiles();
-    }, []);
-
-    const fetchFiles = async () => {
+    const fetchFiles = React.useCallback(async () => {
         try {
             setLoading(true);
             const data = await UploadService.getFiles();
@@ -30,7 +26,11 @@ const UploadsManager = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchFiles();
+    }, [fetchFiles]);
 
     const showNotification = (message, type = 'success') => {
         setNotification({ message, type });
