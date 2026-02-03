@@ -27,6 +27,16 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", backgr
     const [activeMediaIndex, setActiveMediaIndex] = useState(0);
     const touchStartX = useRef(null);
 
+    const nextMedia = React.useCallback(() => {
+        if (!selectedAlbum?.media?.length) return;
+        setActiveMediaIndex((prev) => (prev + 1) % selectedAlbum.media.length);
+    }, [selectedAlbum]);
+
+    const prevMedia = React.useCallback(() => {
+        if (!selectedAlbum?.media?.length) return;
+        setActiveMediaIndex((prev) => (prev - 1 + selectedAlbum.media.length) % selectedAlbum.media.length);
+    }, [selectedAlbum]);
+
     // Keyboard Navigation & Focus Management
     useEffect(() => {
         if (!selectedAlbum) return;
@@ -44,7 +54,7 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", backgr
         firstFocusable?.focus();
 
         return () => window.removeEventListener('keydown', onKeyDown);
-    }, [selectedAlbum, activeMediaIndex]); // depend on index for fresh closures if needed, though functional updates mostly solve this
+    }, [selectedAlbum, activeMediaIndex, nextMedia, prevMedia]);
 
     // Thumbnail Auto-Scroll
     useEffect(() => {
@@ -106,15 +116,7 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", backgr
         setSelectedAlbum(null);
     };
 
-    const nextMedia = () => {
-        if (!selectedAlbum?.media?.length) return;
-        setActiveMediaIndex((prev) => (prev + 1) % selectedAlbum.media.length);
-    };
 
-    const prevMedia = () => {
-        if (!selectedAlbum?.media?.length) return;
-        setActiveMediaIndex((prev) => (prev - 1 + selectedAlbum.media.length) % selectedAlbum.media.length);
-    };
 
     if (loading) return (
         <div id={id} className="py-20 flex justify-center">

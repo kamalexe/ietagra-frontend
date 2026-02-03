@@ -72,6 +72,7 @@ const AdminLayout = () => {
     { name: 'Events', href: '/admin/events', icon: CalendarIcon, roles: ['admin', 'department_admin'] },
     { name: 'Events Config', href: '/admin/events-config', icon: CalendarIcon, roles: ['admin'] },
     { name: 'Gallery', href: '/admin/gallery', icon: PhotoIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Gallery Config', href: '/admin/gallery-config', icon: PhotoIcon, roles: ['admin'] },
     { name: 'Albums', href: '/admin/albums', icon: FolderIcon, roles: ['admin', 'department_admin'] },
     { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon, roles: ['admin', 'department_admin'] },
     { name: 'Research', href: '/admin/research', icon: ClipboardDocumentCheckIcon, roles: ['admin', 'department_admin'] },

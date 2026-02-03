@@ -1,5 +1,6 @@
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import LoginReg from './pages/auth/LoginReg';
 import ResetPassword from './pages/auth/ResetPassword';
 import ChangePassword from './pages/auth/ChangePassword';
@@ -21,6 +22,7 @@ import NavbarConfig from './pages/admin/NavbarConfig';
 import StudentDataManager from './pages/admin/StudentDataManager';
 import EventsList from './pages/admin/EventsList';
 import GalleryList from './pages/admin/GalleryList';
+import GalleryPageConfig from './pages/admin/GalleryPageConfig';
 import AlbumList from './pages/admin/AlbumList';
 import ContactSubmissions from './pages/admin/ContactSubmissions';
 import EventsPage from './pages/EventsPage';
@@ -36,6 +38,7 @@ function App() {
     const { access_token } = useSelector((state) => state.auth);
     return (
         <>
+            <Toaster position="top-right" />
             <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <Routes>
                     {/* Admin Routes */}
@@ -55,6 +58,7 @@ function App() {
                         <Route path="footer" element={<FooterConfig />} />
                         <Route path="navbar" element={<NavbarConfig />} />
                         <Route path="gallery" element={<GalleryList />} />
+                        <Route path="gallery-config" element={<GalleryPageConfig />} />
                         <Route path="albums" element={<AlbumList />} />
                         <Route path="research" element={<ResearchList />} />
                         <Route path="testimonials" element={<TestimonialsList />} />

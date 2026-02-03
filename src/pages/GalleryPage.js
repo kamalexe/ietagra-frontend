@@ -12,16 +12,38 @@ import {
     PlayIcon
 } from '@heroicons/react/24/outline';
 import AlbumService from '../services/AlbumService';
+import DepartmentService from '../services/DepartmentService';
+import GalleryConfigService from '../services/GalleryConfigService';
 
 const GalleryPage = () => {
     const [albums, setAlbums] = useState([]);
+    const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedDepartment, setSelectedDepartment] = useState('All');
+
+    // Config State
+    const [pageConfig, setPageConfig] = useState({
+        heroTitle: 'University Media Gallery',
+        heroTitleHighlight: 'Media Gallery',
+        heroSubtitle: 'Explore our campus events, academic milestones, and unforgettable memories through our curated collections.',
+        heroBackgroundImage: 'https://images.unsplash.com/photo-1523050853063-bd805a9ec218?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+    });
 
     // Lightbox State
     const [selectedAlbum, setSelectedAlbum] = useState(null);
     const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+    const nextMedia = React.useCallback(() => {
+        if (!selectedAlbum?.media?.length) return;
+        setActiveMediaIndex((prev) => (prev + 1) % selectedAlbum.media.length);
+    }, [selectedAlbum]);
+
+    const prevMedia = React.useCallback(() => {
+        if (!selectedAlbum?.media?.length) return;
+        setActiveMediaIndex((prev) => (prev - 1 + selectedAlbum.media.length) % selectedAlbum.media.length);
+    }, [selectedAlbum]);
+
     const touchStartX = useRef(null);
 
     // Keyboard Navigation & Focus Management
@@ -41,7 +63,7 @@ const GalleryPage = () => {
         firstFocusable?.focus();
 
         return () => window.removeEventListener('keydown', onKeyDown);
-    }, [selectedAlbum, activeMediaIndex]);
+    }, [selectedAlbum, activeMediaIndex, nextMedia, prevMedia]);
 
     // Thumbnail Auto-Scroll
     useEffect(() => {
@@ -65,28 +87,40 @@ const GalleryPage = () => {
         touchStartX.current = null;
     };
 
-    const categories = ['All', 'Events', 'Campus', 'Academic', 'Sports', 'Others'];
+    // const categories = ['All', 'Events', 'Campus', 'Academic', 'Sports', 'Others']; // Removing unused var
 
     useEffect(() => {
-        const fetchAlbums = async () => {
+        const loadDat = async () => {
             try {
-                const data = await AlbumService.getAlbums();
-                setAlbums(data);
+                const [albumsData, deptsData, configData] = await Promise.all([
+                    AlbumService.getAlbums(),
+                    DepartmentService.getPublishedDepartments(),
+                    GalleryConfigService.getConfig().catch(() => null)
+                ]);
+                setAlbums(albumsData);
+                setDepartments(deptsData);
+                if (configData) setPageConfig(configData);
             } catch (error) {
-                console.error("Failed to load albums", error);
+                console.error("Failed to load gallery data", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchAlbums();
+        loadDat();
         window.scrollTo(0, 0);
     }, []);
+
+    // Derive dynamic categories from albums
+    const uniqueCategories = ['All', ...new Set(albums.map(a => a.category))];
 
     const filteredAlbums = albums.filter(album => {
         const matchesSearch = album.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             album.description?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = selectedCategory === 'All' || album.category === selectedCategory;
-        return matchesSearch && matchesCategory;
+        const matchesDepartment = selectedDepartment === 'All' ||
+            (album.department && (album.department._id === selectedDepartment || album.department === selectedDepartment));
+
+        return matchesSearch && matchesCategory && matchesDepartment;
     });
 
     const openAlbum = (album) => {
@@ -104,8 +138,7 @@ const GalleryPage = () => {
         document.body.style.overflow = 'unset';
     };
 
-    const nextMedia = () => setActiveMediaIndex((prev) => (prev + 1) % selectedAlbum.media.length);
-    const prevMedia = () => setActiveMediaIndex((prev) => (prev - 1 + selectedAlbum.media.length) % selectedAlbum.media.length);
+
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -123,7 +156,7 @@ const GalleryPage = () => {
                 <div className="absolute inset-0 opacity-20">
                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 mix-blend-multiply" />
                     <img
-                        src="https://images.unsplash.com/photo-1523050853063-bd805a9ec218?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                        src={pageConfig.heroBackgroundImage || "https://images.unsplash.com/photo-1523050853063-bd805a9ec218?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"}
                         alt="Background"
                         className="w-full h-full object-cover"
                     />
@@ -134,7 +167,13 @@ const GalleryPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight"
                     >
-                        University <span className="text-indigo-400">Media Gallery</span>
+                        {pageConfig.heroTitle ? (
+                            <>
+                                {pageConfig.heroTitle.replace(pageConfig.heroTitleHighlight, '')} <span className="text-indigo-400">{pageConfig.heroTitleHighlight}</span>
+                            </>
+                        ) : (
+                            <>University <span className="text-indigo-400">Media Gallery</span></>
+                        )}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0 }}
@@ -142,31 +181,53 @@ const GalleryPage = () => {
                         transition={{ delay: 0.2 }}
                         className="text-xl text-indigo-100 max-w-2xl mx-auto mb-10"
                     >
-                        Explore our campus events, academic milestones, and unforgettable memories through our curated collections.
+                        {pageConfig.heroSubtitle}
                     </motion.p>
                 </div>
             </div>
 
             {/* FILTERS & SEARCH */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-                <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 flex flex-col md:flex-row gap-6 items-center border border-gray-100">
-                    <div className="relative flex-1 w-full">
-                        <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search albums or events..."
-                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 flex flex-col gap-6 border border-gray-100">
+                    <div className="flex flex-col md:flex-row gap-4 w-full">
+                        {/* Search Bar */}
+                        <div className="relative flex-1">
+                            <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search albums or events..."
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Department Dropdown */}
+                        <div className="relative w-full md:w-64">
+                            <select
+                                value={selectedDepartment}
+                                onChange={(e) => setSelectedDepartment(e.target.value)}
+                                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 text-gray-700 appearance-none cursor-pointer"
+                            >
+                                <option value="All">All Departments</option>
+                                {departments.map(dept => (
+                                    <option key={dept._id} value={dept._id}>
+                                        {dept.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                                <FunnelIcon className="h-4 w-4 text-gray-400" />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                    {/* Category Filter Pills */}
+                    <div className="flex items-center gap-3 w-full overflow-x-auto pb-2 no-scrollbar">
                         <div className="flex items-center text-gray-500 mr-2 shrink-0">
-                            <FunnelIcon className="h-5 w-5 mr-2" />
-                            <span className="text-sm font-bold uppercase tracking-wider">Filter:</span>
+                            <span className="text-sm font-bold uppercase tracking-wider">Category:</span>
                         </div>
-                        {categories.map(cat => (
+                        {uniqueCategories.map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
@@ -252,7 +313,7 @@ const GalleryPage = () => {
                             onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}
                             className="mt-6 text-indigo-600 font-bold hover:underline"
                         >
-                            Clear all filters
+                            clear filters
                         </button>
                     </div>
                 )}
