@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     PhotoIcon,
@@ -22,6 +22,48 @@ const GalleryPage = () => {
     // Lightbox State
     const [selectedAlbum, setSelectedAlbum] = useState(null);
     const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+    const touchStartX = useRef(null);
+
+    // Keyboard Navigation & Focus Management
+    useEffect(() => {
+        if (!selectedAlbum) return;
+
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') closeAlbum();
+            if (e.key === 'ArrowRight') nextMedia();
+            if (e.key === 'ArrowLeft') prevMedia();
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+
+        // Focus first interactive element
+        const firstFocusable = document.querySelector('.lightbox-close-btn');
+        firstFocusable?.focus();
+
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [selectedAlbum, activeMediaIndex]);
+
+    // Thumbnail Auto-Scroll
+    useEffect(() => {
+        if (!selectedAlbum) return;
+        const el = document.getElementById(`thumb-${activeMediaIndex}`);
+        el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }, [activeMediaIndex, selectedAlbum]);
+
+    // Swipe Handlers
+    const onTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const onTouchEnd = (e) => {
+        if (!touchStartX.current) return;
+        const delta = touchStartX.current - e.changedTouches[0].clientX;
+
+        if (Math.abs(delta) > 50) {
+            delta > 0 ? nextMedia() : prevMedia();
+        }
+        touchStartX.current = null;
+    };
 
     const categories = ['All', 'Events', 'Campus', 'Academic', 'Sports', 'Others'];
 
@@ -157,6 +199,8 @@ const GalleryPage = () => {
                                 <img
                                     src={album.coverImage}
                                     alt={album.title}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
@@ -221,96 +265,109 @@ const GalleryPage = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[9999] bg-black/98 flex flex-col"
+                        className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-xl flex flex-col"
+                        onClick={closeAlbum}
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-6 md:p-8">
+                        <div
+                            className="relative z-50 flex items-center justify-between p-4 bg-black/40 backdrop-blur-md"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/20">
+                                <div className="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/20">
                                     {selectedAlbum.title.charAt(0)}
                                 </div>
                                 <div>
-                                    <h4 className="text-white font-bold text-xl md:text-2xl leading-tight">{selectedAlbum.title}</h4>
-                                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
-                                        Media {activeMediaIndex + 1} of {selectedAlbum.media.length} • {selectedAlbum.media[activeMediaIndex]?.type}
+                                    <h4 className="text-white font-bold text-lg leading-tight">{selectedAlbum.title}</h4>
+                                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
+                                        {activeMediaIndex + 1} / {selectedAlbum.media.length}
                                     </p>
                                 </div>
                             </div>
                             <button
                                 onClick={closeAlbum}
-                                className="p-4 bg-white/5 rounded-2xl text-white hover:bg-white/10 transition-all border border-white/10"
+                                className="lightbox-close-btn p-2 bg-white rounded-full text-black hover:bg-gray-200 transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50"
                             >
                                 <XMarkIcon className="h-6 w-6" />
                             </button>
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 relative flex items-center justify-center px-4">
+                        <div
+                            className="flex-1 relative w-full h-full p-2 md:p-4 overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                            onTouchStart={onTouchStart}
+                            onTouchEnd={onTouchEnd}
+                        >
                             <button
-                                onClick={(e) => { e.stopPropagation(); prevMedia(); }}
-                                className="absolute left-4 md:left-12 z-20 p-5 bg-white/5 hover:bg-indigo-600 rounded-2xl text-white transition-all backdrop-blur-md border border-white/10 group"
+                                onClick={prevMedia}
+                                className="absolute left-4 md:left-8 z-20 p-4 bg-white/5 hover:bg-indigo-600 rounded-full text-white transition-all backdrop-blur-md border border-white/10 group top-1/2 -translate-y-1/2 focus:outline-none focus:bg-indigo-600"
                             >
-                                <ChevronLeftIcon className="h-8 w-8 group-hover:scale-110 transition-transform" />
+                                <ChevronLeftIcon className="h-6 w-6 group-hover:scale-110 transition-transform" />
                             </button>
 
                             <motion.div
                                 key={activeMediaIndex}
-                                initial={{ opacity: 0, scale: 0.9, x: 50 }}
-                                animate={{ opacity: 1, scale: 1, x: 0 }}
-                                className="w-full max-w-6xl h-full flex flex-col items-center justify-center py-10"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="w-full h-full max-w-7xl mx-auto flex flex-col items-center justify-center"
                             >
-                                {selectedAlbum.media[activeMediaIndex]?.type === 'video' ? (
-                                    <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black border border-white/10">
-                                        <iframe
-                                            src={selectedAlbum.media[activeMediaIndex]?.videoUrl?.replace('watch?v=', 'embed/')}
-                                            className="w-full h-full border-none"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                            title="Gallery Video"
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="relative group max-h-full">
+                                <div className="flex-1 min-h-0 w-full flex items-center justify-center relative">
+                                    {selectedAlbum.media[activeMediaIndex]?.type === 'video' ? (
+                                        <div className="relative w-full h-full flex items-center justify-center">
+                                            <div className="aspect-video w-full max-h-full max-w-full rounded-2xl overflow-hidden shadow-2xl bg-black border border-white/10">
+                                                <iframe
+                                                    src={selectedAlbum.media[activeMediaIndex]?.videoUrl?.replace('watch?v=', 'embed/')}
+                                                    className="w-full h-full border-none"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                    title="Gallery Video"
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
                                         <img
                                                 src={selectedAlbum.media[activeMediaIndex]?.src}
                                             alt="Gallery"
-                                            className="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl select-none"
+                                                loading="eager"
+                                                className="w-full h-full object-contain rounded-lg shadow-2xlSelect-none"
                                         />
-                                            {selectedAlbum.media[activeMediaIndex]?.caption && (
-                                            <div className="absolute -bottom-16 inset-x-0 text-center">
-                                                <div className="inline-block bg-white/5 backdrop-blur-2xl border border-white/10 px-8 py-3 rounded-2xl">
-                                                    <p className="text-white text-sm font-medium italic tracking-wide">
-                                                            "{selectedAlbum.media[activeMediaIndex]?.caption}"
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
+                                    )}
+                                </div>
+
+                                {selectedAlbum.media[activeMediaIndex]?.caption && (
+                                    <div className="flex-shrink-0 mt-4 mb-2 bg-white/5 px-6 py-3 rounded-full backdrop-blur-xl border border-white/10">
+                                        <p className="text-white text-sm italic">"{selectedAlbum.media[activeMediaIndex]?.caption}"</p>
                                     </div>
                                 )}
                             </motion.div>
 
                             <button
-                                onClick={(e) => { e.stopPropagation(); nextMedia(); }}
-                                className="absolute right-4 md:right-12 z-20 p-5 bg-white/5 hover:bg-indigo-600 rounded-2xl text-white transition-all backdrop-blur-md border border-white/10 group"
+                                onClick={nextMedia}
+                                className="absolute right-4 md:right-8 z-20 p-4 bg-white/5 hover:bg-indigo-600 rounded-full text-white transition-all backdrop-blur-md border border-white/10 group top-1/2 -translate-y-1/2 focus:outline-none focus:bg-indigo-600"
                             >
-                                <ChevronRightIcon className="h-8 w-8 group-hover:scale-110 transition-transform" />
+                                <ChevronRightIcon className="h-6 w-6 group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
 
                         {/* Thumbnail Bar */}
-                        <div className="p-8 bg-black/60 backdrop-blur-3xl flex items-center justify-center gap-4 overflow-x-auto no-scrollbar border-t border-white/5">
+                        <div
+                            className="relative z-50 p-4 bg-black/40 backdrop-blur-md flex items-center justify-center gap-3 overflow-x-auto no-scrollbar border-t border-white/5"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             {selectedAlbum.media.map((item, idx) => (
                                 <button
                                     key={idx}
+                                    id={`thumb-${idx}`}
                                     onClick={() => setActiveMediaIndex(idx)}
-                                    className={`relative flex-shrink-0 w-24 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 ${activeMediaIndex === idx
-                                        ? 'border-indigo-500 scale-110 ring-4 ring-indigo-500/20'
-                                        : 'border-transparent opacity-30 hover:opacity-100 hover:scale-105'
+                                    className={`relative flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 ${activeMediaIndex === idx
+                                        ? 'border-indigo-500 scale-110'
+                                        : 'border-transparent opacity-40 hover:opacity-100 hover:scale-105'
                                         }`}
                                 >
                                     {item.type === 'video' ? (
                                         <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-                                            <PlayIcon className="h-8 w-8 text-white" />
+                                            <PlayIcon className="h-6 w-6 text-white" />
                                         </div>
                                     ) : (
                                         <img src={item.src} alt="Nav" className="w-full h-full object-cover" />

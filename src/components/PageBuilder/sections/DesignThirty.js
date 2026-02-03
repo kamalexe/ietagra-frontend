@@ -1,13 +1,72 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PhotoIcon, PlayIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import AlbumService from '../../../services/AlbumService';
 
-const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
+const getEmbedUrl = (url) => {
+    if (!url) return '';
+    try {
+        if (url.includes('youtu.be/')) {
+            const id = url.split('youtu.be/')[1].split('?')[0];
+            return `https://www.youtube.com/embed/${id}`;
+        }
+        if (url.includes('watch?v=')) {
+            const id = url.split('watch?v=')[1].split('&')[0];
+            return `https://www.youtube.com/embed/${id}`;
+        }
+        return url;
+    } catch (e) {
+        return url;
+    }
+};
+
+const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", backgroundColor = "#ffffff" }) => {
     const [albums, setAlbums] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedAlbum, setSelectedAlbum] = useState(null);
     const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+    const touchStartX = useRef(null);
+
+    // Keyboard Navigation & Focus Management
+    useEffect(() => {
+        if (!selectedAlbum) return;
+
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') closeAlbum();
+            if (e.key === 'ArrowRight') nextMedia();
+            if (e.key === 'ArrowLeft') prevMedia();
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+
+        // Focus first interactive element
+        const firstFocusable = document.querySelector('.lightbox-close-btn');
+        firstFocusable?.focus();
+
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [selectedAlbum, activeMediaIndex]); // depend on index for fresh closures if needed, though functional updates mostly solve this
+
+    // Thumbnail Auto-Scroll
+    useEffect(() => {
+        if (!selectedAlbum) return;
+        const el = document.getElementById(`thumb-${activeMediaIndex}`);
+        el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }, [activeMediaIndex, selectedAlbum]);
+
+    // Swipe Handlers
+    const onTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const onTouchEnd = (e) => {
+        if (!touchStartX.current) return;
+        const delta = touchStartX.current - e.changedTouches[0].clientX;
+
+        if (Math.abs(delta) > 50) {
+            delta > 0 ? nextMedia() : prevMedia();
+        }
+        touchStartX.current = null;
+    };
 
     useEffect(() => {
         const fetchAlbums = async () => {
@@ -27,22 +86,33 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
         fetchAlbums();
     }, [category, limit]);
 
+    useEffect(() => {
+        if (selectedAlbum) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [selectedAlbum]);
+
     const openAlbum = (album) => {
         setSelectedAlbum(album);
         setActiveMediaIndex(0);
-        document.body.style.overflow = 'hidden';
     };
 
     const closeAlbum = () => {
         setSelectedAlbum(null);
-        document.body.style.overflow = 'unset';
     };
 
     const nextMedia = () => {
+        if (!selectedAlbum?.media?.length) return;
         setActiveMediaIndex((prev) => (prev + 1) % selectedAlbum.media.length);
     };
 
     const prevMedia = () => {
+        if (!selectedAlbum?.media?.length) return;
         setActiveMediaIndex((prev) => (prev - 1 + selectedAlbum.media.length) % selectedAlbum.media.length);
     };
 
@@ -56,7 +126,7 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
     );
 
     return (
-        <section id={id} className="py-20 bg-white overflow-hidden">
+        <section id={id} className="py-20 overflow-hidden" style={{ backgroundColor }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <motion.h2 
@@ -64,7 +134,7 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
                         whileInView={{ opacity: 1, y: 0 }}
                         className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4"
                     >
-                        {title || "University Media Gallery"}
+                        {title || "University Media Gallery jvhj"}
                     </motion.h2>
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -90,6 +160,8 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
                                 <img 
                                     src={album.coverImage} 
                                     alt={album.title} 
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
@@ -131,10 +203,14 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[9999] bg-black/95 flex flex-col"
+                        className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-xl flex flex-col"
+                        onClick={closeAlbum} // Click outside to close
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-6 bg-black/40 backdrop-blur-md">
+                        <div
+                            className="relative z-50 flex items-center justify-between p-4 bg-black/40 backdrop-blur-md"
+                            onClick={(e) => e.stopPropagation()} // Prevent header click from closing
+                        >
                             <div>
                                 <h4 className="text-white font-bold text-xl">{selectedAlbum.title}</h4>
                                 <p className="text-white/50 text-xs">
@@ -143,18 +219,23 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
                             </div>
                             <button 
                                 onClick={closeAlbum}
-                                className="p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all"
+                                className="lightbox-close-btn p-2 bg-white rounded-full text-black hover:bg-gray-200 transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50"
                             >
                                 <XMarkIcon className="h-6 w-6" />
                             </button>
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 relative flex items-center justify-center p-4 md:p-12">
+                        <div
+                            className="flex-1 relative w-full h-full p-2 md:p-4 overflow-hidden"
+                            onClick={(e) => e.stopPropagation()} // Prevent content click from closing (optional, usually intended)
+                            onTouchStart={onTouchStart}
+                            onTouchEnd={onTouchEnd}
+                        >
                             {/* Prev Button */}
                             <button 
                                 onClick={prevMedia}
-                                className="absolute left-4 md:left-8 z-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all backdrop-blur-sm"
+                                className="absolute left-4 md:left-8 z-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all backdrop-blur-sm top-1/2 -translate-y-1/2 focus:outline-none focus:bg-white/20"
                             >
                                 <ChevronLeftIcon className="h-8 w-8" />
                             </button>
@@ -162,32 +243,37 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
                             {/* Active Media Container */}
                             <motion.div 
                                 key={activeMediaIndex}
-                                initial={{ opacity: 0, scale: 0.95, x: 20 }}
-                                animate={{ opacity: 1, scale: 1, x: 0 }}
-                                className="w-full max-w-5xl h-full flex flex-col items-center justify-center"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="w-full h-full max-w-7xl mx-auto flex flex-col items-center justify-center"
                             >
                                 {selectedAlbum.media && selectedAlbum.media[activeMediaIndex] ? (
                                     <>
-                                        {selectedAlbum.media[activeMediaIndex].type === 'video' ? (
-                                            <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black">
-                                                <iframe
-                                                    src={selectedAlbum.media[activeMediaIndex].videoUrl.replace('watch?v=', 'embed/')}
-                                                    className="w-full h-full border-none"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                    allowFullScreen
-                                                    title="Album Video"
+                                        <div className="flex-1 min-h-0 w-full flex items-center justify-center relative">
+                                            {selectedAlbum.media[activeMediaIndex].type === 'video' ? (
+                                                <div className="relative w-full h-full flex items-center justify-center">
+                                                    <div className="aspect-video w-full max-h-full max-w-full rounded-2xl overflow-hidden shadow-2xl bg-black">
+                                                        <iframe
+                                                            src={getEmbedUrl(selectedAlbum.media[activeMediaIndex].videoUrl)}
+                                                            className="w-full h-full border-none"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowFullScreen
+                                                            title="Album Video"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={selectedAlbum.media[activeMediaIndex].src}
+                                                    alt="Gallery Detail"
+                                                    loading="eager" // Load active image immediately
+                                                    className="w-full h-full object-contain rounded-lg shadow-2xl"
                                                 />
-                                            </div>
-                                        ) : (
-                                            <img
-                                                src={selectedAlbum.media[activeMediaIndex].src}
-                                                alt="Gallery Detail"
-                                                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-                                            />
-                                        )}
+                                            )}
+                                        </div>
 
                                         {selectedAlbum.media[activeMediaIndex].caption && (
-                                            <div className="mt-6 bg-white/5 px-6 py-3 rounded-full backdrop-blur-xl border border-white/10">
+                                            <div className="flex-shrink-0 mt-4 mb-2 bg-white/5 px-6 py-3 rounded-full backdrop-blur-xl border border-white/10">
                                                 <p className="text-white text-sm italic">"{selectedAlbum.media[activeMediaIndex].caption}"</p>
                                             </div>
                                         )}
@@ -200,19 +286,23 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All" }) => {
                             {/* Next Button */}
                             <button 
                                 onClick={nextMedia}
-                                className="absolute right-4 md:right-8 z-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all backdrop-blur-sm"
+                                className="absolute right-4 md:right-8 z-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all backdrop-blur-sm top-1/2 -translate-y-1/2 focus:outline-none focus:bg-white/20"
                             >
                                 <ChevronRightIcon className="h-8 w-8" />
                             </button>
                         </div>
 
                         {/* Thumbnail Bar */}
-                        <div className="p-6 bg-black/40 backdrop-blur-md flex items-center justify-center gap-3 overflow-x-auto no-scrollbar">
+                        <div
+                            className="relative z-50 p-4 bg-black/40 backdrop-blur-md flex items-center justify-center gap-3 overflow-x-auto no-scrollbar"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             {selectedAlbum.media.map((item, idx) => (
                                 <button 
                                     key={idx}
+                                    id={`thumb-${idx}`}
                                     onClick={() => setActiveMediaIndex(idx)}
-                                    className={`relative flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all ${activeMediaIndex === idx ? 'border-indigo-500 scale-110' : 'border-transparent opacity-40 hover:opacity-100'}`}
+                                    className={`relative flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 ${activeMediaIndex === idx ? 'border-indigo-500 scale-110' : 'border-transparent opacity-40 hover:opacity-100'}`}
                                 >
                                     {item.type === 'video' ? (
                                         <div className="w-full h-full bg-gray-900 flex items-center justify-center">
