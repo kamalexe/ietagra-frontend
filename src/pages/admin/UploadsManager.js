@@ -3,7 +3,6 @@ import {
     CloudArrowUpIcon, 
     TrashIcon, 
     DocumentIcon, 
-    ClipboardDocumentCheckIcon, 
     ClipboardDocumentIcon 
 } from '@heroicons/react/24/outline';
 import UploadService from '../../services/UploadService';
