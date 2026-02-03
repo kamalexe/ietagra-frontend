@@ -76,6 +76,8 @@ const UploadsManager = () => {
         showNotification('URL copied to clipboard');
     };
 
+    console.log('UploadsManager render:', { files, error, notification });
+
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -113,7 +115,7 @@ const UploadsManager = () => {
 
             {notification && (
                 <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg flex items-center space-x-2 ${notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                    <span>{notification.message}</span>
+                    <span>{String(notification.message)}</span>
                 </div>
             )}
 
@@ -135,13 +137,15 @@ const UploadsManager = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {files.map((file) => (
-                        <div key={file.filename} className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden group hover:shadow-md transition-shadow">
+                            {files.map((file, index) => {
+                                if (!file || typeof file !== 'object') return null;
+                                return (
+                                    <div key={file.filename || index} className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden group hover:shadow-md transition-shadow">
                             <div className="aspect-w-10 aspect-h-7 bg-gray-100 relative">
-                                {file.url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                                            {file.url && file.url.match && file.url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                                     <img 
                                         src={file.url} 
-                                        alt={file.filename} 
+                                                    alt={file.filename || 'File'} 
                                         className="object-cover w-full h-48"
                                     />
                                 ) : (
@@ -151,7 +155,7 @@ const UploadsManager = () => {
                                 )}
                                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center opacity-0 group-hover:opacity-100 space-x-2">
                                     <button 
-                                        onClick={() => window.open(file.url, '_blank')}
+                                                    onClick={() => file.url && window.open(file.url, '_blank')}
                                         className="p-2 bg-white rounded-full text-gray-700 hover:text-blue-600 shadow-sm"
                                         title="View File"
                                     >
@@ -163,7 +167,7 @@ const UploadsManager = () => {
                                 <p className="text-xs text-gray-500 truncate mb-1" title={String(file.filename || '')}>{String(file.filename || 'Unknown')}</p>
                                 <div className="flex justify-between items-center mt-2">
                                     <button 
-                                        onClick={() => copyToClipboard(file.url)}
+                                                    onClick={() => file.url && copyToClipboard(file.url)}
                                         className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center"
                                     >
                                         <ClipboardDocumentIcon className="h-4 w-4 mr-1" />
@@ -179,7 +183,8 @@ const UploadsManager = () => {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                                )
+                            })}
                 </div>
             )}
         </div>
