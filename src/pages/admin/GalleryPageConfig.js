@@ -93,7 +93,7 @@ const GalleryPageConfig = () => {
                         <p className="text-xs text-gray-500 mt-1">The main heading text.</p>
                     </div>
 
-                    {/* Highlight Text */}
+                    {/* Highlight */}
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Title Highlight Text</label>
                         <input
