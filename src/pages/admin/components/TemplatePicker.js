@@ -379,6 +379,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 image: "https://dbrau.ac.in/wp-content/uploads/elementor/thumbs/ashu_rani-qob6fukhcqrs0rce8uvi9u8791vatwg3wggmjx0dy8.webp",
                 name: "Prof. Ashu Rani",
                 designation: "Vice Chancellor - Dr. Bhimrao Ambedkar University, Agra",
+                chairman: "Hon'ble Governor Smt. Anandiben Patel",
                 quote: "To be a quality higher education Institution by producing students with knowledge, professional skill and ethical values and remain as preferred partner to the Industry and Community for their progress and development",
                 content: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
                 <br/>

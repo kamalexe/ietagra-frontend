@@ -50,7 +50,7 @@ const DesignNine = ({ id, title, variant = 'simple', items, cards, columns = 2, 
                                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
                             >
                                 <h4 className="text-lg font-semibold text-gray-800 mb-2">{item.title}</h4>
-                                <p className="text-teal-600 text-sm mb-1">{item.subtitle}</p>
+                                <p className="text-blue-600 text-sm mb-1">{item.subtitle}</p>
                                 <p className="text-gray-500 text-sm">
                                     <span className="font-medium">{item.meta}</span> {item.date}
                                 </p>
@@ -66,14 +66,14 @@ const DesignNine = ({ id, title, variant = 'simple', items, cards, columns = 2, 
                                 variants={itemVariants}
                                 className="bg-white rounded-xl shadow-lg overflow-hidden"
                             >
-                                <div className="bg-gradient-to-r from-green-500 to-teal-600 py-3 px-6">
+                                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 py-3 px-6">
                                     <h3 className="text-lg font-bold text-white">{item.title}</h3>
                                 </div>
                                 <div className="p-6">
                                     <div className="flex flex-col h-full">
                                         <p className="text-gray-600 flex-grow mb-4">{item.description}</p>
                                         <div className="text-sm text-gray-500 mt-auto">
-                                            <span className="bg-teal-50 text-teal-700 py-1 px-2 rounded-full">
+                                            <span className="bg-blue-50 text-blue-700 py-1 px-2 rounded-full">
                                                 {item.date}
                                             </span>
                                         </div>
@@ -92,12 +92,12 @@ const DesignNine = ({ id, title, variant = 'simple', items, cards, columns = 2, 
                             whileHover={{ y: -5 }}
                             className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100"
                         >
-                            <div className="h-1.5 bg-gradient-to-r from-green-500 to-teal-600"></div>
+                            <div className="h-1.5 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
                             <div className="p-6">
                                 {Icon && (
                                     <div className="mb-4">
-                                        <div className="bg-teal-50 rounded-full p-3 inline-block">
-                                            <Icon className="text-teal-600 text-2xl" />
+                                        <div className="bg-blue-50 rounded-full p-3 inline-block">
+                                            <Icon className="text-blue-600 text-2xl" />
                                         </div>
                                     </div>
                                 )}

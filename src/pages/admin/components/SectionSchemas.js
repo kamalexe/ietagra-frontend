@@ -333,6 +333,7 @@ const schemas = {
         { name: 'image', label: 'Person Image', type: 'image' },
         { name: 'name', label: 'Name', type: 'text' },
         { name: 'designation', label: 'Designation', type: 'text' },
+        { name: 'chairman', label: 'Chairman', type: 'text' },
         { name: 'quote', label: 'Quote', type: 'textarea' },
         { name: 'content', label: 'Content (HTML supported)', type: 'textarea' }
     ],

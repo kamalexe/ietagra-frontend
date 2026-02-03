@@ -6,10 +6,11 @@ const DesignNineteen = ({ id,
     name, 
     designation, 
     quote, 
+    chairman,
     content 
 }) => {
     return (
-        <section id={id} className="py-12 bg-white">
+        <section id={id}>
             <div className="relative min-h-[250px] bg-[#b9292f] flex items-center justify-center mb-10 overflow-hidden">
                 {/* Background Overlay */}
                 <div className="absolute inset-0 bg-[url('https://smslucknow.ac.in/assets/images/bg/bg-do2.png')] bg-cover bg-center opacity-30"></div>
@@ -35,7 +36,7 @@ const DesignNineteen = ({ id,
                         {quote && (
                             <blockquote className="italic text-gray-600 border-l-4 border-orange-500 pl-4 py-2 bg-gray-50 rounded text-sm text-left w-full">
                                 "{quote}"
-                                <cite className="block mt-2 font-bold text-gray-800 not-italic text-right">- Chairman</cite>
+                                <cite className="block mt-2 font-bold text-gray-800 not-italic text-right">- {chairman}</cite>
                             </blockquote>
                         )}
                     </div>
