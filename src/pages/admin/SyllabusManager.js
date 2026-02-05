@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Plus, Trash2, FileText, ArrowLeft, Filter } from 'lucide-react';
+import { Plus, Trash2, FileText, ArrowLeft } from 'lucide-react';
 import UploadService from '../../services/UploadService';
 import { getToken } from '../../services/LocalStorageService';
 
@@ -32,7 +32,7 @@ const SyllabusManager = () => {
         try {
             // Reusing the public API (or we can use a protected admin one if we make it)
             // Querying all for now. Ideally should support filtering/pagination for admin too.
-            const url = `${process.env.REACT_APP_API_BASE_URL}/syllabus`; 
+            const url = `${process.env.REACT_APP_API_BASE_URL}/syllabus`;
             const res = await axios.get(url);
             if (res.data.success) {
                 setSyllabuses(res.data.data);

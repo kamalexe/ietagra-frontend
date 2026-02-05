@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Download, Search, Filter, Calendar, Book, Layers, Grid3x3, List, Table2, X, Eye, Share2, Heart, ChevronDown } from 'lucide-react';
+import { Download, Search, Filter, Calendar, Book, Layers, Grid3x3, List, X, Eye, Heart, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DesignThirtySeven = ({ title, subtitle, type = 'syllabus' }) => {
