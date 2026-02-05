@@ -621,6 +621,15 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 subtitle: "Explore our latest research contributions.",
                 badge: "Research"
             }
+        },
+        {
+            key: 'design_thirty_five',
+            name: 'Company Registration Form',
+            description: 'Full registration form for companies (Placement Drive).',
+            demoData: {
+                title: "Company Registration",
+                subtitle: "For Campus Placement Drive"
+            }
         }
     ];
 

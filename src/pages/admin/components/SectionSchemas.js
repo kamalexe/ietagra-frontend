@@ -484,6 +484,10 @@ const schemas = {
         },
         { name: 'themeColor', label: 'Theme Background Color (Tailwind class, e.g. bg-red-600)', type: 'text' },
         { name: 'speed', label: 'Animation Speed (e.g. 20s)', type: 'text' }
+    ],
+    'design_thirty_five': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Form Title', type: 'text', placeholder: 'Company Registration' },
+        { name: 'subtitle', label: 'Form Subtitle', type: 'text', placeholder: 'For Campus Placement Drive' }
     ]
 };
 

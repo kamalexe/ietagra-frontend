@@ -34,6 +34,7 @@ import DesignThirtyTwo from './sections/DesignThirtyTwo';
 import DesignThirtyThree from './sections/DesignThirtyThree';
 import DesignThirtyFour from './sections/DesignThirtyFour';
 import DesignFifteen from './sections/DesignFifteen';
+import DesignThirtyFive from './sections/DesignThirtyFive';
 
 // Adapters for new documentation-based templates
 const HeroSection = (props) => <DesignOne {...props} />;
@@ -115,7 +116,8 @@ const SectionRegistry = {
     university_media_gallery: DesignThirty,
     common_image_gallery: DesignThirtyTwo,
     department_events_grid: DesignThirtyThree,
-    research_list: DesignThirtyFour
+    design_thirty_four: DesignThirtyFour,
+    design_thirty_five: DesignThirtyFive
 };
 
 export default SectionRegistry;

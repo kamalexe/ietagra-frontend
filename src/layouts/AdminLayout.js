@@ -65,7 +65,8 @@ const AdminLayout = () => {
   const allNavigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Squares2X2Icon, roles: ['admin', 'department_admin'] },
     { name: 'Home', href: '/admin/home', icon: HomeIcon, roles: ['admin'] },
-    { name: 'Training and Placement', href: '/admin/training-placement', icon: AcademicCapIcon, roles: ['admin'] },
+    { name: 'Company Registrations', href: '/admin/company-registrations', icon: AcademicCapIcon, roles: ['admin'] },
+    { name: 'Training and Placement Config', href: '/admin/training-placement', icon: AcademicCapIcon, roles: ['admin'] },
     { name: 'Pages', href: '/admin/pages', icon: DocumentTextIcon, roles: ['admin'] },
     { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon, roles: ['admin'] },
     { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon, roles: ['admin', 'department_admin'] },

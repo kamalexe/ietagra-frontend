@@ -33,6 +33,8 @@ import ResearchList from './pages/admin/ResearchList';
 import TestimonialsList from './pages/admin/TestimonialsList';
 import UserManagement from './pages/admin/UserManagement';
 import UploadsManager from './pages/admin/UploadsManager';
+import CompanyRegistrationsList from './pages/admin/CompanyRegistrationsList';
+import CompanyRegistration from './pages/CompanyRegistration';
 
 function App() {
     const { access_token } = useSelector((state) => state.auth);
@@ -64,6 +66,7 @@ function App() {
                         <Route path="testimonials" element={<TestimonialsList />} />
                         <Route path="users" element={<UserManagement />} />
                         <Route path="uploads" element={<UploadsManager />} />
+                        <Route path="company-registrations" element={<CompanyRegistrationsList />} />
                         <Route path="settings" element={<div>Settings Page</div>} />
                     </Route>
 
@@ -84,6 +87,7 @@ function App() {
                         <Route path="/profile" element={<Navigate to="/admin/dashboard" replace />} />
                         <Route path="/:slug" element={<DynamicPage />} />
                         <Route path="/gallery" element={<GalleryPage />} />
+                        <Route path="/company-registration" element={<CompanyRegistration />} />
                         <Route path="*" element={<h1>Error 404 Page not found !!</h1>} />
                     </Route>
                 </Routes>
