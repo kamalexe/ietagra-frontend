@@ -47,6 +47,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const userAuthApi = createApi({
   reducerPath: 'userAuthApi',
   baseQuery: baseQueryWithReauth,
+  tagTypes: ['Users'], // Define cache tags
   endpoints: (builder) => ({
     registerUser: builder.mutation({
       query: (user) => {
@@ -128,7 +129,8 @@ export const userAuthApi = createApi({
             'authorization': `Bearer ${access_token}`,
           }
         }
-      }
+      },
+      providesTags: ['Users'], // This query provides the Users cache tag
     }),
     updateUserRole: builder.mutation({
       query: ({ id, access_token, data }) => {
@@ -141,7 +143,8 @@ export const userAuthApi = createApi({
             'Content-type': 'application/json',
           }
         }
-      }
+      },
+      invalidatesTags: ['Users'], // Invalidate Users cache when this mutation succeeds
     }),
   }),
 })

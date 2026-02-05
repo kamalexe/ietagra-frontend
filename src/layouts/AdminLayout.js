@@ -27,7 +27,7 @@ const AdminLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { access_token } = useSelector((state) => state.auth);
-  const { role, name, email } = useSelector((state) => state.user);
+  const { role, name, email, permissions } = useSelector((state) => state.user);
 
   // Fetch user info if access_token is present
   // Fetch user info if access_token is present
@@ -43,7 +43,8 @@ const AdminLayout = () => {
         name: data.user.name,
         role: data.user.role,
         department: data.user.department,
-        id: data.user._id
+        id: data.user._id,
+        permissions: data.user.permissions
       }));
 
       // Auto-register account for switching
@@ -69,27 +70,32 @@ const AdminLayout = () => {
     { name: 'Training and Placement Config', href: '/admin/training-placement', icon: AcademicCapIcon, roles: ['admin'] },
     { name: 'Pages', href: '/admin/pages', icon: DocumentTextIcon, roles: ['admin'] },
     { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon, roles: ['admin'] },
-    { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Events', href: '/admin/events', icon: CalendarIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_faculty' },
+    { name: 'Events', href: '/admin/events', icon: CalendarIcon, roles: ['admin', 'department_admin'], permission: 'manage_events' },
     { name: 'Events Config', href: '/admin/events-config', icon: CalendarIcon, roles: ['admin'] },
-    { name: 'Gallery', href: '/admin/gallery', icon: PhotoIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Gallery', href: '/admin/gallery', icon: PhotoIcon, roles: ['admin', 'department_admin'], permission: 'manage_gallery' },
     { name: 'Gallery Config', href: '/admin/gallery-config', icon: PhotoIcon, roles: ['admin'] },
-    { name: 'Albums', href: '/admin/albums', icon: FolderIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Research', href: '/admin/research', icon: ClipboardDocumentCheckIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Testimonials', href: '/admin/testimonials', icon: ChatBubbleLeftRightIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Albums', href: '/admin/albums', icon: FolderIcon, roles: ['admin', 'department_admin'], permission: 'manage_albums' },
+    { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_student_data' },
+    { name: 'Research', href: '/admin/research', icon: ClipboardDocumentCheckIcon, roles: ['admin', 'department_admin'], permission: 'manage_research' },
+    { name: 'Testimonials', href: '/admin/testimonials', icon: ChatBubbleLeftRightIcon, roles: ['admin', 'department_admin'], permission: 'manage_testimonials' },
     { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon, roles: ['admin'] },
     { name: 'Footer', href: '/admin/footer', icon: SwatchIcon, roles: ['admin'] },
     { name: 'Navbar', href: '/admin/navbar', icon: MapIcon, roles: ['admin'] },
     { name: 'User Management', href: '/admin/users', icon: UsersIcon, roles: ['admin'] },
-    { name: 'Uploads', href: '/admin/uploads', icon: UsersIcon, roles: ['admin', 'department_admin'] },
-    // TODO: Add Exam Schedule and Syllabus for update and manage 
-    { name: 'Exam Schedule', href: '/admin/add-exam-schedule', icon: UsersIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Syllabus', href: '/admin/add-syllabus', icon: UsersIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Uploads', href: '/admin/uploads', icon: UsersIcon, roles: ['admin', 'department_admin'], permission: 'manage_uploads' },
+    { name: 'Exam Schedule', href: '/admin/add-exam-schedule', icon: UsersIcon, roles: ['admin', 'department_admin'], permission: 'manage_exam_schedule' },
+    { name: 'Syllabus', href: '/admin/add-syllabus', icon: UsersIcon, roles: ['admin', 'department_admin'], permission: 'manage_syllabus' },
+    { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon, roles: ['admin', 'department_admin'], permission: 'manage_settings' },
   ];
 
-  const navigation = allNavigation.filter(item => item.roles.includes(role));
+  const navigation = allNavigation.filter(item => {
+    if (role === 'admin') return true;
+    if (item.permission) {
+      return permissions && permissions.includes(item.permission);
+    }
+    return item.roles.includes(role);
+  });
 
   console.log('Current User Role:', role);
   console.log('Navigation Items:', navigation.length);

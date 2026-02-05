@@ -488,6 +488,32 @@ const schemas = {
     'design_thirty_five': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Form Title', type: 'text', placeholder: 'Company Registration' },
         { name: 'subtitle', label: 'Form Subtitle', type: 'text', placeholder: 'For Campus Placement Drive' }
+    ],
+    'design_thirty_six': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Syllabus & Curriculum' },
+    { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Download the latest academic documents' },
+    { name: 'type', label: 'Document Type', type: 'select', options: ['syllabus', 'exam-schedule'] }
+    ],
+    'design_thirty_seven': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Academic Resources' },
+    { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Access the latest syllabus and exam schedules' },
+    { name: 'type', label: 'Document Type', type: 'select', options: ['syllabus', 'exam-schedule'] }
+    ],
+    'syllabus_viewer': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Syllabus & Curriculum' },
+    { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Download the latest syllabus documents' }
+    ],
+    'exam_schedule_viewer': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Exam Schedules' },
+    { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'View and download exam timetables' }
+    ],
+    'syllabus_viewer_enhanced': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Academic Resources' },
+    { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Search and download syllabus documents' }
+    ],
+    'exam_schedule_viewer_enhanced': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Exam Schedules' },
+        { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Search and preview exam timetables' }
     ]
 };
 

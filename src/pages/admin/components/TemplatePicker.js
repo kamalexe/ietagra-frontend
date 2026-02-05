@@ -630,6 +630,26 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 title: "Company Registration",
                 subtitle: "For Campus Placement Drive"
             }
+        },
+        {
+            key: 'design_thirty_six',
+            name: 'Syllabus & Exam Schedule Viewer (Basic)',
+            description: 'Clean document viewer with filters for academic year, program, and semester.',
+            demoData: {
+                title: "Syllabus & Curriculum",
+                subtitle: "Download the latest academic documents and curriculum details.",
+                type: "syllabus"
+            }
+        },
+        {
+            key: 'design_thirty_seven',
+            name: 'Syllabus & Exam Schedule Viewer (Enhanced)',
+            description: 'Modern glassmorphism design with search, grid/list views, collapsible filters, and PDF preview modal.',
+            demoData: {
+                title: "Academic Resources",
+                subtitle: "Access the latest syllabus, exam schedules, and curriculum documents.",
+                type: "syllabus"
+            }
         }
     ];
 

@@ -6,7 +6,8 @@ const initialState = {
   phone: "",
   role: "",
   department: null,
-  id: null
+  id: null,
+  permissions: []
 }
 
 export const userSlice = createSlice({
@@ -20,6 +21,7 @@ export const userSlice = createSlice({
       state.role = action.payload.role
       state.department = action.payload.department
       state.id = action.payload.id
+      state.permissions = action.payload.permissions || []
     },
     unsetUserInfo: (state, action) => {
       state.email = ""
@@ -28,6 +30,7 @@ export const userSlice = createSlice({
       state.role = ""
       state.department = null
       state.id = null
+      state.permissions = []
     },
   }
 })
