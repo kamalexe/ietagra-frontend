@@ -35,6 +35,7 @@ import DesignThirtyThree from './sections/DesignThirtyThree';
 import DesignThirtyFour from './sections/DesignThirtyFour';
 import DesignFifteen from './sections/DesignFifteen';
 import DesignThirtyFive from './sections/DesignThirtyFive';
+import DesignThirtySix from './sections/DesignThirtySix';
 
 // Adapters for new documentation-based templates
 const HeroSection = (props) => <DesignOne {...props} />;
@@ -67,6 +68,8 @@ const VisionMission = (props) => (
     />
 );
 const StatsGrid = (props) => <DesignNine {...props} />; // Assuming DesignNine can handle stats or we use another
+const SyllabusViewer = (props) => <DesignThirtySix {...props} type="syllabus" />;
+const ExamScheduleViewer = (props) => <DesignThirtySix {...props} type="exam-schedule" />;
 
 const SectionRegistry = {
     design_one: DesignOne,
@@ -102,7 +105,6 @@ const SectionRegistry = {
     design_thirty_one: DesignThirtyOne,
     design_thirty_two: DesignThirtyTwo,
     design_thirty_three: DesignThirtyThree,
-    design_thirty_four: DesignThirtyFour,
 
     // New Aliases
     hero_section: HeroSection,
@@ -117,7 +119,10 @@ const SectionRegistry = {
     common_image_gallery: DesignThirtyTwo,
     department_events_grid: DesignThirtyThree,
     design_thirty_four: DesignThirtyFour,
-    design_thirty_five: DesignThirtyFive
+    design_thirty_five: DesignThirtyFive,
+    design_thirty_six: DesignThirtySix,
+    syllabus_viewer: SyllabusViewer,
+    exam_schedule_viewer: ExamScheduleViewer
 };
 
 export default SectionRegistry;
