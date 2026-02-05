@@ -83,8 +83,9 @@ const AdminLayout = () => {
     { name: 'Navbar', href: '/admin/navbar', icon: MapIcon, roles: ['admin'] },
     { name: 'User Management', href: '/admin/users', icon: UsersIcon, roles: ['admin'] },
     { name: 'Uploads', href: '/admin/uploads', icon: UsersIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Add Exam Schedule', href: '/admin/add-exam-schedule', icon: UsersIcon, roles: ['admin', 'department_admin'] },
-    { name: 'Add Syllabus', href: '/admin/add-syllabus', icon: UsersIcon, roles: ['admin', 'department_admin'] },
+    // TODO: Add Exam Schedule and Syllabus for update and manage 
+    { name: 'Exam Schedule', href: '/admin/add-exam-schedule', icon: UsersIcon, roles: ['admin', 'department_admin'] },
+    { name: 'Syllabus', href: '/admin/add-syllabus', icon: UsersIcon, roles: ['admin', 'department_admin'] },
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon, roles: ['admin', 'department_admin'] },
   ];
 

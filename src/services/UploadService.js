@@ -40,8 +40,14 @@ const UploadService = {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to upload file');
+            const textFn = await response.text();
+            try {
+                const errorData = JSON.parse(textFn);
+                throw new Error(errorData.message || 'Failed to upload file');
+            } catch (e) {
+                console.error("Non-JSON Error Response:", textFn);
+                throw new Error(`Upload Failed: Server returned ${response.status} ${response.statusText}`);
+            }
         }
 
         const resData = await response.json();

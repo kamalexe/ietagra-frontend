@@ -35,8 +35,8 @@ import UserManagement from './pages/admin/UserManagement';
 import UploadsManager from './pages/admin/UploadsManager';
 import CompanyRegistrationsList from './pages/admin/CompanyRegistrationsList';
 import CompanyRegistration from './pages/CompanyRegistration';
-import AddSyllabus from './pages/admin/AddSyllabus';
-import AddExamSchedule from './pages/admin/AddExamSchedule';
+import SyllabusManager from './pages/admin/SyllabusManager';
+import ExamScheduleManager from './pages/admin/ExamScheduleManager';
 
 function App() {
     const { access_token } = useSelector((state) => state.auth);
@@ -68,8 +68,8 @@ function App() {
                         <Route path="testimonials" element={<TestimonialsList />} />
                         <Route path="users" element={<UserManagement />} />
                         <Route path="uploads" element={<UploadsManager />} />
-                        <Route path="add-syllabus" element={<AddSyllabus />} />
-                        <Route path="add-exam-schedule" element={<AddExamSchedule />} />
+                        <Route path="add-syllabus" element={<SyllabusManager />} />
+                        <Route path="add-exam-schedule" element={<ExamScheduleManager />} />
                         <Route path="company-registrations" element={<CompanyRegistrationsList />} />
                         <Route path="settings" element={<div>Settings Page</div>} />
                     </Route>
