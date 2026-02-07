@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PageService from '../services/PageService';
-import AdmissionModal from '../utils/AdmissionModel';
+import AdmissionModal from '../components/AdmissionModal';
 import PageRenderer from '../components/PageBuilder/PageRenderer';
 
 const Home = () => {
