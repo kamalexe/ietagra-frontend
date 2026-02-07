@@ -146,7 +146,24 @@ export const userAuthApi = createApi({
       },
       invalidatesTags: ['Users'], // Invalidate Users cache when this mutation succeeds
     }),
+    updateLoggedUser: builder.mutation({
+      query: ({ access_token, data }) => {
+        return {
+          url: 'profile/',
+          method: 'PUT',
+          body: data,
+          headers: {
+            'authorization': `Bearer ${access_token}`,
+            'Content-type': 'application/json',
+          }
+        }
+      },
+      // Optimistic update or invalidation could be done here, 
+      // but simplistic approach: invalidate 'Users', or maybe a specific 'Profile' tag if we had one.
+      // Since getLoggedUser doesn't have a tag and acts as cache, we might need to manually update cache or refetch.
+      // Simplest: no tag invalidation, the component refetches or updates local state.
+    }),
   }),
 })
 
-export const { useRegisterUserMutation, useLoginUserMutation, useGetLoggedUserQuery, useChangeUserPasswordMutation, useSendPasswordResetEmailMutation, useResetPasswordMutation, useGetAllUsersQuery, useUpdateUserRoleMutation } = userAuthApi
+export const { useRegisterUserMutation, useLoginUserMutation, useGetLoggedUserQuery, useChangeUserPasswordMutation, useSendPasswordResetEmailMutation, useResetPasswordMutation, useGetAllUsersQuery, useUpdateUserRoleMutation, useUpdateLoggedUserMutation } = userAuthApi

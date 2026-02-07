@@ -77,6 +77,7 @@ const AdminLayout = () => {
     { name: 'Gallery Config', href: '/admin/gallery-config', icon: PhotoIcon, roles: ['admin'] },
     { name: 'Albums', href: '/admin/albums', icon: FolderIcon, roles: ['admin', 'department_admin'], permission: 'manage_albums' },
     { name: 'Student Data', href: '/admin/student-data', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_student_data' },
+    { name: 'Student Profiles', href: '/admin/student-profiles', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_student_data' },
     { name: 'Research', href: '/admin/research', icon: ClipboardDocumentCheckIcon, roles: ['admin', 'department_admin'], permission: 'manage_research' },
     { name: 'Testimonials', href: '/admin/testimonials', icon: ChatBubbleLeftRightIcon, roles: ['admin', 'department_admin'], permission: 'manage_testimonials' },
     { name: 'Contact Queries', href: '/admin/contacts', icon: EnvelopeIcon, roles: ['admin'] },
@@ -86,6 +87,7 @@ const AdminLayout = () => {
     { name: 'Uploads', href: '/admin/uploads', icon: UsersIcon, roles: ['admin', 'department_admin'], permission: 'manage_uploads' },
     { name: 'Exam Schedule', href: '/admin/add-exam-schedule', icon: UsersIcon, roles: ['admin', 'department_admin'], permission: 'manage_exam_schedule' },
     { name: 'Syllabus', href: '/admin/add-syllabus', icon: UsersIcon, roles: ['admin', 'department_admin'], permission: 'manage_syllabus' },
+    { name: 'My Profile', href: '/admin/profile', icon: UserGroupIcon, roles: ['student', 'faculty', 'admin', 'department_admin'] },
     { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon, roles: ['admin', 'department_admin'], permission: 'manage_settings' },
   ];
 

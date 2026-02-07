@@ -37,6 +37,8 @@ import CompanyRegistrationsList from './pages/admin/CompanyRegistrationsList';
 import CompanyRegistration from './pages/CompanyRegistration';
 import SyllabusManager from './pages/admin/SyllabusManager';
 import ExamScheduleManager from './pages/admin/ExamScheduleManager';
+import Profile from './pages/account/Profile';
+import StudentProfileManager from './pages/admin/StudentProfileManager';
 
 function App() {
     const { access_token } = useSelector((state) => state.auth);
@@ -52,6 +54,9 @@ function App() {
                         <Route path="home" element={<HomeConfig />} />
                         <Route path="training-placement" element={<PageBuilder slug="tandpcell" />} />
                         <Route path="student-data" element={<StudentDataManager />} />
+                        <Route path="student-data" element={<StudentDataManager />} />
+                        <Route path="student-profiles" element={<StudentProfileManager />} />
+                        <Route path="profile" element={<Profile />} />
                         <Route path="contacts" element={<ContactSubmissions />} />
                         <Route path="pages" element={<PagesList />} />
                         <Route path="departments" element={<DepartmentsList />} />
@@ -88,7 +93,7 @@ function App() {
                         <Route path="api/account/reset/:id/:token" element={<ResetPassword />} />
                         {/* Redirect old dashboard/profile attempts to admin */}
                         <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
-                        <Route path="/profile" element={<Navigate to="/admin/dashboard" replace />} />
+                        <Route path="/profile" element={<Navigate to="/admin/profile" replace />} />
                         <Route path="/:slug" element={<DynamicPage />} />
                         <Route path="/gallery" element={<GalleryPage />} />
                         <Route path="/company-registration" element={<CompanyRegistration />} />

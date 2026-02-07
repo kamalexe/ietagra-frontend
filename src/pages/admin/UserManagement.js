@@ -156,7 +156,8 @@ const UserManagement = () => {
                                     >
                                         <option value="user">User</option>
                                         <option value="department_admin">Department Admin</option>
-                                        <option value="admin">Super Admin</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="super_admin">Super Admin</option>
                                     </select>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">

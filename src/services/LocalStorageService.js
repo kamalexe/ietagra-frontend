@@ -18,8 +18,8 @@ const storeToken = (value) => {
     } else {
       const access = value.access || value.access_token
       const refresh = value.refresh || value.refresh_token
-      localStorage.setItem('access_token', access)
-      localStorage.setItem('refresh_token', refresh)
+      if (access) localStorage.setItem('access_token', access)
+      if (refresh) localStorage.setItem('refresh_token', refresh)
     }
   }
 }
@@ -48,6 +48,10 @@ const getAccounts = () => {
 
 const registerAccount = (token, userData) => {
   if (!token || !userData || !userData.email) return;
+
+  // Ensure we have a valid access token
+  const accessToken = typeof token === 'string' ? token : (token.access_token || token.access);
+  if (!accessToken) return;
 
   const accounts = getAccounts();
   const existingIndex = accounts.findIndex(acc => acc.email === userData.email);

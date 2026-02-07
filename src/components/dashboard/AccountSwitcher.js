@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Avatar, Typography, IconButton, Menu, MenuItem, Divider, Tooltip } from '@mui/material';
 import { getAccounts, switchAccount, removeAccount, removeToken } from '../../services/LocalStorageService';
+import { useDispatch } from 'react-redux';
+import { unSetUserToken } from '../../features/authSlice';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
@@ -11,6 +13,7 @@ import CheckIcon from '@mui/icons-material/Check';
 const AccountSwitcher = ({ currentUser }) => {
     const [accounts, setAccounts] = useState([]);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -63,6 +66,7 @@ const AccountSwitcher = ({ currentUser }) => {
     };
 
     const handleAddAccount = () => {
+        dispatch(unSetUserToken({ access_token: null }));
         removeToken();
         navigate('/login');
     };
@@ -71,7 +75,9 @@ const AccountSwitcher = ({ currentUser }) => {
         e.stopPropagation();
         removeAccount(email);
         // fetchAccounts is called by event listener
+        // fetchAccounts is called by event listener
         if (email === currentUser?.email) {
+            dispatch(unSetUserToken({ access_token: null }));
             removeToken();
             navigate('/login');
         }
@@ -147,6 +153,11 @@ const AccountSwitcher = ({ currentUser }) => {
                                 <span className="text-xs text-gray-500 truncate">{currentUser?.email}</span>
                             </div>
                             <CheckIcon fontSize="small" color="primary" />
+                        </MenuItem>
+                        <MenuItem onClick={() => { handleClose(); navigate('/admin/profile'); }}>
+                            <div className="flex flex-col flex-1">
+                                <span className="text-sm font-medium">Manage Profile</span>
+                            </div>
                         </MenuItem>
                         <Divider sx={{ my: 1 }} />
                     </>
