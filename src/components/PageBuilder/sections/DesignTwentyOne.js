@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import EventService from '../../../services/EventService';
 import TestimonialService from '../../../services/TestimonialService';
+import SEO from '../../SEO';
 
 
 const DesignTwentyOne = () => {
@@ -94,6 +95,11 @@ const DesignTwentyOne = () => {
 
     return (
         <div id={id} className="bg-gray-50 min-h-screen font-sans">
+            <SEO
+                title={displayEvent.title}
+                description={displayEvent.subtitle || "Event at IET Agra"}
+                image={displayEvent.image}
+            />
             {/* Banner Header */}
             <div className="relative h-96 bg-cover bg-center" style={{ backgroundImage: displayEvent.image ? `url(${displayEvent.image})` : 'none', backgroundColor: '#333' }}>
                 <div className="absolute inset-0 bg-black opacity-60"></div>

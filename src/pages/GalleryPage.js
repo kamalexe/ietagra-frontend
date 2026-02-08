@@ -14,6 +14,7 @@ import {
 import AlbumService from '../services/AlbumService';
 import DepartmentService from '../services/DepartmentService';
 import GalleryConfigService from '../services/GalleryConfigService';
+import SEO from '../components/SEO';
 
 const GalleryPage = () => {
     const [albums, setAlbums] = useState([]);
@@ -151,6 +152,11 @@ const GalleryPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
+            <SEO
+                title={pageConfig.heroTitle ? pageConfig.heroTitle.replace(pageConfig.heroTitleHighlight, '') + pageConfig.heroTitleHighlight : 'University Media Gallery'}
+                description={pageConfig.heroSubtitle}
+                image={pageConfig.heroBackgroundImage}
+            />
             {/* HERO SECTION */}
             <div className="relative py-24 bg-indigo-900 overflow-hidden">
                 <div className="absolute inset-0 opacity-20">

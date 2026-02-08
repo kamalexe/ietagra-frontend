@@ -424,7 +424,11 @@ const EventsList = () => {
         speakers: [],
         agenda: [],
         gallery: [],
-        resources: []
+        resources: [],
+        metaTitle: '',
+        metaDescription: '',
+        metaKeywords: '',
+        excludeFromSitemap: false
     });
     const [activeTab, setActiveTab] = useState('Basic Info');
     const [editingId, setEditingId] = useState(null);
@@ -511,7 +515,11 @@ const EventsList = () => {
                 speakers: Array.isArray(event.speakers) ? event.speakers : [],
                 agenda: Array.isArray(event.agenda) ? event.agenda : [],
                 gallery: Array.isArray(event.gallery) ? event.gallery : [],
-                resources: Array.isArray(event.resources) ? event.resources : []
+                resources: Array.isArray(event.resources) ? event.resources : [],
+                metaTitle: event.metaTitle || '',
+                metaDescription: event.metaDescription || '',
+                metaKeywords: event.metaKeywords || '',
+                excludeFromSitemap: event.excludeFromSitemap || false
             });
         } else {
             setEditingId(null);
@@ -529,7 +537,11 @@ const EventsList = () => {
                 speakers: [],
                 agenda: [],
                 gallery: [],
-                resources: []
+                resources: [],
+                metaTitle: '',
+                metaDescription: '',
+                metaKeywords: '',
+                excludeFromSitemap: false
             });
         }
         setActiveTab('Basic Info');
@@ -798,7 +810,7 @@ const EventsList = () => {
                                     </div>
                                     <div className="border-b border-gray-200">
                                         <nav className="-mb-px flex space-x-4 overflow-x-auto" aria-label="Tabs">
-                                            {['Basic Info', 'Speakers', 'Agenda', 'Gallery', 'Resources', 'Testimonials'].map((tab) => (
+                                            {['Basic Info', 'Speakers', 'Agenda', 'Gallery', 'Resources', 'Testimonials', 'SEO'].map((tab) => (
                                                 <button
                                                     key={tab}
                                                     type="button"
@@ -950,6 +962,57 @@ const EventsList = () => {
                                                     <p className="text-xs mt-2 text-gray-400">Testimonials are linked to existing events.</p>
                                                 </div>
                                             )
+                                        )}
+
+                                        {activeTab === 'SEO' && (
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Meta Title</label>
+                                                    <input
+                                                        type="text"
+                                                        name="metaTitle"
+                                                        value={formData.metaTitle}
+                                                        onChange={handleChange}
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                        placeholder="Custom title for search results"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Meta Description</label>
+                                                    <textarea
+                                                        name="metaDescription"
+                                                        rows={3}
+                                                        value={formData.metaDescription}
+                                                        onChange={handleChange}
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                        placeholder="Brief summary for search engines"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Meta Keywords</label>
+                                                    <input
+                                                        type="text"
+                                                        name="metaKeywords"
+                                                        value={formData.metaKeywords}
+                                                        onChange={handleChange}
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                        placeholder="Comma separated keywords"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="excludeFromSitemap"
+                                                        checked={formData.excludeFromSitemap}
+                                                        onChange={handleChange}
+                                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                                    />
+                                                    <div className="ml-2">
+                                                        <label className="block text-sm font-medium text-gray-700">Exclude from Sitemap</label>
+                                                        <p className="text-xs text-gray-500">If checked, this event will not appear in the generated sitemap.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 </div>

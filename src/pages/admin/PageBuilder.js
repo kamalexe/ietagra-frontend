@@ -27,7 +27,8 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
     const [seoData, setSeoData] = useState({
         metaTitle: '',
         metaDescription: '',
-        metaKeywords: ''
+        metaKeywords: '',
+        excludeFromSitemap: false
     });
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -49,7 +50,8 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
                     setSeoData({
                         metaTitle: pageData.metaTitle || '',
                         metaDescription: pageData.metaDescription || '',
-                        metaKeywords: pageData.metaKeywords || ''
+                        metaKeywords: pageData.metaKeywords || '',
+                        excludeFromSitemap: pageData.excludeFromSitemap || false
                     });
                     setStatus(pageData.status || 'draft');
                 }
@@ -123,7 +125,8 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
         setSeoData({
             metaTitle: data.metaTitle,
             metaDescription: data.metaDescription,
-            metaKeywords: data.metaKeywords
+            metaKeywords: data.metaKeywords,
+            excludeFromSitemap: data.excludeFromSitemap
         });
     };
 

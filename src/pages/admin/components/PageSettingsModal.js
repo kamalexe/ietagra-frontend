@@ -6,7 +6,8 @@ const PageSettingsModal = ({ isOpen, onClose, initialData, onSave }) => {
         title: '',
         metaTitle: '',
         metaDescription: '',
-        metaKeywords: ''
+        metaKeywords: '',
+        excludeFromSitemap: false
     });
 
     useEffect(() => {
@@ -15,7 +16,8 @@ const PageSettingsModal = ({ isOpen, onClose, initialData, onSave }) => {
                 title: initialData.title || '',
                 metaTitle: initialData.metaTitle || '',
                 metaDescription: initialData.metaDescription || '',
-                metaKeywords: initialData.metaKeywords || ''
+                metaKeywords: initialData.metaKeywords || '',
+                excludeFromSitemap: initialData.excludeFromSitemap || false
             });
         }
     }, [initialData]);
@@ -98,6 +100,23 @@ const PageSettingsModal = ({ isOpen, onClose, initialData, onSave }) => {
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                                 placeholder="Comma separated keywords e.g. college, admission, agra"
                             />
+                        </div>
+
+                        <div className="flex items-start">
+                            <div className="flex h-5 items-center">
+                                <input
+                                    id="excludeFromSitemap"
+                                    name="excludeFromSitemap"
+                                    type="checkbox"
+                                    checked={formData.excludeFromSitemap}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, excludeFromSitemap: e.target.checked }))}
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div className="ml-3 text-sm">
+                                <label htmlFor="excludeFromSitemap" className="font-medium text-gray-700">Exclude from Sitemap</label>
+                                <p className="text-gray-500">If checked, this page will not appear in the sitemap.xml file.</p>
+                            </div>
                         </div>
                     </div>
                 </div>

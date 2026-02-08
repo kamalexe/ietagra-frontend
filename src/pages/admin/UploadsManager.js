@@ -6,6 +6,7 @@ import {
     ClipboardDocumentIcon 
 } from '@heroicons/react/24/outline';
 import UploadService from '../../services/UploadService';
+import { optimizeCloudinaryUrl } from '../../utils/cloudinary';
 
 const UploadsManager = () => {
     const [files, setFiles] = useState([]);
@@ -154,7 +155,7 @@ const UploadsManager = () => {
                                 )}
                                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center opacity-0 group-hover:opacity-100 space-x-2">
                                     <button 
-                                                    onClick={() => file.url && window.open(file.url, '_blank')}
+                                                    onClick={() => file.url && window.open(optimizeCloudinaryUrl(file.url), '_blank')}
                                         className="p-2 bg-white rounded-full text-gray-700 hover:text-blue-600 shadow-sm"
                                         title="View File"
                                     >
@@ -166,7 +167,7 @@ const UploadsManager = () => {
                                 <p className="text-xs text-gray-500 truncate mb-1" title={String(file.filename || '')}>{String(file.filename || 'Unknown')}</p>
                                 <div className="flex justify-between items-center mt-2">
                                     <button 
-                                                    onClick={() => file.url && copyToClipboard(file.url)}
+                                                    onClick={() => file.url && copyToClipboard(optimizeCloudinaryUrl(file.url))}
                                         className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center"
                                     >
                                         <ClipboardDocumentIcon className="h-4 w-4 mr-1" />

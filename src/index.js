@@ -8,13 +8,19 @@ import { store } from './app/store'
 
 import { createRoot } from 'react-dom/client';
 
+import { HelmetProvider } from 'react-helmet-async';
+
 const container = document.getElementById('root');
 const root = createRoot(container);
 
 root.render(
+  <React.StrictMode>
     <Provider store={store}>
-      <App />
-  </Provider>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </Provider>
+  </React.StrictMode>
 );
 
 reportWebVitals();

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PageService from '../../services/PageService';
 import SectionRegistry from './SectionRegistry';
+import SEO from '../SEO';
 
 const PageRenderer = ({ slug, data }) => {
   const [pageData, setPageData] = useState(data || null);
@@ -43,6 +44,10 @@ const PageRenderer = ({ slug, data }) => {
 
   return (
     <div className="page-renderer">
+      <SEO
+        title={pageData.title}
+        description={pageData.description || `Page for ${pageData.title}`}
+      />
       {pageData.sections
         .sort((a, b) => a.order - b.order)
         .map((section) => {
