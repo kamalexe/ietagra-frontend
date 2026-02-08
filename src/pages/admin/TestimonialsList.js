@@ -21,7 +21,8 @@ const TestimonialsList = () => {
         image: '', 
         department: '',
         type: 'text',
-        videoUrl: ''
+        videoUrl: '',
+        isPublished: true
     });
     const [editingId, setEditingId] = useState(null);
 
@@ -66,7 +67,8 @@ const TestimonialsList = () => {
                 image: item.image || '',
                 department: item.department?._id || item.department || '',
                 type: item.type || 'text',
-                videoUrl: item.videoUrl || ''
+                videoUrl: item.videoUrl || '',
+                isPublished: item.isPublished !== undefined ? item.isPublished : true
             });
         } else {
             setEditingId(null);
@@ -78,7 +80,8 @@ const TestimonialsList = () => {
                 image: '', 
                 department: '',
                 type: 'text',
-                videoUrl: ''
+                videoUrl: '',
+                isPublished: true
             });
         }
         setIsModalOpen(true);
@@ -96,11 +99,17 @@ const TestimonialsList = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Sanitize department for backend (empty string -> null)
+            const payload = { ...formData };
+            if (payload.department === '') {
+                payload.department = null;
+            }
+
             if (editingId) {
-                await TestimonialService.updateTestimonial(editingId, formData);
+                await TestimonialService.updateTestimonial(editingId, payload);
                 alert("Testimonial updated successfully!");
             } else {
-                await TestimonialService.createTestimonial(formData);
+                await TestimonialService.createTestimonial(payload);
                 alert("Testimonial created successfully!");
             }
             handleCloseModal();
@@ -176,7 +185,12 @@ const TestimonialsList = () => {
                                     <div className="flex items-center">
                                         {item.image && <img className="h-10 w-10 rounded-full mr-3 object-cover" src={item.image} alt="" />}
                                         <div>
-                                            <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                                                <span className={`px-1.5 py-0.5 text-[10px] rounded-full ${item.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                    {item.isPublished ? 'Published' : 'Draft'}
+                                                </span>
+                                            </div>
                                             <div className="text-sm text-gray-500">{item.role}</div>
                                         </div>
                                     </div>
@@ -250,7 +264,7 @@ const TestimonialsList = () => {
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700">Department</label>
                                                     <select name="department" value={formData.department} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                        <option value="">Select Department</option>
+                                                        <option value="">General (University Wide)</option>
                                                         {departments.map(dept => (
                                                             <option key={dept._id} value={dept._id}>{dept.name}</option>
                                                         ))}
@@ -287,6 +301,18 @@ const TestimonialsList = () => {
                                                     <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
                                                 </label>
                                             </div>
+                                        </div>
+
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                id="isPublishedGlobal"
+                                                name="isPublished"
+                                                checked={formData.isPublished}
+                                                onChange={e => setFormData({ ...formData, isPublished: e.target.checked })}
+                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                            />
+                                            <label htmlFor="isPublishedGlobal" className="text-sm text-gray-700">Publish immediately</label>
                                         </div>
                                     </div>
                                 </div>

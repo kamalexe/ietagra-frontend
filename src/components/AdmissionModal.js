@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import CloudinaryService from '../services/CloudinaryService';
 
 const AdmissionModal = ({ config }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -12,7 +13,18 @@ const AdmissionModal = ({ config }) => {
     '/images/admissionPosterI.jpg',
   ];
 
-  const posterImages = config?.posters?.length > 0 ? config.posters : defaultImages;
+  // Helper to get usable image URLs
+  const getImages = () => {
+    if (config?.cloudinaryPublicIds && config.cloudinaryPublicIds.length > 0) {
+      return config.cloudinaryPublicIds.map(id => CloudinaryService.getOptimizedUrl(id));
+    }
+    if (config?.posters && config.posters.length > 0) {
+      return config.posters;
+    }
+    return defaultImages;
+  };
+
+  const posterImages = getImages();
   const applyLink = config?.link || 'https://dbrauadm.samarth.edu.in/';
 
   useEffect(() => {
@@ -141,6 +153,9 @@ const AdmissionModal = ({ config }) => {
                   src={posterImages[currentPoster]}
                   alt={`IET Agra Admissions 2025-26 Poster ${currentPoster + 1}`}
                   className="w-auto h-auto max-w-full max-h-[70vh] md:max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                  fetchpriority="high"
+                  loading="eager"
+                  decoding="async"
                 />
               </motion.div>
 

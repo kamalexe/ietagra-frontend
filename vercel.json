@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://ietagra-backend-yuml.onrender.com/api/:path*"
+    }
+  ]
+}

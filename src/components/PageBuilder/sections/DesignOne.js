@@ -2,6 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { fadeIn } from '../../../utils/animations';
+import { optimizeCloudinaryUrl } from '../../../utils/cloudinary';
 
 const DesignOne = ({ id, badge, title, underlineColor, description, variant = 'simple', backgroundImage, buttons, gradient }) => {
     // Hero Variant (Rich Banner)
@@ -10,7 +11,14 @@ const DesignOne = ({ id, badge, title, underlineColor, description, variant = 's
             <div id={id} className={`relative overflow-hidden ${gradient || 'bg-gradient-to-r from-gray-900 to-gray-800'} text-white mb-12`}>
                 {backgroundImage && (
                     <div className="absolute inset-0 opacity-20">
-                        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${backgroundImage}')` }}></div>
+                        <img
+                            src={optimizeCloudinaryUrl(backgroundImage)}
+                            alt="Background"
+                            className="absolute inset-0 w-full h-full object-cover"
+                            fetchpriority="high"
+                            loading="eager"
+                            decoding="async"
+                        />
                     </div>
                 )}
 

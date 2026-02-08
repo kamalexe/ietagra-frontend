@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PageService from '../services/PageService';
 import AdmissionModal from '../components/AdmissionModal';
 import PageRenderer from '../components/PageBuilder/PageRenderer';
 
 const Home = () => {
+  const hasFetched = useRef(false);
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchHomeData = async () => {
       try {
         const data = await PageService.getPageBySlug('home');

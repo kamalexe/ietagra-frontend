@@ -2,7 +2,8 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getDeviceId } from './LocalStorageService';
 
 // Define a service using a base URL and expected endpoints
-const baseQuery = fetchBaseQuery({ baseUrl: `${process.env.REACT_APP_API_BASE_URL}/account/` });
+// Force relative path to use Vercel proxy
+const baseQuery = fetchBaseQuery({ baseUrl: `/api/account/` });
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);

@@ -284,7 +284,7 @@ const ResourcesManager = ({ resources, onChange, onUpload }) => {
 const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
     const [testimonials, setTestimonials] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [newItem, setNewItem] = useState({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event' });
+    const [newItem, setNewItem] = useState({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event', isPublished: true });
     const [uploading, setUploading] = useState(false);
 
     const handleUpload = async (e) => {
@@ -316,30 +316,20 @@ const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
     const addItem = async () => {
         if (!newItem.name || !newItem.message || !newItem.role) return alert('Name, Role and Message are required');
 
-        try {
-            // If departmentId is not passed (e.g. General event), we might need to handle this. 
-            // For now assuming even General events might have a "General" department or the user needs to select one?
-            // HACK: If no departmentId, we'll try to find one or alert.
-            // Ideally, we should allow selecting department if it's null.
-            // Assuming current simple case: Use passed departmentId. 
-            if (!departmentId) {
-                // Fallback or Alert?
-                // Let's alert for now if critical.
-                // OR hardcode a department? Let's assume the user MUST link it to a department.
-                // We'll add a department selector if needed later.
-                alert("Event must belong to a department to add testimonials (Backend requirement).");
-                return;
-            }
+        // Final safety check, though UI should prevent this
+        // Department check removed per user request (General events allowed)
+        // if (!departmentId) { ... }
 
+        try {
             await TestimonialService.createTestimonial({
                 ...newItem,
                 event: eventId,
-                department: departmentId
+                department: departmentId || null
             });
-            setNewItem({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event' });
+            setNewItem({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event', isPublished: true });
             fetchTestimonials();
         } catch (error) {
-            alert(error.message);
+            alert(error.message || "Failed to add testimonial");
         }
     };
 
@@ -356,6 +346,7 @@ const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
     return (
         <div className="space-y-4 border p-4 rounded-md bg-gray-50">
             <h4 className="font-medium text-gray-900">Event Testimonials</h4>
+
             <div className="grid grid-cols-2 gap-2">
                 <input type="text" placeholder="Name" className="border p-2 rounded" value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })} />
                 <input type="text" placeholder="Role (e.g. Student)" className="border p-2 rounded" value={newItem.role} onChange={e => setNewItem({ ...newItem, role: e.target.value })} />
@@ -378,14 +369,32 @@ const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
                     <input type="text" placeholder="Video URL" className="border p-2 rounded" value={newItem.videoUrl} onChange={e => setNewItem({ ...newItem, videoUrl: e.target.value })} />
                 )}
             </div>
+
+            <div className="flex items-center space-x-2 py-2">
+                <input
+                    type="checkbox"
+                    id="isPublished"
+                    checked={newItem.isPublished}
+                    onChange={e => setNewItem({ ...newItem, isPublished: e.target.checked })}
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isPublished" className="text-sm text-gray-700">Publish immediately</label>
+            </div>
+
             <button type="button" onClick={addItem} className="px-3 py-1 bg-green-600 text-white rounded text-sm">Add Testimonial</button>
 
             {loading ? <p>Loading...</p> : (
                 <ul className="space-y-2 mt-2 max-h-60 overflow-y-auto">
                     {testimonials.map((item) => (
                         <li key={item._id} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
-                            <div className="text-sm">
-                                <span className="font-bold">{item.name}</span>: <span className="text-gray-600 truncate">{item.message.substring(0, 30)}...</span>
+                            <div className="text-sm flex-1">
+                                <div className="flex items-center gap-2">
+                                    <span className="font-bold">{item.name}</span>
+                                    <span className={`px-1.5 py-0.5 text-[10px] rounded-full ${item.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                        {item.isPublished ? 'Published' : 'Draft'}
+                                    </span>
+                                </div>
+                                <span className="text-gray-600 truncate block">{item.message.substring(0, 30)}...</span>
                             </div>
                             <button type="button" onClick={() => removeItem(item._id)} className="text-red-500"><XMarkIcon className="h-4 w-4" /></button>
                         </li>

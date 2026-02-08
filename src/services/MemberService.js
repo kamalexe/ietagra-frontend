@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getToken } from './LocalStorageService';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = '/api' || 'http://localhost:5000/api';
 
 const getMembers = async (params = {}) => {
     const { access_token } = getToken();
