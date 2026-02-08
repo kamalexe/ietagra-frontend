@@ -12,7 +12,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     // Try to get a new token directly via fetch to avoid circular dependency or RTK state issues
     // Note: We rely on the refresh_token cookie being sent automatically
     const refreshResult = await baseQuery({
-      url: 'refresh/',
+      url: 'refresh',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     }, api, extraOptions);
@@ -53,7 +53,7 @@ export const userAuthApi = createApi({
     registerUser: builder.mutation({
       query: (user) => {
         return {
-          url: 'register/',
+          url: 'register',
           method: 'POST',
           body: user,
           headers: {
@@ -65,7 +65,7 @@ export const userAuthApi = createApi({
     loginUser: builder.mutation({
       query: (user) => {
         return {
-          url: 'login/',
+          url: 'login',
           method: 'POST',
           body: { ...user, deviceId: getDeviceId() },
           headers: {
@@ -77,7 +77,7 @@ export const userAuthApi = createApi({
     getLoggedUser: builder.query({
       query: (access_token) => {
         return {
-          url: 'profile/',
+          url: 'profile',
           method: 'GET',
           headers: {
             'authorization': `Bearer ${access_token}`,
@@ -88,7 +88,7 @@ export const userAuthApi = createApi({
     changeUserPassword: builder.mutation({
       query: ({ actualData, access_token }) => {
         return {
-          url: 'changepassword/',
+          url: 'changepassword',
           method: 'POST',
           body: actualData,
           headers: {
@@ -100,7 +100,7 @@ export const userAuthApi = createApi({
     sendPasswordResetEmail: builder.mutation({
       query: (user) => {
         return {
-          url: 'send-reset-password-email/',
+          url: 'send-reset-password-email',
           method: 'POST',
           body: user,
           headers: {
@@ -112,7 +112,7 @@ export const userAuthApi = createApi({
     resetPassword: builder.mutation({
       query: ({ actualData, id, token }) => {
         return {
-          url: `/reset-password/${id}/${token}/`,
+          url: `/reset-password/${id}/${token}`,
           method: 'POST',
           body: actualData,
           headers: {
@@ -124,7 +124,7 @@ export const userAuthApi = createApi({
     getAllUsers: builder.query({
       query: (access_token) => {
         return {
-          url: 'users/',
+          url: 'users',
           method: 'GET',
           headers: {
             'authorization': `Bearer ${access_token}`,
@@ -150,7 +150,7 @@ export const userAuthApi = createApi({
     updateLoggedUser: builder.mutation({
       query: ({ access_token, data }) => {
         return {
-          url: 'profile/',
+          url: 'profile',
           method: 'PUT',
           body: data,
           headers: {
