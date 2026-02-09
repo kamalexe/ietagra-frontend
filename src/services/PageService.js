@@ -1,7 +1,7 @@
 import { getToken } from './LocalStorageService';
 
-// Force relative path to use Vercel proxy
-const API_BASE_URL = '/api';
+// Force relative path to use Vercel proxy, or use env var if provided
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 const PAGES_URL = `${API_BASE_URL}/pages`;
 
 const getAuthHeaders = () => {

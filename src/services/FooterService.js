@@ -1,7 +1,7 @@
 import { getToken } from './LocalStorageService';
 
-// Force relative path
-const API_BASE_URL = '/api';
+// Force relative path, or use env var if provided
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 const FOOTER_URL = `${API_BASE_URL}/footer`;
 
 const getAuthHeaders = () => {
