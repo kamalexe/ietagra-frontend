@@ -309,13 +309,15 @@ const schemas = {
     'design_eighteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+        { name: 'icon', label: 'Main Icon/Emoji', type: 'text', placeholder: '💻' },
         {
             name: 'stats',
             label: 'Statistics',
             type: 'list',
             itemSchema: [
                 { name: 'value', label: 'Value (e.g. 12+)', type: 'text' },
-                { name: 'label', label: 'Label', type: 'text' }
+                { name: 'label', label: 'Label', type: 'text' },
+                { name: 'icon', label: 'Icon/Emoji', type: 'text' }
             ]
         },
         {

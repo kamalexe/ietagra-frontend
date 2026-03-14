@@ -4,11 +4,16 @@ const DesignEighteen = ({
     id,
     title = "Computer Science & Engineering",
     subtitle = "Institute of Engineering and Technology, Swami Vivekanand Campus, Dr. Bhimrao Ambedkar University, Agra",
+    icon = "💻",
     stats = [
-        { value: "12+", label: "Modern Labs" },
-        { value: "95%", label: "Placement Rate" },
-        { value: "8+", label: "Research Areas" }
-  ]
+        { value: "12+", label: "Modern Labs", icon: "🔬" },
+        { value: "95%", label: "Placement Rate", icon: "🎓" },
+        { value: "8+", label: "Research Areas", icon: "📚" }
+    ],
+    buttons = [
+        { text: "Explore Department", link: "#about", variant: "primary" },
+        { text: "Contact Us", link: "#contact", variant: "secondary" }
+    ]
 }) => {
     return (
       <section
@@ -27,7 +32,7 @@ const DesignEighteen = ({
 
           {/* Floating Icons */}
           <div className="absolute left-[10%] top-[20%] text-4xl opacity-30 animate-float">
-              💻
+                {icon}
           </div>
 
           <div className="absolute right-[15%] top-[30%] text-4xl opacity-30 animate-float">
@@ -45,7 +50,7 @@ const DesignEighteen = ({
                   {/* Icon */}
                   <div className="flex justify-center mb-8">
                       <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-xl">
-                          <span className="text-4xl">💻</span>
+                            <span className="text-4xl">{icon}</span>
                       </div>
                   </div>
 
@@ -64,13 +69,18 @@ const DesignEighteen = ({
 
                   {/* Buttons */}
                   <div className="flex flex-col sm:flex-row justify-center gap-6 mb-16">
-                      <a className="px-6 py-3 bg-white text-blue-900 rounded-lg font-semibold shadow-lg hover:shadow-xl transition">
-                          Explore Department
-                      </a>
-
-                      <a className="px-6 py-3 border border-white/70 rounded-lg backdrop-blur-md hover:bg-white/10 transition">
-                          Contact Us
-                      </a>
+                        {buttons && buttons.map((button, index) => (
+                            <a
+                                key={index}
+                                href={button.link || "#"}
+                                className={`px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition ${button.variant === 'primary'
+                                    ? 'bg-white text-blue-900'
+                                    : 'border border-white/70 backdrop-blur-md hover:bg-white/10'
+                                    }`}
+                            >
+                                {button.text}
+                            </a>
+                        ))}
                   </div>
 
                   {/* Glass Stats */}
@@ -78,12 +88,15 @@ const DesignEighteen = ({
                       {stats.map((stat, i) => (
                           <div
                               key={i}
-                              className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20"
+                              className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-1"
                           >
-                    <h3 className="text-3xl font-bold">{stat.value}</h3>
-                    <p className="text-blue-100">{stat.label}</p>
-                </div>
-            ))}
+                              <div className="flex flex-col items-center">
+                                  {stat.icon && <span className="text-2xl mb-2">{stat.icon}</span>}
+                                  <h3 className="text-3xl font-bold">{stat.value}</h3>
+                                  <p className="text-blue-100">{stat.label}</p>
+                              </div>
+                          </div>
+                      ))}
                   </div>
 
               </div>
