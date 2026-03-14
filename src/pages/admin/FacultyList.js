@@ -4,6 +4,8 @@ import FacultyService from '../../services/FacultyService';
 import DepartmentService from '../../services/DepartmentService';
 import FileService from '../../services/FileService';
 import { useSelector } from 'react-redux';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Bars3Icon } from '@heroicons/react/24/outline';
 
 const FacultyList = () => {
     // State for faculty list
@@ -178,6 +180,30 @@ const FacultyList = () => {
         }
     };
 
+    const handleDragEnd = async (result) => {
+        if (!result.destination) return;
+
+        const items = Array.from(faculty);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        setFaculty(items);
+
+        // Prepare orders for backend
+        const orders = items.map((item, index) => ({
+            id: item._id,
+            order: index
+        }));
+
+        try {
+            await FacultyService.reorderFaculty(orders);
+        } catch (err) {
+            console.error("Failed to save reorder:", err);
+            alert("Failed to save new order: " + err.message);
+            loadFaculty(); // Revert on failure
+        }
+    };
+
     // Helper to generate initials for avatar placeholder
     const getInitials = (name) => {
         return name
@@ -218,87 +244,112 @@ const FacultyList = () => {
             </div>
 
             <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Public</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {faculty.map((person) => (
-                            <tr key={person._id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                        <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0 flex items-center justify-center">
-                                            {person.image ? (
-                                                <img src={person.image} alt={person.name} className="h-full w-full object-cover" />
-                                            ) : (
-                                                <span className="text-gray-500 font-medium text-xs">{getInitials(person.name)}</span>
-                                            )}
-                                        </div>
-                                        <div className="ml-4">
-                                            <div className="text-sm font-medium text-gray-900">{person.name}</div>
-                                            <div className="text-xs text-gray-500">{person.email}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">{person.designation}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-blue-600 font-semibold">{person.department?.name || person.department}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <button
-                                        onClick={() => handleStatusChange(person._id, 'isPublic', !person.isPublic)}
-                                        className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${person.isPublic ? 'bg-green-600' : 'bg-gray-200'}`}
-                                    >
-                                        <span className="sr-only">Toggle Public</span>
-                                        <span
-                                            aria-hidden="true"
-                                            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${person.isPublic ? 'translate-x-5' : 'translate-x-0'}`}
-                                        />
-                                    </button>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <button
-                                        onClick={() => handleStatusChange(person._id, 'isApproved', !person.isApproved)}
-                                        className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${person.isApproved ? 'bg-green-600' : 'bg-gray-200'}`}
-                                    >
-                                        <span className="sr-only">Toggle Approved</span>
-                                        <span
-                                            aria-hidden="true"
-                                            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${person.isApproved ? 'translate-x-5' : 'translate-x-0'}`}
-                                        />
-                                    </button>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div className="flex space-x-3">
-                                        <button
-                                            onClick={() => handleOpenModal(person)}
-                                            className="text-indigo-600 hover:text-indigo-900"
-                                            title="Edit"
-                                        >
-                                            <PencilSquareIcon className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(person._id)}
-                                            className="text-red-600 hover:text-red-900"
-                                            title="Delete"
-                                        >
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                </td>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-6 py-3 text-left"></th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Public</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <Droppable droppableId="faculty-list">
+                            {(provided) => (
+                                <tbody
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    className="bg-white divide-y divide-gray-200"
+                                >
+                                    {faculty.map((person, index) => (
+                                        <Draggable key={person._id} draggableId={person._id} index={index}>
+                                            {(provided) => (
+                                                <tr
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    className="hover:bg-gray-50"
+                                                >
+                                                    <td className="px-4 py-4 whitespace-nowrap">
+                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600">
+                                                            <Bars3Icon className="h-5 w-5" />
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="flex items-center">
+                                                            <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0 flex items-center justify-center">
+                                                                {person.image ? (
+                                                                    <img src={person.image} alt={person.name} className="h-full w-full object-cover" />
+                                                                ) : (
+                                                                    <span className="text-gray-500 font-medium text-xs">{getInitials(person.name)}</span>
+                                                                )}
+                                                            </div>
+                                                            <div className="ml-4">
+                                                                <div className="text-sm font-medium text-gray-900">{person.name}</div>
+                                                                <div className="text-xs text-gray-500">{person.email}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">{person.designation}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-blue-600 font-semibold">{person.department?.name || person.department}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <button
+                                                            onClick={() => handleStatusChange(person._id, 'isPublic', !person.isPublic)}
+                                                            className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${person.isPublic ? 'bg-green-600' : 'bg-gray-200'}`}
+                                                        >
+                                                            <span className="sr-only">Toggle Public</span>
+                                                            <span
+                                                                aria-hidden="true"
+                                                                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${person.isPublic ? 'translate-x-5' : 'translate-x-0'}`}
+                                                            />
+                                                        </button>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <button
+                                                            onClick={() => handleStatusChange(person._id, 'isApproved', !person.isApproved)}
+                                                            className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${person.isApproved ? 'bg-green-600' : 'bg-gray-200'}`}
+                                                        >
+                                                            <span className="sr-only">Toggle Approved</span>
+                                                            <span
+                                                                aria-hidden="true"
+                                                                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${person.isApproved ? 'translate-x-5' : 'translate-x-0'}`}
+                                                            />
+                                                        </button>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                        <div className="flex space-x-3">
+                                                            <button
+                                                                onClick={() => handleOpenModal(person)}
+                                                                className="text-indigo-600 hover:text-indigo-900"
+                                                                title="Edit"
+                                                            >
+                                                                <PencilSquareIcon className="h-5 w-5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(person._id)}
+                                                                className="text-red-600 hover:text-red-900"
+                                                                title="Delete"
+                                                            >
+                                                                <TrashIcon className="h-5 w-5" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </tbody>
+                            )}
+                        </Droppable>
+                    </table>
+                </DragDropContext>
             </div>
 
             {/* Modal */}

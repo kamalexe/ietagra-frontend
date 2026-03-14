@@ -121,6 +121,21 @@ const FacultyService = {
         }
 
         return await response.json();
+    },
+
+    async reorderFaculty(orders) {
+        const response = await fetch(`${API_BASE_URL}/faculty/reorder`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ orders })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || error.message || 'Failed to reorder faculty');
+        }
+
+        return await response.json();
     }
 };
 
