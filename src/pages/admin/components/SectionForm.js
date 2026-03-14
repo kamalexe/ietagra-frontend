@@ -7,7 +7,7 @@ const SectionForm = ({ section, onClose, onSave }) => {
   const [formData, setFormData] = useState({});
   const [jsonInputs, setJsonInputs] = useState({});
   const [jsonErrors, setJsonErrors] = useState({});
-
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     if (section && section.data) {
@@ -16,6 +16,22 @@ const SectionForm = ({ section, onClose, onSave }) => {
       setJsonErrors({});
     }
   }, [section]);
+
+  useEffect(() => {
+    // Fetch departments for dynamic select fields
+    const fetchDepartments = async () => {
+      try {
+        // Using inline import/require to avoid top-level import issues if not explicitly added
+        // But we can just import it at top since we are editing the file
+        const DepartmentService = require('../../../services/DepartmentService').default;
+        const data = await DepartmentService.getAllDepartments();
+        setDepartments(data || []);
+      } catch (error) {
+        console.error('Failed to load departments for SectionForm:', error);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -181,6 +197,27 @@ const SectionForm = ({ section, onClose, onSave }) => {
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
+          </div>
+        );
+      case 'department_select':
+        return (
+          <div className="col-span-6" key={index}>
+            <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">{field.label}</label>
+            <select
+              name={field.name}
+              id={inputId}
+              value={value}
+              onChange={(e) => onFieldChange(field.name, e.target.value)}
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">-- No specific department --</option>
+              {departments.map((dept) => (
+                <option key={dept._id} value={dept._id}>
+                  {dept.name}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500">Overrides or acts as the department ID for fetching dynamic items.</p>
           </div>
         );
       case 'number':

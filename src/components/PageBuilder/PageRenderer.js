@@ -59,8 +59,8 @@ const  PageRenderer = ({ slug, data }) => {
             key={section.id}
             id={section.id}
             title={section.data?.title || section.title}
+            departmentId={section.data?.departmentId || pageData.departmentId}
             {...section.data}
-            departmentId={pageData.departmentId}
           />;
         })}
     </div>

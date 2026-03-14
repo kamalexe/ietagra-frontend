@@ -194,6 +194,7 @@ const schemas = {
     ],
     'design_twelve': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
+        { name: 'departmentId', label: 'Department (for dynamic fetching)', type: 'department_select' },
         {
             name: 'items',
             label: 'Team / Faculty Members',
