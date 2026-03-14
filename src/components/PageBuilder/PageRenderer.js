@@ -58,7 +58,7 @@ const  PageRenderer = ({ slug, data }) => {
           return <Component
             key={section.id}
             id={section.id}
-            title={section.title}
+            title={section.data?.title || section.title}
             {...section.data}
             departmentId={pageData.departmentId}
           />;

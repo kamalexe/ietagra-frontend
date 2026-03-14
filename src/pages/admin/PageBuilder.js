@@ -115,7 +115,7 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
 
     const handleSaveSection = (id, newData) => {
         setSections(sections.map(sec =>
-            sec.id === id ? { ...sec, data: newData } : sec
+            sec.id === id ? { ...sec, data: newData, title: newData.title || sec.title } : sec
         ));
         setEditingSection(null);
     };

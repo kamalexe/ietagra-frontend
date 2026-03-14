@@ -514,6 +514,11 @@ const schemas = {
     'exam_schedule_viewer_enhanced': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Exam Schedules' },
         { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Search and preview exam timetables' }
+    ],
+    'campus_grid': [
+        { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Title', type: 'text', placeholder: 'Our Dynamic Campuses' },
+        { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Explore our specialized campuses across the city of Agra.' }
     ]
 };
 
