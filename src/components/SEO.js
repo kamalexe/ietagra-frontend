@@ -1,7 +1,18 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-export default function SEO({ title, description, keywords, name, type, image, url }) {
+export default function SEO({
+    title = 'Institute of Engineering & Technology, Agra',
+    description = 'Official website of Institute of Engineering & Technology, Dr. B. R. Ambedkar University, Agra.',
+    keywords = 'IET Agra, Engineering College Agra, Dr. B. R. Ambedkar University, IET Khandari',
+    name = 'IET Agra',
+    type = 'website',
+    image = '/logo192.png', // Fallback image if needed, ensure this path is correct or use an import
+    url // Default to current URL handling inside component
+}) {
+    // If url is not provided, use window.location.href safely (check for window existence for SSR compatibility)
+    const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+
     return (
         <Helmet>
             {/* Standard metadata tags */}
@@ -14,7 +25,7 @@ export default function SEO({ title, description, keywords, name, type, image, u
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
             {image && <meta property="og:image" content={image} />}
-            {url && <meta property="og:url" content={url} />}
+            <meta property="og:url" content={currentUrl} />
             
              {/* Twitter Card tags */}
             <meta name="twitter:creator" content={name} />
@@ -25,13 +36,3 @@ export default function SEO({ title, description, keywords, name, type, image, u
         </Helmet>
     );
 }
-
-SEO.defaultProps = {
-    title: 'Institute of Engineering & Technology, Agra',
-    description: 'Official website of Institute of Engineering & Technology, Dr. B. R. Ambedkar University, Agra.',
-    keywords: 'IET Agra, Engineering College Agra, Dr. B. R. Ambedkar University, IET Khandari',
-    name: 'IET Agra',
-    type: 'website',
-    image: '%PUBLIC_URL%/logo192.png', // Fallback image if needed, ensure this path is correct or use an import
-    url: window.location.href // Default to current URL
-};

@@ -4,7 +4,7 @@ import PageService from '../../services/PageService';
 import SectionRegistry from './SectionRegistry';
 import SEO from '../SEO';
 
-const PageRenderer = ({ slug, data }) => {
+const  PageRenderer = ({ slug, data }) => {
   const [pageData, setPageData] = useState(data || null);
   const [loading, setLoading] = useState(!data);
   const [error, setError] = useState(null);
@@ -57,6 +57,8 @@ const PageRenderer = ({ slug, data }) => {
           }
           return <Component
             key={section.id}
+            id={section.id}
+            title={section.title}
             {...section.data}
             departmentId={pageData.departmentId}
           />;

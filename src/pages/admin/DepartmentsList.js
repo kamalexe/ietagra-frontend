@@ -4,6 +4,7 @@ import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, AcademicCapIcon, XMarkI
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Combobox } from '@headlessui/react';
 import PageService from '../../services/PageService';
+import CourseService from '../../services/CourseService';
 import DepartmentService from '../../services/DepartmentService';
 import FacultyService from '../../services/FacultyService';
 
@@ -12,6 +13,7 @@ const DepartmentsList = () => {
   const [departments, setDepartments] = useState([]);
 
   const [editingId, setEditingId] = useState(null);
+  const [courses, setCourses] = useState([]);
 
   // Faculty Autocomplete State
   const [facultyMembers, setFacultyMembers] = useState([]);
@@ -32,6 +34,7 @@ const DepartmentsList = () => {
   React.useEffect(() => {
     loadDepartments();
     loadFaculty();
+    loadCourses();
   }, []);
 
   const loadDepartments = async () => {
@@ -52,12 +55,21 @@ const DepartmentsList = () => {
     }
   };
 
+  const loadCourses = async () => {
+    try {
+      const data = await CourseService.getAllCourses();
+      setCourses(data || []);
+    } catch (err) {
+      console.error("Failed to load courses", err);
+    }
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newDept, setNewDept] = useState({ name: '', slug: '', head: '', description: '' });
+  const [newDept, setNewDept] = useState({ name: '', slug: '', head: '', description: '', courseIds: [] });
 
   const openCreateModal = () => {
     setEditingId(null);
-    setNewDept({ name: '', slug: '', head: '', description: '' });
+    setNewDept({ name: '', slug: '', head: '', description: '', courseIds: [] });
     setQuery('');
     setIsModalOpen(true);
   };
@@ -68,7 +80,8 @@ const DepartmentsList = () => {
       name: dept.name,
       slug: dept.slug, // Use original slug
       head: dept.head || '',
-      description: dept.description || ''
+      description: dept.description || '',
+      courseIds: dept.courseIds ? dept.courseIds.map(c => c._id || c) : []
     });
     setQuery('');
     setIsModalOpen(true);
@@ -174,6 +187,9 @@ const DepartmentsList = () => {
                 Head of Dept
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Courses
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Last Modified
               </th>
               <th scope="col" className="relative px-6 py-3">
@@ -202,6 +218,19 @@ const DepartmentsList = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {dept.head}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="flex flex-wrap gap-1 max-w-xs">
+                    {dept.courseIds && dept.courseIds.length > 0 ? (
+                      dept.courseIds.map(course => (
+                        <span key={course._id} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-800">
+                          {course.name}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-400 italic">None</span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {dept.updatedAt ? dept.updatedAt.split('T')[0] : 'N/A'}
@@ -354,6 +383,32 @@ const DepartmentsList = () => {
                         onChange={(e) => setNewDept({ ...newDept, description: e.target.value })}
                       />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Offered Courses (Many-to-Many)</label>
+                      <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-3 border border-gray-200 rounded-md bg-gray-50">
+                        {courses.map(course => (
+                          <label key={course._id} className="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer hover:bg-white p-1 rounded transition-colors">
+                            <input
+                              type="checkbox"
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                              checked={newDept.courseIds.includes(course._id)}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setNewDept(prev => ({
+                                  ...prev,
+                                  courseIds: checked
+                                    ? [...prev.courseIds, course._id]
+                                    : prev.courseIds.filter(id => id !== course._id)
+                                }));
+                              }}
+                            />
+                            <span>{course.name} <span className="text-[10px] text-gray-400">({course.campusId?.name || 'N/A'})</span></span>
+                          </label>
+                        ))}
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500 italic">Select all courses that belong to this department.</p>
+                    </div>
+
                     <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                       <button
                         type="submit"

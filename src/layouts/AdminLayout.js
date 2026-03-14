@@ -41,7 +41,8 @@ const NAVIGATION_STRUCTURE = [
     icon: AcademicCapIcon,
     roles: ['admin', 'department_admin'],
     children: [
-      { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon, roles: ['admin'] },
+      { name: 'Campuses', href: '/admin/campuses', icon: MapIcon, roles: ['admin', 'department_admin'] },
+      { name: 'Departments', href: '/admin/departments', icon: AcademicCapIcon, roles: ['admin', 'department_admin'] },
       { name: 'Faculty', href: '/admin/faculty', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_faculty' },
       { name: 'Student Records', href: '/admin/student-data', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_student_data' },
       { name: 'Profiles', href: '/admin/student-profiles', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_student_data' },

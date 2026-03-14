@@ -39,6 +39,8 @@ import SyllabusManager from './pages/admin/SyllabusManager';
 import ExamScheduleManager from './pages/admin/ExamScheduleManager';
 import Profile from './pages/account/Profile';
 import StudentProfileManager from './pages/admin/StudentProfileManager';
+import CampusesList from './pages/admin/CampusesList';
+import CoursesList from './pages/admin/CoursesList';
 
 function App() {
     const { access_token } = useSelector((state) => state.auth);
@@ -60,6 +62,8 @@ function App() {
                         <Route path="contacts" element={<ContactSubmissions />} />
                         <Route path="pages" element={<PagesList />} />
                         <Route path="departments" element={<DepartmentsList />} />
+                        <Route path="campuses" element={<CampusesList />} />
+                        <Route path="courses" element={<CoursesList />} />
                         <Route path="faculty" element={<FacultyList />} />
                         <Route path="pages/:slug" element={<PageBuilder />} />
                         <Route path="events" element={<EventsList />} />
@@ -95,6 +99,8 @@ function App() {
                         <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
                         <Route path="/profile" element={<Navigate to="/admin/profile" replace />} />
                         <Route path="/:slug" element={<DynamicPage />} />
+                        <Route path="/campus/:campusSlug" element={<DynamicPage />} />
+                        <Route path="/campus/:campusSlug/:courseSlug" element={<DynamicPage />} />
                         <Route path="/gallery" element={<GalleryPage />} />
                         <Route path="/company-registration" element={<CompanyRegistration />} />
                         <Route path="*" element={<h1>Error 404 Page not found !!</h1>} />

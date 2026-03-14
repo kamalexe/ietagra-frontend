@@ -37,6 +37,7 @@ import DesignFifteen from './sections/DesignFifteen';
 import DesignThirtyFive from './sections/DesignThirtyFive';
 import DesignThirtySix from './sections/DesignThirtySix';
 import DesignThirtySeven from './sections/DesignThirtySeven';
+import DesignThirtyEight from './sections/DesignThirtyEight';
 
 // Adapters for new documentation-based templates
 const HeroSection = (props) => <DesignOne {...props} />;
@@ -111,6 +112,8 @@ const SectionRegistry = {
 
     // New Aliases
     hero_section: HeroSection,
+    HeroSection: HeroSection,
+    hero_slider: DesignFive, // Placeholder if hero_slider is used
     about_brief: AboutBrief,
     department_hero: DepartmentHero,
     hod_message: HodMessage,
@@ -125,8 +128,10 @@ const SectionRegistry = {
     design_thirty_five: DesignThirtyFive,
     design_thirty_six: DesignThirtySix,
     design_thirty_seven: DesignThirtySeven,
+    design_thirty_eight: DesignThirtyEight,
     syllabus_viewer: SyllabusViewer,
     exam_schedule_viewer: ExamScheduleViewer,
+    campus_grid: DesignThirtyEight,
     syllabus_viewer_enhanced: SyllabusViewerEnhanced,
     exam_schedule_viewer_enhanced: ExamScheduleViewerEnhanced
 };
