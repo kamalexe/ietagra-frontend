@@ -1,14 +1,18 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const DesignTwentyNine = ({ id,
     title = "Announcements",
-    announcements = [
-        { text: "Kashi Tamil Sangamam (KTS) 4.0", link: "https://kashitamil.bhu.edu.in" },
-        { text: "OPD Online Booking [Click here]", link: "https://bhuopd.com/" }
-    ],
+    announcements = [],
     themeColor = "bg-red-600",
     speed = "20s"
 }) => {
+    // Defensive check and duplication for marquee
+    const safeAnnouncements = Array.isArray(announcements) ? announcements : [];
+
+    // Convert speed string to seconds number if possible, default to 20
+    const duration = parseFloat(speed) || 20;
+
     return (
         <section id={id} className="bg-white border-y border-gray-100 shadow-sm overflow-hidden">
             <div className="flex items-stretch h-12 md:h-14">
@@ -30,9 +34,22 @@ const DesignTwentyNine = ({ id,
 
                 {/* Marquee Content */}
                 <div className="relative flex-1 bg-gray-50 overflow-hidden flex items-center">
-                    <div className="marquee-container flex items-center whitespace-nowrap">
-                        <div className="marquee-content flex items-center">
-                            {announcements.map((item, idx) => (
+                    <motion.div
+                        className="flex items-center whitespace-nowrap"
+                        animate={{ x: [0, -1000] }} // Simplified logic, will adjust based on content if needed or use infinite loop
+                        transition={{
+                            x: {
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                duration: duration,
+                                ease: "linear",
+                            },
+                        }}
+                        style={{ width: 'max-content' }}
+                    >
+                        {/* First Set */}
+                        <div className="flex items-center">
+                            {safeAnnouncements.map((item, idx) => (
                                 <div key={idx} className="flex items-center px-8 md:px-12">
                                     <span className="shrink-0 w-2 h-2 rounded-full bg-red-500 mr-3"></span>
                                     {item.link ? (
@@ -51,8 +68,8 @@ const DesignTwentyNine = ({ id,
                             ))}
                         </div>
                         {/* Duplicate for seamless scrolling */}
-                        <div className="marquee-content flex items-center" aria-hidden="true">
-                            {announcements.map((item, idx) => (
+                        <div className="flex items-center" aria-hidden="true">
+                            {safeAnnouncements.map((item, idx) => (
                                 <div key={`dup-${idx}`} className="flex items-center px-8 md:px-12">
                                     <span className="shrink-0 w-2 h-2 rounded-full bg-red-500 mr-3"></span>
                                     {item.link ? (
@@ -70,37 +87,9 @@ const DesignTwentyNine = ({ id,
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-
-            <style jsx>{`
-                .marquee-container {
-                    display: flex;
-                    width: max-content;
-                    animation: marquee linear infinite;
-                    animation-duration: ${speed};
-                }
-
-                .marquee-content {
-                    display: flex;
-                    align-items: center;
-                }
-
-                @keyframes marquee {
-                    0% {
-                        transform: translate3d(0, 0, 0);
-                    }
-                    100% {
-                        transform: translate3d(-50%, 0, 0);
-                    }
-                }
-
-                /* Pause on hover if user prefers */
-                .marquee-container:hover {
-                    animation-play-state: paused;
-                }
-            `}</style>
         </section>
     );
 };

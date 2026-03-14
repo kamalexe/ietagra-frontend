@@ -14,7 +14,7 @@ const DesignTwentyEight = ({ id,
             <div className="container mx-auto px-4">
                 {/* Section Heading */}
                 <div className="mb-12 text-center lg:text-left">
-                    <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 inline-block relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 lg:after:left-0 after:right-0 after:mx-auto lg:after:mx-0 after:w-24 after:h-1.5 after:bg-${themeColor}`}>
+                    <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 inline-block relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 lg:after:left-0 after:right-0 after:mx-auto lg:after:mx-0 after:w-24 after:h-1.5 after:bg-blue-600`}>
                         {title}
                     </h2>
                 </div>
@@ -24,7 +24,7 @@ const DesignTwentyEight = ({ id,
                     <div className="lg:w-1/3 w-full flex flex-col items-center">
                         <div className="relative group w-full max-w-sm">
                             {/* Decorative border */}
-                            <div className={`absolute -inset-4 border-2 border-${themeColor}/20 rounded-2xl transform rotate-2 group-hover:rotate-0 transition-transform duration-500`}></div>
+                            <div className={`absolute -inset-4 border-2 border-blue-600/20 rounded-2xl transform rotate-2 group-hover:rotate-0 transition-transform duration-500`}></div>
                             
                             <div className="relative overflow-hidden rounded-xl shadow-2xl bg-gray-100 aspect-[4/5] flex items-center justify-center">
                                 <img 
@@ -38,10 +38,10 @@ const DesignTwentyEight = ({ id,
 
                         <div className="mt-8 text-center lg:text-left w-full pl-0 lg:pl-4">
                             <h3 className="text-2xl font-bold text-gray-900">{name}</h3>
-                            <p className={`text-${themeColor} font-medium text-lg`}>{designation}</p>
+                            <p className={`text-blue-600 font-medium text-lg`}>{designation}</p>
                             
                             {/* Visual signature accent */}
-                            <div className={`mt-4 w-16 h-1 bg-${themeColor}/30 rounded`}></div>
+                            <div className={`mt-4 w-16 h-1 bg-blue-600/30 rounded`}></div>
                         </div>
                     </div>
 
@@ -62,7 +62,7 @@ const DesignTwentyEight = ({ id,
                                     </h4>
                                 )}
 
-                                <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-4 text-justify">
+                                <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed text-justify [&_p]:mb-5 [&_em]:text-gray-600 [&_em]:font-medium">
                                     {content ? (
                                         <div 
                                             className="section-content"
@@ -80,21 +80,11 @@ const DesignTwentyEight = ({ id,
                             </div>
 
                             {/* Decorative element at bottom right */}
-                            <div className={`absolute bottom-6 right-6 w-12 h-12 border-r-2 border-b-2 border-${themeColor}/20`}></div>
+                            <div className={`absolute bottom-6 right-6 w-12 h-12 border-r-2 border-b-2 border-blue-600/20`}></div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <style jsx>{`
-                .section-content :global(p) {
-                    margin-bottom: 1.25rem;
-                }
-                .section-content :global(em) {
-                    color: #4b5563;
-                    font-weight: 500;
-                }
-            `}</style>
         </section>
     );
 };
