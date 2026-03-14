@@ -70,7 +70,6 @@ const CoursesList = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const slug = formData.slug.toLowerCase().trim().replace(/\s+/g, '-');
-        const selectedCampus = campuses.find(c => c._id === formData.campusId);
 
         try {
             if (editingId) {

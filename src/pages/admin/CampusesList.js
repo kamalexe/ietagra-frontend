@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, BuildingLibraryIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import CampusService from '../../services/CampusService';
-import PageService from '../../services/PageService';
 
 const CampusesList = () => {
     const [campuses, setCampuses] = useState([]);
