@@ -8,8 +8,8 @@ const DesignThirtySix = ({ title, subtitle, type = 'syllabus' }) => {
 
     // Determine API endpoint and field mappings based on type
     const isExam = type === 'exam-schedule';
-    const apiEndpoint = isExam ? '/api/exam-schedule' : '/api/syllabus';
-    const filterApiEndpoint = '/api/syllabus/filters'; // We can reuse syllabus filters for now or generic api
+    const apiEndpoint = isExam ? '/exam-schedule' : '/syllabus';
+    const filterApiEndpoint = '/syllabus/filters'; // We can reuse syllabus filters for now or generic api
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ const DesignThirtySix = ({ title, subtitle, type = 'syllabus' }) => {
             try {
                 // For now, reusing syllabus filters as they share year/program
                 // In production, might want separate filter endpoints
-                const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${filterApiEndpoint}`);
+                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}${filterApiEndpoint}`);
                 if (res.data.success) {
                     setOptions(prev => ({
                         ...prev,
@@ -59,7 +59,7 @@ const DesignThirtySix = ({ title, subtitle, type = 'syllabus' }) => {
                 if (filters.semester) params.append('semester', filters.semester);
                 if (isExam && filters.examType) params.append('examType', filters.examType);
 
-                const url = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${apiEndpoint}?${params.toString()}`;
+                const url = `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}${apiEndpoint}?${params.toString()}`;
                 const res = await axios.get(url);
 
                 if (res.data.success) {

@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const DesignThirtySeven = ({ title, subtitle, type = 'syllabus' }) => {
     const isExam = type === 'exam-schedule';
-    const apiEndpoint = isExam ? '/api/exam-schedule' : '/api/syllabus';
-    const filterApiEndpoint = '/api/syllabus/filters';
+    const apiEndpoint = isExam ? '/exam-schedule' : '/syllabus';
+    const filterApiEndpoint = '/syllabus/filters';
 
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -34,7 +34,7 @@ const DesignThirtySeven = ({ title, subtitle, type = 'syllabus' }) => {
     useEffect(() => {
         const fetchOptions = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${filterApiEndpoint}`);
+                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}${filterApiEndpoint}`);
                 if (res.data.success) {
                     setOptions(prev => ({
                         ...prev,
@@ -60,7 +60,7 @@ const DesignThirtySeven = ({ title, subtitle, type = 'syllabus' }) => {
                 if (filters.semester) params.append('semester', filters.semester);
                 if (isExam && filters.examType) params.append('examType', filters.examType);
 
-                const url = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${apiEndpoint}?${params.toString()}`;
+                const url = `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}${apiEndpoint}?${params.toString()}`;
                 const res = await axios.get(url);
 
                 if (res.data.success) {
