@@ -36,12 +36,8 @@ const UserLogin = () => {
     }
   }
 
-  let { access_token } = getToken()
-  useEffect(() => {
-    if (access_token) {
-      dispatch(setUserToken({ access_token: access_token }))
-    }
-  }, [access_token, dispatch])
+  // The authSlice now initializes token from localStorage directly,
+  // so we don't need a useEffect here to sync it.
 
 
   return (
