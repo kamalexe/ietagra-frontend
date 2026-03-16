@@ -63,28 +63,7 @@ const Profile = () => {
     const { user, profile } = data;
     const isFaculty = user.role === 'faculty';
     const isStudent = user.role === 'student';
-
-    if (!isFaculty && !isStudent) {
-        return (
-            <div className="max-w-4xl mx-auto p-6">
-                <div className="bg-white shadow rounded-lg p-6">
-                    <div className="flex items-center space-x-4 mb-6">
-                        <div className="bg-indigo-100 p-3 rounded-full">
-                            <UserCircleIcon className="w-12 h-12 text-indigo-600" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-800">{user.name}</h1>
-                            <p className="text-gray-600">{user.email}</p>
-                            <span className="inline-block mt-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium capitalize">
-                                {user.role.replace('_', ' ')}
-                            </span>
-                        </div>
-                    </div>
-                    <p className="text-gray-500">Profile editing is currently available only for Faculty and Students.</p>
-                </div>
-            </div>
-        );
-    }
+    const canEditProfile = isFaculty || isStudent;
 
     return (
         <div className="max-w-4xl mx-auto p-6">
@@ -92,13 +71,15 @@ const Profile = () => {
                 <h1 className="text-3xl font-bold text-gray-800">My Profile</h1>
                 {!forcePasswordUpdate && (
                     <div className="flex bg-gray-200 rounded-lg p-1">
-                        <button
-                            onClick={() => setActiveTab('profile')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition ${activeTab === 'profile' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                        >
-                            <UserCircleIcon className="w-4 h-4 inline mr-2" />
-                            Profile
-                        </button>
+                        {canEditProfile && (
+                            <button
+                                onClick={() => setActiveTab('profile')}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition ${activeTab === 'profile' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                            >
+                                <UserCircleIcon className="w-4 h-4 inline mr-2" />
+                                Profile
+                            </button>
+                        )}
                         <button
                             onClick={() => setActiveTab('security')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition ${activeTab === 'security' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
@@ -122,28 +103,28 @@ const Profile = () => {
                 <div className="bg-white shadow rounded-lg p-6">
                     <ChangePassword />
                 </div>
-            ) : (
+            ) : canEditProfile ? (
                 <>
                         {/* Approval Status Banner */}
                         {profile && !profile.isApproved && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm text-yellow-700">
-                                Your profile is currently <strong>Pending Approval</strong>. It will not be visible to the public until approved by an administrator.
-                                Any changes you make will reset your approval status.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <div className="bg-white shadow rounded-lg overflow-hidden">
+                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm text-yellow-700">
+                                            Your profile is currently <strong>Pending Approval</strong>. It will not be visible to the public until approved by an administrator.
+                                            Any changes you make will reset your approval status.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        <div className="bg-white shadow rounded-lg overflow-hidden">
+                            {/* Existing Profile implementation for Faculty/Students */}
                 {/* Header */}
                 <div className="bg-indigo-600 px-6 py-4 flex justify-between items-center">
                     <h1 className="text-white text-xl font-bold">My Profile</h1>
@@ -385,7 +366,23 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
-                </>
+                    </>
+                ) : (
+                    <div className="bg-white shadow rounded-lg p-6">
+                        <div className="flex items-center space-x-4 mb-6">
+                            <div className="bg-indigo-100 p-3 rounded-full">
+                                <UserCircleIcon className="w-12 h-12 text-indigo-600" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-800">{user.name}</h1>
+                                <p className="text-gray-600">{user.email}</p>
+                                <span className="inline-block mt-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium capitalize">
+                                    {user.role.replace('_', ' ')}
+                                </span>
+                            </div>
+                        </div>
+                        <p className="text-gray-500">Profile editing is currently available only for Faculty and Students.</p>
+                    </div>
             )}
 </div>
 );
