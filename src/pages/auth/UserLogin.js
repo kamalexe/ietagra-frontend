@@ -1,4 +1,5 @@
-import { TextField, Button, Box, Alert, Typography, CircularProgress } from '@mui/material';
+import { TextField, Button, Box, Alert, Typography, CircularProgress, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -7,10 +8,14 @@ import { getToken, storeToken, registerAccount } from '../../services/LocalStora
 import { useLoginUserMutation } from '../../services/userAuthApi';
 
 const UserLogin = () => {
-  const [server_error, setServerError] = useState({})
+  const [server_error, setServerError] = useState("")
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [loginUser, { isLoading }] = useLoginUserMutation()
   const dispatch = useDispatch()
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -20,42 +25,80 @@ const UserLogin = () => {
     }
     const res = await loginUser(actualData)
     if (res.error) {
-      // console.log(typeof (res.error.data.errors))
-      // console.log(res.error.data.errors)
-      setServerError(res.error.data?.errors || {})
+      setServerError(res.error.data?.error || res.error.data?.message || "Login Failed")
     }
     if (res.data) {
-      console.log(typeof (res.data))
-      console.log(res.data)
-      storeToken(res.data) // Fixed: pass the whole object containing access_token
-      registerAccount(res.data, res.data.user) // Added: register account for switcher
+      storeToken(res.data)
+      registerAccount(res.data, res.data.user)
       let { access_token } = getToken()
       dispatch(setUserToken({ access_token: access_token }))
       navigate('/admin/dashboard')
     }
   }
+
   let { access_token } = getToken()
   useEffect(() => {
-    dispatch(setUserToken({ access_token: access_token }))
+    if (access_token) {
+      dispatch(setUserToken({ access_token: access_token }))
+    }
   }, [access_token, dispatch])
 
 
-  return <>
-    {server_error.non_field_errors ? console.log(server_error.non_field_errors[0]) : ""}
-    {server_error.email ? console.log(server_error.email[0]) : ""}
-    {server_error.password ? console.log(server_error.password[0]) : ""}
+  return (
     <Box component='form' noValidate sx={{ mt: 1, p: 4 }} id='login-form' onSubmit={handleSubmit}>
-      <TextField margin='normal' required fullWidth id='email' name='email' label='Email Address' />
-      {server_error.email ? <Typography style={{ fontSize: 12, color: 'red', paddingLeft: 10 }}>{server_error.email[0]}</Typography> : ""}
-      <TextField margin='normal' required fullWidth id='password' name='password' label='Password' type='password' autoComplete='current-password' />
-      {server_error.password ? <Typography style={{ fontSize: 12, color: 'red', paddingLeft: 10 }}>{server_error.password[0]}</Typography> : ""}
+      {server_error && <Alert severity='error' sx={{ mb: 2 }}>{server_error}</Alert>}
+
+      <TextField
+        margin='normal'
+        required
+        fullWidth
+        id='email'
+        name='email'
+        label='Email Address'
+        autoFocus
+      />
+
+      <TextField
+        margin='normal'
+        required
+        fullWidth
+        id='password'
+        name='password'
+        label='Password'
+        type={showPassword ? 'text' : 'password'}
+        autoComplete='current-password'
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
       <Box textAlign='center'>
-        {isLoading ? <CircularProgress /> : <Button type='submit' variant='contained' sx={{ mt: 3, mb: 2, px: 5 }}>Login</Button>}
+        {isLoading ? (
+          <CircularProgress sx={{ mt: 3 }} />
+        ) : (
+          <Button type='submit' variant='contained' sx={{ mt: 3, mb: 2, px: 5, py: 1.2, fontWeight: 'bold' }}>
+            Login
+          </Button>
+        )}
       </Box>
-      <NavLink to='/sendpasswordresetemail' >Forgot Password ?</NavLink>
-      {server_error.non_field_errors ? <Alert severity='error'>{server_error.non_field_errors[0]}</Alert> : ''}
+
+      <Box sx={{ mt: 2, textAlign: 'right' }}>
+        <NavLink to='/sendpasswordresetemail' style={{ textDecoration: 'none', color: '#1976d2', fontSize: '0.9rem' }}>
+          Forgot Password?
+        </NavLink>
+      </Box>
     </Box>
-  </>;
+  );
 };
 
 export default UserLogin;
