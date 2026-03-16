@@ -1,6 +1,6 @@
-import { TextField, Button, Box, Alert, Typography, CircularProgress, InputAdornment, IconButton } from '@mui/material';
+import { TextField, Button, Box, Alert, CircularProgress, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { setUserToken } from '../../features/authSlice';
