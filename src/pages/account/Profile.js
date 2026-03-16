@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useGetLoggedUserQuery, useUpdateLoggedUserMutation } from '../../services/userAuthApi';
 import { getToken } from '../../services/LocalStorageService';
-import { PencilIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, UserCircleIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import ChangePassword from '../auth/ChangePassword';
+import { useSelector } from 'react-redux';
 
 const Profile = () => {
     const { access_token } = getToken();
     const { data, isError, isLoading, refetch } = useGetLoggedUserQuery(access_token);
     const [updateLoggedUser] = useUpdateLoggedUserMutation();
+    const { forcePasswordUpdate } = useSelector((state) => state.user);
 
     const [isEditing, setIsEditing] = useState(false);
+    const [activeTab, setActiveTab] = useState('profile');
     const [formData, setFormData] = useState({});
+
+    useEffect(() => {
+        if (forcePasswordUpdate) {
+            setActiveTab('security');
+        }
+    }, [forcePasswordUpdate]);
 
     useEffect(() => {
         if (data && data.profile) {
@@ -78,10 +88,44 @@ const Profile = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">My Profile</h1>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold text-gray-800">My Profile</h1>
+                {!forcePasswordUpdate && (
+                    <div className="flex bg-gray-200 rounded-lg p-1">
+                        <button
+                            onClick={() => setActiveTab('profile')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition ${activeTab === 'profile' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            <UserCircleIcon className="w-4 h-4 inline mr-2" />
+                            Profile
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('security')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition ${activeTab === 'security' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            <ShieldCheckIcon className="w-4 h-4 inline mr-2" />
+                            Security
+                        </button>
+                    </div>
+                )}
+            </div>
 
-            {/* Approval Status Banner */}
-            {profile && !profile.isApproved && (
+            {forcePasswordUpdate && (
+                <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                    <p className="text-sm text-red-700 font-bold">
+                        First Login Detected: You must change your password before you can access any other features.
+                    </p>
+                </div>
+            )}
+
+            {activeTab === 'security' ? (
+                <div className="bg-white shadow rounded-lg p-6">
+                    <ChangePassword />
+                </div>
+            ) : (
+                <>
+                        {/* Approval Status Banner */}
+                        {profile && !profile.isApproved && (
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                     <div className="flex">
                         <div className="flex-shrink-0">
@@ -341,8 +385,10 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
-        </div>
-    );
+                </>
+            )}
+</div>
+);
 };
 
 export default Profile;

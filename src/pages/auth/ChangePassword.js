@@ -12,6 +12,7 @@ const ChangePassword = () => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const actualData = {
+      old_password: data.get('old_password'),
       password: data.get('password'),
       password2: data.get('password2'),
     }
@@ -21,22 +22,20 @@ const ChangePassword = () => {
       setServerError(res.error.data?.errors || {})
     }
     if (res.data) {
-      console.log(res.data)
       setServerError({})
       setServerMsg(res.data)
       document.getElementById("password-change-form").reset();
     }
 
   };
-  // Getting User Data from Redux Store
-  // const myData = useSelector(state => state.user)
-  // console.log("Change Password", myData)
 
   return (
     <Grid container justifyContent='center' className="pt-8">
       <Grid item sm={6} xs={12}>
         <h1>Change Password</h1>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} id="password-change-form">
+          <TextField margin="normal" required fullWidth name="old_password" label="Current Password" type="password" id="old_password" />
+          {server_error.old_password ? <Typography style={{ fontSize: 12, color: 'red', paddingLeft: 10 }}>{server_error.old_password[0]}</Typography> : ""}
           <TextField margin="normal" required fullWidth name="password" label="New Password" type="password" id="password" />
           {server_error.password ? <Typography style={{ fontSize: 12, color: 'red', paddingLeft: 10 }}>{server_error.password[0]}</Typography> : ""}
           <TextField margin="normal" required fullWidth name="password2" label="Confirm New Password" type="password" id="password2" />

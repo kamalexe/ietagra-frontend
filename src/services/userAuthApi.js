@@ -90,9 +90,14 @@ export const userAuthApi = createApi({
         return {
           url: 'changepassword',
           method: 'POST',
-          body: actualData,
+          body: {
+            old_password: actualData.old_password,
+            password: actualData.password,
+            password_confirmation: actualData.password_confirmation || actualData.password2,
+          },
           headers: {
             'authorization': `Bearer ${access_token}`,
+            'Content-type': 'application/json',
           }
         }
       }

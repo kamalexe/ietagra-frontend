@@ -113,7 +113,7 @@ const AdminLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { access_token } = useSelector((state) => state.auth);
-  const { role, name, email, permissions } = useSelector((state) => state.user);
+  const { role, name, email, permissions, forcePasswordUpdate } = useSelector((state) => state.user);
 
   // Fetch user info if access_token is present
   const { data, isSuccess, isLoading } = useGetLoggedUserQuery(access_token, {
@@ -128,7 +128,8 @@ const AdminLayout = () => {
         role: data.user.role,
         department: data.user.department,
         id: data.user._id,
-        permissions: data.user.permissions
+        permissions: data.user.permissions,
+        forcePasswordUpdate: data.user.forcePasswordUpdate
       }));
 
       // Auto-register account for switching
@@ -192,10 +193,18 @@ const AdminLayout = () => {
     return <Navigate to="/login" replace />;
   }
 
+  // Handle Forced Password Update
+  if (forcePasswordUpdate && location.pathname !== '/admin/profile') {
+    return <Navigate to="/admin/profile" replace />;
+  }
+
 
 
   // Function to check permission for a single item
   const hasAccess = (item) => {
+    if (forcePasswordUpdate) {
+      return item.href === '/admin/profile' || item.name === 'My Profile';
+    }
     if (role === 'admin' || role === 'super_admin') return true;
     if (item.permission) {
       return permissions && permissions.includes(item.permission);

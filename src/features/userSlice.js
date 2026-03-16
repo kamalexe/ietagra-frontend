@@ -7,7 +7,8 @@ const initialState = {
   role: "",
   department: null,
   id: null,
-  permissions: []
+  permissions: [],
+  forcePasswordUpdate: false
 }
 
 export const userSlice = createSlice({
@@ -22,6 +23,7 @@ export const userSlice = createSlice({
       state.department = action.payload.department
       state.id = action.payload.id
       state.permissions = action.payload.permissions || []
+      state.forcePasswordUpdate = action.payload.forcePasswordUpdate || false
     },
     unsetUserInfo: (state, action) => {
       state.email = ""
@@ -31,6 +33,7 @@ export const userSlice = createSlice({
       state.department = null
       state.id = null
       state.permissions = []
+      state.forcePasswordUpdate = false
     },
   }
 })
