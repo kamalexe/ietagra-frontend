@@ -10,7 +10,8 @@ const CATEGORIES = [
     { id: 'placement', label: 'Placements' },
     { id: 'project', label: 'Projects' },
     { id: 'mooc', label: 'MOOC Courses' },
-    { id: 'achievement', label: 'Achievements' }
+    { id: 'achievement', label: 'Achievements' },
+    { id: 'other', label: 'General/Other Records' }
 ];
 
 const SAMPLE_HEADERS = {
@@ -18,7 +19,8 @@ const SAMPLE_HEADERS = {
     placement: ['studentName', 'batch', 'branch', 'enrollmentNo', 'company', 'package', 'designation'],
     project: ['studentName', 'batch', 'branch', 'enrollmentNo', 'projectName', 'technology', 'supervisor', 'githubLink', 'pptLink'],
     mooc: ['studentName', 'batch', 'branch', 'enrollmentNo', 'courseName', 'platform', 'score'],
-    achievement: ['studentName', 'batch', 'branch', 'enrollmentNo', 'title', 'description', 'date']
+    achievement: ['studentName', 'batch', 'branch', 'enrollmentNo', 'title', 'description', 'date'],
+    other: ['studentName', 'batch', 'branch', 'enrollmentNo', 'Class', 'Section', 'Admission No', 'Bus Number', 'Blood Group', 'Emergency Name', 'Emergency Phone']
 };
 
 const StudentDataManager = () => {
