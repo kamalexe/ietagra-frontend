@@ -30,6 +30,11 @@ const ChangePassword = () => {
       setServerError("")
       setServerMsg(res.data.message || "Password updated successfully")
       document.getElementById("password-change-form").reset();
+
+      // Reload window after a short delay to refresh the app state and enable UI
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     }
   };
 
