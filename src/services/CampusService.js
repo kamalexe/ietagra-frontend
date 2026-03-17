@@ -97,6 +97,21 @@ const CampusService = {
 
         const resData = await response.json();
         return resData;
+    },
+
+    async reorderCampuses(orders) {
+        const response = await fetch(`${API_BASE_URL}/campuses/reorder`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ orders })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || error.message || 'Failed to reorder campuses');
+        }
+
+        return await response.json();
     }
 };
 

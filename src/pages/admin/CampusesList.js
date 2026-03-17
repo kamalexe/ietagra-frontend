@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, BuildingLibraryIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, BuildingLibraryIcon, XMarkIcon, Cog6ToothIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CampusService from '../../services/CampusService';
 
 const CampusesList = () => {
@@ -24,6 +25,36 @@ const CampusesList = () => {
             setCampuses(sortedData);
         } catch (err) {
             console.error("Failed to load campuses", err);
+        }
+    };
+
+    const onDragEnd = async (result) => {
+        if (!result.destination) return;
+
+        const items = Array.from(campuses);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        // Update local state immediately
+        const updatedItems = items.map((item, index) => ({
+            ...item,
+            order: index
+        }));
+        setCampuses(updatedItems);
+
+        // Prepare orders for sync
+        const orders = updatedItems.map((item, index) => ({
+            id: item._id,
+            order: index
+        }));
+
+        try {
+            await CampusService.reorderCampuses(orders);
+            // toast.success("Order updated"); // If toast is available, but alert might be too annoying here
+        } catch (error) {
+            console.error("Failed to update order", error);
+            alert("Failed to save new order");
+            loadCampuses(); // Revert on failure
         }
     };
 
@@ -133,43 +164,72 @@ const CampusesList = () => {
             </div>
 
             <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campus Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {campuses.map((campus) => (
-                            <tr key={campus._id}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{campus.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">/campus/{campus.slug}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{campus.address}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{campus.order || 0}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div className="flex justify-end space-x-3">
-                                        <button onClick={() => openEditModal(campus)} className="text-indigo-600 hover:text-indigo-900">
-                                            <Cog6ToothIcon className="h-5 w-5" />
-                                        </button>
-                                        <Link to={`/admin/pages/${encodeURIComponent(`campus/${campus.slug}`)}`} className="text-blue-600 hover:text-blue-900">
-                                            <PencilSquareIcon className="h-5 w-5" />
-                                        </Link>
-                                        <a href={`/campus/${campus.slug}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600">
-                                            <EyeIcon className="h-5 w-5" />
-                                        </a>
-                                        <button onClick={() => handleDelete(campus._id, campus.slug)} className="text-red-400 hover:text-red-600">
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                </td>
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-3 py-3 w-10"></th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campus Name</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase text-center">Order</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <Droppable droppableId="campuses">
+                            {(provided) => (
+                                <tbody
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    className="bg-white divide-y divide-gray-200"
+                                >
+                                    {campuses.map((campus, index) => (
+                                        <Draggable key={campus._id} draggableId={campus._id} index={index}>
+                                            {(provided, snapshot) => (
+                                                <tr
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    className={`${snapshot.isDragging ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                                                >
+                                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-400">
+                                                        <div {...provided.dragHandleProps} className="cursor-move">
+                                                            <Bars3Icon className="h-5 w-5" />
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{campus.name}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">/campus/{campus.slug}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{campus.address}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                            {campus.order || 0}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                        <div className="flex justify-end space-x-3">
+                                                            <button onClick={() => openEditModal(campus)} className="text-indigo-600 hover:text-indigo-900">
+                                                                <Cog6ToothIcon className="h-5 w-5" />
+                                                            </button>
+                                                            <Link to={`/admin/pages/${encodeURIComponent(`campus/${campus.slug}`)}`} className="text-blue-600 hover:text-blue-900">
+                                                                <PencilSquareIcon className="h-5 w-5" />
+                                                            </Link>
+                                                            <a href={`/campus/${campus.slug}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600">
+                                                                <EyeIcon className="h-5 w-5" />
+                                                            </a>
+                                                            <button onClick={() => handleDelete(campus._id, campus.slug)} className="text-red-400 hover:text-red-600">
+                                                                <TrashIcon className="h-5 w-5" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </tbody>
+                            )}
+                        </Droppable>
+                    </table>
+                </DragDropContext>
             </div>
 
             {isModalOpen && (
