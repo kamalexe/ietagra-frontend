@@ -68,7 +68,9 @@ const FacultyList = () => {
         specialization: '',
         experience: '',
         skills: '',
-        achievements: ''
+        achievements: '',
+        isPublic: true,
+        isApproved: false
     });
 
     const handleOpenModal = (member = null) => {
@@ -243,7 +245,7 @@ const FacultyList = () => {
                 </div>
             </div>
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+            <div className="bg-white shadow-md rounded-lg overflow-x-auto border border-gray-200">
                 <DragDropContext onDragEnd={handleDragEnd}>
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
@@ -252,6 +254,8 @@ const FacultyList = () => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialization</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Public</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -297,6 +301,12 @@ const FacultyList = () => {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-blue-600 font-semibold">{person.department?.name || person.department}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {person.specialization || '-'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {person.experience || '-'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <button
@@ -432,6 +442,32 @@ const FacultyList = () => {
                                             <label className={`mt-1 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-gray-50 hover:bg-gray-100 cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                                 {uploading ? 'Uploading...' : 'Upload'}
                                                 <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center">
+                                            <input
+                                                id="isPublic"
+                                                type="checkbox"
+                                                checked={formData.isPublic}
+                                                onChange={e => setFormData({ ...formData, isPublic: e.target.checked })}
+                                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            />
+                                            <label htmlFor="isPublic" className="ml-2 block text-sm font-medium text-gray-700">
+                                                Public (Visible on Frontend)
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <input
+                                                id="isApproved"
+                                                type="checkbox"
+                                                checked={formData.isApproved}
+                                                onChange={e => setFormData({ ...formData, isApproved: e.target.checked })}
+                                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            />
+                                            <label htmlFor="isApproved" className="ml-2 block text-sm font-medium text-gray-700">
+                                                Approved
                                             </label>
                                         </div>
                                     </div>
