@@ -193,9 +193,16 @@ const SectionForm = ({ section, onClose, onSave }) => {
               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             >
               <option value="">Select...</option>
-              {field.options.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
+              {field.options.map((opt, i) => {
+                const isObject = typeof opt === 'object' && opt !== null;
+                const optValue = isObject ? opt.value : opt;
+                const optLabel = isObject ? opt.label : opt;
+                return (
+                  <option key={i} value={optValue}>
+                    {optLabel}
+                  </option>
+                );
+              })}
             </select>
           </div>
         );
