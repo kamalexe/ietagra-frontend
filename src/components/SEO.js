@@ -8,10 +8,30 @@ export default function SEO({
     name = 'IET Agra',
     type = 'website',
     image = '/logo192.png', // Fallback image if needed, ensure this path is correct or use an import
-    url // Default to current URL handling inside component
+    url, // Default to current URL handling inside component
+    schemaType = 'CollegeOrUniversity',
+    schemaData = {}
 }) {
     // If url is not provided, use window.location.href safely (check for window existence for SSR compatibility)
     const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+
+    // AI SEO: Structured Data (JSON-LD)
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": schemaType,
+        "name": title,
+        "description": description,
+        "url": currentUrl,
+        ...schemaData
+    };
+
+    if (schemaType === 'CollegeOrUniversity' || schemaType === 'Department') {
+        structuredData.parentOrganization = {
+            "@type": "CollegeOrUniversity",
+            "name": "Institute of Engineering & Technology, Agra",
+            "url": "https://ietagra.iotabuild.in"
+        };
+    }
 
     return (
         <Helmet>
@@ -19,6 +39,11 @@ export default function SEO({
             <title>{title} | IET Agra</title>
             <meta name='description' content={description} />
             <meta name='keywords' content={keywords} />
+
+            {/* AI SEO: Dynamic JSON-LD */}
+            <script type="application/ld+json">
+                {JSON.stringify(structuredData)}
+            </script>
 
             {/* Open Graph tags */}
             <meta property="og:type" content={type} />

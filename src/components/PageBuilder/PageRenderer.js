@@ -45,8 +45,10 @@ const  PageRenderer = ({ slug, data }) => {
   return (
     <div className="page-renderer">
       <SEO
-        title={pageData.title}
-        description={pageData.description || `Page for ${pageData.title}`}
+        title={pageData.metaTitle || pageData.title}
+        description={pageData.metaDescription || `Explore ${pageData.title} at Institute of Engineering & Technology, Agra.`}
+        keywords={pageData.metaKeywords}
+        schemaType={pageData.type === 'department' ? 'Department' : (pageData.type === 'course_page' ? 'Course' : 'CollegeOrUniversity')}
       />
       {pageData.sections
         .sort((a, b) => a.order - b.order)

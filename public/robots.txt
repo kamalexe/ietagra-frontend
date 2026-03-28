@@ -1,10 +1,8 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow: /admin/
+Allow: /
+Disallow: /admin
+Disallow: /api
 Disallow: /login
-Disallow: /changepassword
-Disallow: /sendpasswordresetemail
 Disallow: /dashboard
-Disallow: /profile
 
 Sitemap: https://ietagra.iotabuild.in/sitemap.xml
