@@ -1,7 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon, TrophyIcon, CurrencyRupeeIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
+import axiosInstance from '../../../api/axiosConfig';
 
-const DesignTwentyFive = ({ id, title, description, subtitle, items = [] }) => {
+const DesignTwentyFive = ({ id, title, description, subtitle, items = [], dataSource }) => {
+    // State for dynamic data
+    const [fetchedItems, setFetchedItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+
     // State for filters
     const [filters, setFilters] = useState({
         company: '',
@@ -10,33 +15,62 @@ const DesignTwentyFive = ({ id, title, description, subtitle, items = [] }) => {
         sort: 'highest' // 'highest', 'lowest'
     });
 
+    // Fetch Data
+    useEffect(() => {
+        if (dataSource) {
+            const fetchData = async () => {
+                setLoading(true);
+                try {
+                    const response = await axiosInstance.get(`/student-records?category=${dataSource}`);
+                    if (response.data.success) {
+                        const transformed = response.data.data.map(rec => ({
+                            ...rec,
+                            ...rec.metadata,
+                            key: rec._id
+                        }));
+                        setFetchedItems(transformed);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch dynamic placement data:", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchData();
+        } else {
+            setFetchedItems(items || []);
+        }
+    }, [dataSource, items]);
+
     // Helper to parse package string to number for sorting (e.g., "12 LPA" -> 12)
     const parsePackage = (pkgStr) => {
         if (!pkgStr) return 0;
-        const match = pkgStr.match(/(\d+(\.\d+)?)/);
+        // pkgStr might be a number or a string like "12 LPA"
+        const pkgValue = String(pkgStr);
+        const match = pkgValue.match(/(\d+(\.\d+)?)/);
         return match ? parseFloat(match[0]) : 0;
     };
 
     // Calculate Stats
     const stats = useMemo(() => {
-        if (!items.length) return null;
-        const packages = items.map(i => parsePackage(i.package));
+        if (!fetchedItems.length) return null;
+        const packages = fetchedItems.map(i => parsePackage(i.package));
         const highest = Math.max(...packages);
-        const avg = packages.reduce((a, b) => a + b, 0) / packages.length;
+        const avg = packages.reduce((a, b) => a + b, 0) / fetchedItems.length;
         return {
             highest: highest.toFixed(2),
             average: avg.toFixed(2),
-            totalPlaced: items.length
+            totalPlaced: fetchedItems.length
         };
-    }, [items]);
+    }, [fetchedItems]);
 
     // Extract unique values for dropdowns
-    const uniqueCompanies = useMemo(() => [...new Set(items.map(item => item.company).filter(Boolean))], [items]);
-    const uniqueBranches = useMemo(() => [...new Set(items.map(item => item.branch).filter(Boolean))], [items]);
+    const uniqueCompanies = useMemo(() => [...new Set(fetchedItems.map(item => item.company).filter(Boolean))], [fetchedItems]);
+    const uniqueBranches = useMemo(() => [...new Set(fetchedItems.map(item => item.branch).filter(Boolean))], [fetchedItems]);
 
     // Filter and Sort logic
     const filteredItems = useMemo(() => {
-        let result = items.filter(item => {
+        let result = fetchedItems.filter(item => {
             const matchesCompany = !filters.company || item.company === filters.company;
             const matchesBranch = !filters.branch || item.branch === filters.branch;
             const matchesSearch = !filters.search || 
@@ -54,11 +88,13 @@ const DesignTwentyFive = ({ id, title, description, subtitle, items = [] }) => {
         });
 
         return result;
-    }, [items, filters]);
+    }, [fetchedItems, filters]);
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
+
+    if (loading) return <div className="p-12 text-center text-gray-500 animate-pulse bg-blue-50">Loading Placements...</div>;
 
     return (
         <section id={id} className="py-16 bg-gradient-to-br from-blue-50 to-white">

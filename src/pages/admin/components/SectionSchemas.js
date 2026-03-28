@@ -273,9 +273,16 @@ const schemas = {
         { name: 'description', label: 'Description', type: 'textarea' },
         {
             name: 'dataSource',
-            label: 'Data Source (Dynamic)',
+            label: 'Data Source (Dynamic Library)',
             type: 'select',
-            options: ['', 'project', 'gate', 'placement', 'mooc', 'achievement']
+            options: [
+                { label: 'Manual Entry (Use list below)', value: '' },
+                { label: 'Student Projects', value: 'project' },
+                { label: 'GATE Qualifiers', value: 'gate' },
+                { label: 'Placement Records', value: 'placement' },
+                { label: 'MOOC Courses', value: 'mooc' },
+                { label: 'Student Achievements', value: 'achievement' }
+            ]
         },
         {
             name: 'projects',
@@ -455,9 +462,21 @@ const schemas = {
         { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Student MOOC Achievements' },
         { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Online Certifications' },
         { name: 'description', label: 'Description', type: 'textarea' },
+        { 
+            name: 'dataSource',
+            label: 'Data Source (Dynamic)',
+            type: 'select',
+            options: [
+                { label: 'None (Use Manual Items)', value: '' },
+                { label: 'MOOC Courses', value: 'mooc' },
+                { label: 'Achievements', value: 'achievement' },
+                { label: 'Placements', value: 'placement' },
+                { label: 'Student Projects', value: 'project' }
+            ]
+        },
         {
             name: 'items',
-            label: 'MOOC Items List',
+            label: 'MOOC Items List (Manual)',
             type: 'list',
             itemSchema: [
                 { name: 'studentName', label: 'Student Name', type: 'text' },
@@ -476,8 +495,20 @@ const schemas = {
         { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Celebrating Success Stories' },
         { name: 'description', label: 'Description', type: 'textarea' },
         {
+            name: 'dataSource',
+            label: 'Data Source (Dynamic)',
+            type: 'select',
+            options: [
+                { label: 'None (Use Manual Items)', value: '' },
+                { label: 'Placements', value: 'placement' },
+                { label: 'Achievements', value: 'achievement' },
+                { label: 'MOOC Courses', value: 'mooc' },
+                { label: 'Student Projects', value: 'project' }
+            ]
+        },
+        {
             name: 'items',
-            label: 'Placement Items List',
+            label: 'Placement Items List (Manual)',
             type: 'list',
             itemSchema: [
                 { name: 'studentName', label: 'Student Name', type: 'text' },
@@ -486,6 +517,38 @@ const schemas = {
                 { name: 'company', label: 'Company', type: 'text' },
                 { name: 'package', label: 'Package (e.g. 10 LPA)', type: 'text' },
                 { name: 'designation', label: 'Designation', type: 'text' }
+            ]
+        }
+    ],
+    'design_twenty_six': [
+        { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Hall of Fame' },
+        { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Recognizing Excellence' },
+        { name: 'description', label: 'Description', type: 'textarea' },
+        {
+            name: 'dataSource',
+            label: 'Data Source (Dynamic Library)',
+            type: 'select',
+            options: [
+                { label: 'Manual Entry (Use list below)', value: '' },
+                { label: 'Student Achievements', value: 'achievement' },
+                { label: 'Student Projects', value: 'project' },
+                { label: 'GATE Qualifiers', value: 'gate' },
+                { label: 'MOOC Courses', value: 'mooc' },
+                { label: 'Placement Records', value: 'placement' }
+            ]
+        },
+        {
+            name: 'items',
+            label: 'Achievements List (Manual)',
+            type: 'list',
+            itemSchema: [
+                { name: 'title', label: 'Achievement Title', type: 'text' },
+                { name: 'studentName', label: 'Student Name', type: 'text' },
+                { name: 'date', label: 'Date (e.g. Feb 2024)', type: 'text' },
+                { name: 'batch', label: 'Batch', type: 'text' },
+                { name: 'branch', label: 'Branch', type: 'text' },
+                { name: 'description', label: 'Short Description', type: 'textarea' }
             ]
         }
     ],
@@ -527,24 +590,11 @@ const schemas = {
         { name: 'themeColor', label: 'Theme Background Color (Tailwind class, e.g. bg-red-600)', type: 'text' },
         { name: 'speed', label: 'Animation Speed (e.g. 20s)', type: 'text' }
     ],
-    'design_twenty_six': [
+    'design_thirty_four': [
         { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
-        { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Hall of Fame' },
-        { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Recognizing Excellence' },
-        { name: 'description', label: 'Description', type: 'textarea' },
-        {
-            name: 'items',
-            label: 'Achievements List',
-            type: 'list',
-            itemSchema: [
-                { name: 'title', label: 'Achievement Title', type: 'text' },
-                { name: 'studentName', label: 'Student Name', type: 'text' },
-                { name: 'date', label: 'Date (e.g. Feb 2024)', type: 'text' },
-                { name: 'batch', label: 'Batch', type: 'text' },
-                { name: 'branch', label: 'Branch', type: 'text' },
-                { name: 'description', label: 'Short Description', type: 'textarea' }
-            ]
-        }
+        { name: 'title', label: 'Section Title', type: 'text' },
+        { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+        { name: 'badge', label: 'Badge Text', type: 'text' }
     ],
     'design_thirty_five': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Form Title', type: 'text', placeholder: 'Company Registration' },

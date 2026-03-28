@@ -1,7 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon, StarIcon, AcademicCapIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import axiosInstance from '../../../api/axiosConfig';
+const DesignTwentySix = ({ id, title, description, subtitle, items = [], dataSource }) => {
+    // State for dynamic data
+    const [fetchedItems, setFetchedItems] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-const DesignTwentySix = ({ id, title, description, subtitle, items = [] }) => {
     // State for filters
     const [filters, setFilters] = useState({
         batch: '',
@@ -9,14 +13,41 @@ const DesignTwentySix = ({ id, title, description, subtitle, items = [] }) => {
         search: ''
     });
 
+    // Fetch Data
+    useEffect(() => {
+        if (dataSource) {
+            const fetchData = async () => {
+                setLoading(true);
+                try {
+                    const response = await axiosInstance.get(`/student-records?category=${dataSource}`);
+                    if (response.data.success) {
+                        const transformed = response.data.data.map(rec => ({
+                            ...rec,
+                            ...rec.metadata,
+                            key: rec._id
+                        }));
+                        setFetchedItems(transformed);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch dynamic achievement data:", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchData();
+        } else {
+            setFetchedItems(items || []);
+        }
+    }, [dataSource, items]);
+
     // Extract unique values for dropdowns
-    const uniqueBatches = useMemo(() => [...new Set(items.map(item => item.batch).filter(Boolean))], [items]);
-    const uniqueBranches = useMemo(() => [...new Set(items.map(item => item.branch).filter(Boolean))], [items]);
+    const uniqueBatches = useMemo(() => [...new Set(fetchedItems.map(item => item.batch).filter(Boolean))], [fetchedItems]);
+    const uniqueBranches = useMemo(() => [...new Set(fetchedItems.map(item => item.branch).filter(Boolean))], [fetchedItems]);
 
     // Filter logic
     const filteredItems = useMemo(() => {
-        return items.filter(item => {
-            const matchesBatch = !filters.batch || item.batch === filters.batch;
+        return fetchedItems.filter(item => {
+            const matchesBatch = !filters.batch || String(item.batch) === String(filters.batch);
             const matchesBranch = !filters.branch || item.branch === filters.branch;
             const matchesSearch = !filters.search || 
                 item.title?.toLowerCase().includes(filters.search.toLowerCase()) || 
@@ -24,11 +55,13 @@ const DesignTwentySix = ({ id, title, description, subtitle, items = [] }) => {
             
             return matchesBatch && matchesBranch && matchesSearch;
         });
-    }, [items, filters]);
+    }, [fetchedItems, filters]);
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
+
+    if (loading) return <div className="p-12 text-center text-gray-500 animate-pulse bg-white">Loading Achievements...</div>;
 
     return (
         <section id={id} className="py-16 bg-white">
