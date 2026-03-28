@@ -44,17 +44,24 @@ const COLUMN_CONFIG = {
         { key: 'platform', label: 'Platform', render: (val) => <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">{val}</span> },
         { key: 'score', label: 'Score' }
     ],
-    // Default fallback
     achievement: [
         { key: 'batch', label: 'Batch' },
         { key: 'studentName', label: 'Student Name' },
         { key: 'title', label: 'Title', className: 'font-bold' },
         { key: 'description', label: 'Description' },
         { key: 'date', label: 'Date' }
+    ],
+    other: [
+        { key: 'studentName', label: 'Student Name', className: 'font-medium text-gray-900' },
+        { key: 'batch', label: 'Batch' },
+        { key: 'branch', label: 'Branch' },
+        { key: 'enrollmentNo', label: 'Enrollment No.' },
+        { key: 'Class', label: 'Class' },
+        { key: 'Section', label: 'Section' }
     ]
 };
 
-const DesignSixteen = ({ id, title, description, projects, dataSource }) => {
+const DesignSixteen = ({ id, title, description, projects, dataSource, departmentId }) => {
     // State
     const [fetchedData, setFetchedData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -68,7 +75,10 @@ const DesignSixteen = ({ id, title, description, projects, dataSource }) => {
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const response = await axiosInstance.get(`/student-records?category=${dataSource}`);
+                    let url = `/student-records?category=${dataSource}`;
+                    if (departmentId) url += `&department=${departmentId}`;
+
+                    const response = await axiosInstance.get(url);
                     const resData = response.data;
                     if (resData.success) {
                         // Flatten metadata into the row object for easier table rendering
@@ -89,7 +99,7 @@ const DesignSixteen = ({ id, title, description, projects, dataSource }) => {
         } else if (Array.isArray(projects)) {
             setFetchedData(projects);
         }
-    }, [dataSource, projects]);
+    }, [dataSource, projects, departmentId]);
 
     // Derived Data (Filtering)
     // Derived Data (Filtering)

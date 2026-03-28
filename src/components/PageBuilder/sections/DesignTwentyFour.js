@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import axiosInstance from '../../../api/axiosConfig';
-const DesignTwentyFour = ({ id, title, description, subtitle, items = [], dataSource }) => {
+const DesignTwentyFour = ({ id, title, description, subtitle, items = [], dataSource, departmentId }) => {
     // State for dynamic data
     const [fetchedItems, setFetchedItems] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -20,7 +20,9 @@ const DesignTwentyFour = ({ id, title, description, subtitle, items = [], dataSo
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const response = await axiosInstance.get(`/student-records?category=${dataSource}`);
+                    let url = `/student-records?category=${dataSource}`;
+                    if (departmentId) url += `&department=${departmentId}`;
+                    const response = await axiosInstance.get(url);
                     if (response.data.success) {
                         const transformed = response.data.data.map(rec => ({
                             ...rec,
@@ -39,7 +41,7 @@ const DesignTwentyFour = ({ id, title, description, subtitle, items = [], dataSo
         } else {
             setFetchedItems(items || []);
         }
-    }, [dataSource, items]);
+    }, [dataSource, items, departmentId]);
 
     // Extract unique values for dropdowns
     const uniqueBatches = useMemo(() => [...new Set(fetchedItems.map(item => item.batch).filter(Boolean))], [fetchedItems]);

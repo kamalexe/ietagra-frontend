@@ -271,6 +271,7 @@ const schemas = {
     'design_sixteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
+        { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
         {
             name: 'dataSource',
             label: 'Data Source (Dynamic Library)',
@@ -281,7 +282,8 @@ const schemas = {
                 { label: 'GATE Qualifiers', value: 'gate' },
                 { label: 'Placement Records', value: 'placement' },
                 { label: 'MOOC Courses', value: 'mooc' },
-                { label: 'Student Achievements', value: 'achievement' }
+                { label: 'Student Achievements', value: 'achievement' },
+                { label: 'General / Other Records', value: 'other' }
             ]
         },
         {
@@ -462,6 +464,7 @@ const schemas = {
         { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Student MOOC Achievements' },
         { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Online Certifications' },
         { name: 'description', label: 'Description', type: 'textarea' },
+        { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
         { 
             name: 'dataSource',
             label: 'Data Source (Dynamic)',
@@ -471,7 +474,8 @@ const schemas = {
                 { label: 'MOOC Courses', value: 'mooc' },
                 { label: 'Achievements', value: 'achievement' },
                 { label: 'Placements', value: 'placement' },
-                { label: 'Student Projects', value: 'project' }
+                { label: 'Student Projects', value: 'project' },
+                { label: 'Common Student Data', value: 'other' }
             ]
         },
         {
@@ -494,6 +498,7 @@ const schemas = {
         { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Placement Highlights' },
         { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Celebrating Success Stories' },
         { name: 'description', label: 'Description', type: 'textarea' },
+        { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
         {
             name: 'dataSource',
             label: 'Data Source (Dynamic)',
@@ -503,7 +508,8 @@ const schemas = {
                 { label: 'Placements', value: 'placement' },
                 { label: 'Achievements', value: 'achievement' },
                 { label: 'MOOC Courses', value: 'mooc' },
-                { label: 'Student Projects', value: 'project' }
+                { label: 'Student Projects', value: 'project' },
+                { label: 'Common Student Data', value: 'other' }
             ]
         },
         {
@@ -525,6 +531,7 @@ const schemas = {
         { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Hall of Fame' },
         { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Recognizing Excellence' },
         { name: 'description', label: 'Description', type: 'textarea' },
+        { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
         {
             name: 'dataSource',
             label: 'Data Source (Dynamic Library)',
@@ -535,7 +542,8 @@ const schemas = {
                 { label: 'Student Projects', value: 'project' },
                 { label: 'GATE Qualifiers', value: 'gate' },
                 { label: 'MOOC Courses', value: 'mooc' },
-                { label: 'Placement Records', value: 'placement' }
+                { label: 'Placement Records', value: 'placement' },
+                { label: 'Common Student Data', value: 'other' }
             ]
         },
         {
@@ -594,7 +602,8 @@ const schemas = {
         { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
-        { name: 'badge', label: 'Badge Text', type: 'text' }
+        { name: 'badge', label: 'Badge Text', type: 'text' },
+        { name: 'departmentId', label: 'Limit to Department', type: 'department_select' }
     ],
     'design_thirty_five': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Form Title', type: 'text', placeholder: 'Company Registration' },

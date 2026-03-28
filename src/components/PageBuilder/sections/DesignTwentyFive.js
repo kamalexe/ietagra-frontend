@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon, TrophyIcon, CurrencyRupeeIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
 import axiosInstance from '../../../api/axiosConfig';
 
-const DesignTwentyFive = ({ id, title, description, subtitle, items = [], dataSource }) => {
+const DesignTwentyFive = ({ id, title, description, subtitle, items = [], dataSource, departmentId }) => {
     // State for dynamic data
     const [fetchedItems, setFetchedItems] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -21,7 +21,9 @@ const DesignTwentyFive = ({ id, title, description, subtitle, items = [], dataSo
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const response = await axiosInstance.get(`/student-records?category=${dataSource}`);
+                    let url = `/student-records?category=${dataSource}`;
+                    if (departmentId) url += `&department=${departmentId}`;
+                    const response = await axiosInstance.get(url);
                     if (response.data.success) {
                         const transformed = response.data.data.map(rec => ({
                             ...rec,
@@ -40,7 +42,7 @@ const DesignTwentyFive = ({ id, title, description, subtitle, items = [], dataSo
         } else {
             setFetchedItems(items || []);
         }
-    }, [dataSource, items]);
+    }, [dataSource, items, departmentId]);
 
     // Helper to parse package string to number for sorting (e.g., "12 LPA" -> 12)
     const parsePackage = (pkgStr) => {
