@@ -6,6 +6,14 @@ import FacultyService from '../../../services/FacultyService';
 const DesignTwelve = ({ id, title, items: initialItems = [], departmentId }) => {
     const [items, setItems] = useState(initialItems);
     const [loading, setLoading] = useState(false);
+    const [expandedItems, setExpandedItems] = useState({}); // Track which items are expanded
+
+    const toggleExpand = (index) => {
+        setExpandedItems(prev => ({
+            ...prev,
+            [index]: !prev[index]
+        }));
+    };
 
     useEffect(() => {
         // If no items provided manually, and we have a departmentId, fetch dynamically
@@ -104,7 +112,7 @@ const DesignTwelve = ({ id, title, items: initialItems = [], departmentId }) => 
                                             Achievements:
                                         </h5>
                                         <ul className="space-y-2">
-                                            {item.achievements.slice(0, 2).map((ach, idx) => (
+                                            {(expandedItems[index] ? item.achievements : item.achievements.slice(0, 2)).map((ach, idx) => (
                                                 <li key={idx} className="flex items-start">
                                                     <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 mt-1.5 mr-2 flex-shrink-0"></span>
                                                     <span className="text-sm text-gray-600">{ach}</span>
@@ -112,11 +120,14 @@ const DesignTwelve = ({ id, title, items: initialItems = [], departmentId }) => 
                                             ))}
                                         </ul>
                                         {item.totalAchievements > 2 && (
-                                            <button className="mt-3 text-sm text-white bg-blue-500 hover:bg-blue-600 font-medium flex items-center mx-auto px-3 py-1 rounded-md transition-colors w-full justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <button
+                                                onClick={() => toggleExpand(index)}
+                                                className="mt-3 text-sm text-white bg-blue-500 hover:bg-blue-600 font-medium flex items-center mx-auto px-3 py-1 rounded-md transition-colors w-full justify-center"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-1 transition-transform ${expandedItems[index] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                                 </svg>
-                                                Show all ({item.totalAchievements})
+                                                {expandedItems[index] ? 'Show less' : `Show all (${item.totalAchievements})`}
                                             </button>
                                         )}
                                     </div>
