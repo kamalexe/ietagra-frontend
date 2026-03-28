@@ -450,6 +450,45 @@ const schemas = {
             ]
         }
     ],
+    'design_twenty_four': [
+        { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Student MOOC Achievements' },
+        { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Online Certifications' },
+        { name: 'description', label: 'Description', type: 'textarea' },
+        {
+            name: 'items',
+            label: 'MOOC Items List',
+            type: 'list',
+            itemSchema: [
+                { name: 'studentName', label: 'Student Name', type: 'text' },
+                { name: 'enrollmentNo', label: 'Enrollment No.', type: 'text' },
+                { name: 'courseName', label: 'Course Name', type: 'text' },
+                { name: 'platform', label: 'Platform (e.g. NPTEL, Coursera)', type: 'text' },
+                { name: 'score', label: 'Score', type: 'text' },
+                { name: 'batch', label: 'Batch', type: 'text' },
+                { name: 'branch', label: 'Branch', type: 'text' }
+            ]
+        }
+    ],
+    'design_twenty_five': [
+        { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Placement Highlights' },
+        { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Celebrating Success Stories' },
+        { name: 'description', label: 'Description', type: 'textarea' },
+        {
+            name: 'items',
+            label: 'Placement Items List',
+            type: 'list',
+            itemSchema: [
+                { name: 'studentName', label: 'Student Name', type: 'text' },
+                { name: 'batch', label: 'Batch', type: 'text' },
+                { name: 'branch', label: 'Branch', type: 'text' },
+                { name: 'company', label: 'Company', type: 'text' },
+                { name: 'package', label: 'Package (e.g. 10 LPA)', type: 'text' },
+                { name: 'designation', label: 'Designation', type: 'text' }
+            ]
+        }
+    ],
     'design_twenty_seven': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title1', label: 'Main Title', type: 'text' },
         { name: 'title2', label: 'Italic/Accent Title', type: 'text' },
