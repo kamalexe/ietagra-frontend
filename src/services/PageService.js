@@ -6,20 +6,26 @@ const PAGES_URL = `${API_BASE_URL}/pages`;
 
 const getAuthHeaders = () => {
     const { access_token } = getToken();
-    // console.log("Debug: access_token for request:", access_token);
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': access_token ? `Bearer ${access_token}` : ''
+    const headers = {
+        'Content-Type': 'application/json'
     };
+    if (access_token) {
+        headers['Authorization'] = `Bearer ${access_token}`;
+    }
+    return headers;
 };
 
 const PageService = {
     async getPageBySlug(slug) {
-        const response = await fetch(`${PAGES_URL}/${encodeURIComponent(slug)}`, {
+        // Send token if available to bypass caching and allow viewing drafts for admins
+        const headers = getAuthHeaders();
+
+        // Add cache buster for admin requests to ensure fresh data
+        const cacheBuster = `?_cb=${Date.now()}`;
+
+        const response = await fetch(`${PAGES_URL}/${encodeURIComponent(slug)}${cacheBuster}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: headers
         });
 
         if (!response.ok) {
