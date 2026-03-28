@@ -488,6 +488,25 @@ const schemas = {
         { name: 'themeColor', label: 'Theme Background Color (Tailwind class, e.g. bg-red-600)', type: 'text' },
         { name: 'speed', label: 'Animation Speed (e.g. 20s)', type: 'text' }
     ],
+    'design_twenty_six': [
+        { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Section Title', type: 'text', placeholder: 'Hall of Fame' },
+        { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Recognizing Excellence' },
+        { name: 'description', label: 'Description', type: 'textarea' },
+        {
+            name: 'items',
+            label: 'Achievements List',
+            type: 'list',
+            itemSchema: [
+                { name: 'title', label: 'Achievement Title', type: 'text' },
+                { name: 'studentName', label: 'Student Name', type: 'text' },
+                { name: 'date', label: 'Date (e.g. Feb 2024)', type: 'text' },
+                { name: 'batch', label: 'Batch', type: 'text' },
+                { name: 'branch', label: 'Branch', type: 'text' },
+                { name: 'description', label: 'Short Description', type: 'textarea' }
+            ]
+        }
+    ],
     'design_thirty_five': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Form Title', type: 'text', placeholder: 'Company Registration' },
         { name: 'subtitle', label: 'Form Subtitle', type: 'text', placeholder: 'For Campus Placement Drive' }
