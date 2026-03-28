@@ -135,18 +135,18 @@ const DesignTwentySix = ({ id, title, description, subtitle, items = [], dataSou
                                                 <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full mb-3 uppercase tracking-wider">
                                                     {item.batch} • {item.branch}
                                                 </span>
-                                                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                                                <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
+                                                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title || item.courseName || item.projectName || 'Dynamic Record'}</h3>
+                                                <p className="text-gray-600 mb-4 line-clamp-3">{item.description || item.technology || 'Achievement Record'}</p>
                                                 
                                                 <div className={`flex items-center gap-4 ${index % 2 === 0 ? 'md:justify-end' : 'md:justify-start'}`}>
                                                     <div className="flex items-center text-sm text-gray-500">
                                                         <AcademicCapIcon className="h-4 w-4 mr-1 text-blue-500" />
-                                                        <span className="font-medium text-gray-900">{item.studentName}</span>
+                                                        <span className="font-medium text-gray-900">{item.studentName || 'Student'}</span>
                                                     </div>
-                                                    {item.date && (
+                                                    {(item.date || item.platform || item.year) && (
                                                         <div className="flex items-center text-sm text-gray-500">
                                                             <CalendarIcon className="h-4 w-4 mr-1 text-blue-500" />
-                                                            <span>{item.date}</span>
+                                                            <span>{item.date || item.platform || item.year}</span>
                                                         </div>
                                                     )}
                                                 </div>

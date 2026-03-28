@@ -227,23 +227,23 @@ const DesignTwentyFive = ({ id, title, description, subtitle, items = [], dataSo
                                         )}
                                     </div>
 
-                                    <h3 className="text-lg font-bold text-gray-900 mb-1">{item.studentName}</h3>
-                                    <p className="text-sm text-gray-500 mb-4">{item.branch} • {item.batch}</p>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-1">{item.studentName || 'Student Name'}</h3>
+                                    <p className="text-sm text-gray-500 mb-4">{item.branch || 'Common'} • {item.batch || item.year || 'N/A'}</p>
 
                                     <div className="mt-auto pt-4 border-t border-gray-100">
                                         <div className="flex justify-between items-end">
                                             <div>
-                                                <p className="text-xs text-gray-500 uppercase font-semibold">Company</p>
-                                                <p className="text-gray-900 font-medium truncate w-32" title={item.company}>{item.company}</p>
+                                                <p className="text-xs text-gray-500 uppercase font-semibold">{item.company ? 'Company' : item.platform ? 'Platform' : 'Source'}</p>
+                                                <p className="text-gray-900 font-medium truncate w-32" title={item.company || item.platform || item.date}>{item.company || item.platform || item.date || 'Member'}</p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-xs text-blue-600 uppercase font-bold">Package</p>
-                                                <p className="text-xl font-bold text-gray-900">{item.package}</p>
+                                                <p className="text-xs text-blue-600 uppercase font-bold">{item.package ? 'Package' : item.score ? 'Score' : 'Level'}</p>
+                                                <p className="text-xl font-bold text-gray-900">{item.package || item.score || item.gateScore || '-'}</p>
                                             </div>
                                         </div>
-                                        {item.designation && (
-                                             <div className="mt-2 text-xs text-gray-500 truncate" title={item.designation}>
-                                                Role: {item.designation}
+                                        {(item.designation || item.courseName || item.title || item.projectName) && (
+                                            <div className="mt-2 text-xs text-gray-500 truncate" title={item.designation || item.courseName || item.title || item.projectName}>
+                                                {item.designation ? `Role: ${item.designation}` : `Detail: ${item.courseName || item.title || item.projectName}`}
                                              </div>
                                         )}
                                     </div>
