@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 
+const DEFAULT_FACULTY_PASSWORD = 'fac@123';
+
 const FacultyList = () => {
     // State for faculty list
     const [faculty, setFaculty] = useState([]);
@@ -70,7 +72,8 @@ const FacultyList = () => {
         skills: '',
         achievements: '',
         isPublic: true,
-        isApproved: false
+        isApproved: false,
+        password: ''
     });
 
     const handleOpenModal = (member = null) => {
@@ -80,7 +83,8 @@ const FacultyList = () => {
                 ...member,
                 department: member.department?._id || member.department || '',
                 skills: member.skills ? member.skills.join(', ') : '',
-                achievements: member.achievements ? member.achievements.join('\n') : ''
+                achievements: member.achievements ? member.achievements.join('\n') : '',
+                password: '' // Always clear password on open for security/clarity
             });
         } else {
             setEditingMember(null);
@@ -93,7 +97,8 @@ const FacultyList = () => {
                 specialization: '',
                 experience: '',
                 skills: '',
-                achievements: ''
+                achievements: '',
+                password: ''
             });
         }
         setIsModalOpen(true);
@@ -458,6 +463,7 @@ const FacultyList = () => {
                                                 Public (Visible on Frontend)
                                             </label>
                                         </div>
+
                                         <div className="flex items-center">
                                             <input
                                                 id="isApproved"
@@ -471,6 +477,35 @@ const FacultyList = () => {
                                             </label>
                                         </div>
                                     </div>
+
+                                    {role === 'admin' && (
+                                        <div className="flex-1">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Password
+                                                <span className="ml-2 text-[10px] text-gray-500 font-normal">(Default: {DEFAULT_FACULTY_PASSWORD})</span>
+                                            </label>
+                                            <div className="mt-1 flex gap-2">
+                                                <input
+                                                    type="password"
+                                                    value={formData.password}
+                                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                                    placeholder="Leave blank to keep current"
+                                                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (window.confirm(`Reset password to default (${DEFAULT_FACULTY_PASSWORD})?`)) {
+                                                            setFormData({ ...formData, password: DEFAULT_FACULTY_PASSWORD });
+                                                        }
+                                                    }}
+                                                    className="px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-xs font-medium text-gray-600 hover:bg-gray-100 whitespace-nowrap"
+                                                >
+                                                    Set Default
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                         <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
                                             {editingMember ? 'Update Faculty' : 'Add Faculty'}
