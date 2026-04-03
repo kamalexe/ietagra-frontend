@@ -38,6 +38,7 @@ import DesignThirtyFive from './sections/DesignThirtyFive';
 import DesignThirtySix from './sections/DesignThirtySix';
 import DesignThirtySeven from './sections/DesignThirtySeven';
 import DesignThirtyEight from './sections/DesignThirtyEight';
+import DesignThirtyNine from './sections/DesignThirtyNine';
 
 // Adapters for new documentation-based templates
 const HeroSection = (props) => <DesignOne {...props} />;
@@ -69,7 +70,7 @@ const VisionMission = (props) => (
         swotData={{ strengths: props.mission || [] }} // Mapping mission to list-compatible prop
     />
 );
-const StatsGrid = (props) => <DesignNine {...props} />; // Assuming DesignNine can handle stats or we use another
+const StatsGrid = (props) => <DesignThirtyNine {...props} />;
 const SyllabusViewer = (props) => <DesignThirtySix {...props} type="syllabus" />;
 const ExamScheduleViewer = (props) => <DesignThirtySix {...props} type="exam-schedule" />;
 const SyllabusViewerEnhanced = (props) => <DesignThirtySeven {...props} type="syllabus" />;
@@ -129,6 +130,7 @@ const SectionRegistry = {
     design_thirty_six: DesignThirtySix,
     design_thirty_seven: DesignThirtySeven,
     design_thirty_eight: DesignThirtyEight,
+    design_thirty_nine: DesignThirtyNine,
     syllabus_viewer: SyllabusViewer,
     exam_schedule_viewer: ExamScheduleViewer,
     campus_grid: DesignThirtyEight,

@@ -2,6 +2,42 @@ import React, { useState, useEffect } from 'react';
 import { XMarkIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import SectionSchemas from './SectionSchemas';
 import FileService from '../../../services/FileService';
+import * as FaIcons from 'react-icons/fa';
+
+const GRADIENT_OPTIONS = [
+  { label: 'Blue Indigo', value: 'bg-gradient-to-r from-blue-600 to-indigo-700' },
+  { label: 'Purple Pink', value: 'bg-gradient-to-r from-purple-600 to-pink-600' },
+  { label: 'Green Teal', value: 'bg-gradient-to-r from-green-500 to-teal-600' },
+  { label: 'Orange Red', value: 'bg-gradient-to-r from-orange-500 to-red-600' },
+  { label: 'Deep Ocean', value: 'bg-gradient-to-r from-slate-900 to-slate-700' },
+  { label: 'Sunset', value: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500' },
+];
+
+const UNDERLINE_OPTIONS = [
+  { label: 'Blue', value: 'from-blue-500 to-indigo-500' },
+  { label: 'Red', value: 'from-red-500 to-orange-500' },
+  { label: 'Green', value: 'from-green-400 to-teal-500' },
+  { label: 'Yellow', value: 'from-yellow-400 to-orange-500' },
+  { label: 'Purple', value: 'from-purple-500 to-pink-500' },
+];
+
+const ICON_OPTIONS = [
+  { value: 'FaGraduationCap', icon: FaIcons.FaGraduationCap },
+  { value: 'FaBook', icon: FaIcons.FaBook },
+  { value: 'FaUsers', icon: FaIcons.FaUsers },
+  { value: 'FaChalkboardTeacher', icon: FaIcons.FaChalkboardTeacher },
+  { value: 'FaLaptopCode', icon: FaIcons.FaLaptopCode },
+  { value: 'FaAward', icon: FaIcons.FaAward },
+  { value: 'FaBuilding', icon: FaIcons.FaBuilding },
+  { value: 'FaBriefcase', icon: FaIcons.FaBriefcase },
+  { value: 'FaFlask', icon: FaIcons.FaFlask },
+  { value: 'FaMicroscope', icon: FaIcons.FaMicroscope },
+  { value: 'FaTrophy', icon: FaIcons.FaTrophy },
+  { value: 'FaEnvelope', icon: FaIcons.FaEnvelope },
+  { value: 'FaPhoneAlt', icon: FaIcons.FaPhoneAlt },
+  { value: 'FaMapMarkerAlt', icon: FaIcons.FaMapMarkerAlt },
+  { value: 'FaGlobe', icon: FaIcons.FaGlobe },
+];
 
 const SectionForm = ({ section, onClose, onSave }) => {
   const [formData, setFormData] = useState({});
@@ -32,11 +68,6 @@ const SectionForm = ({ section, onClose, onSave }) => {
     };
     fetchDepartments();
   }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
 
   const handleJsonChange = (key, value, isFull, onUpdate) => {
     // Update raw input
@@ -108,6 +139,14 @@ const SectionForm = ({ section, onClose, onSave }) => {
 
   // Generic recursive field renderer
   const renderField = (field, index, currentValue, onFieldChange, parentContext = null) => {
+    // Handle conditional visibility
+    if (field.condition) {
+      const conditionValue = formData[field.condition.field];
+      if (conditionValue !== field.condition.value) {
+        return null;
+      }
+    }
+
     const value = currentValue !== undefined ? currentValue : '';
 
     // Unique ID for inputs to prevent conflicts
@@ -225,6 +264,108 @@ const SectionForm = ({ section, onClose, onSave }) => {
               ))}
             </select>
             <p className="mt-1 text-xs text-gray-500">Overrides or acts as the department ID for fetching dynamic items.</p>
+          </div>
+        );
+      case 'color_suggestion':
+        const suggestions = field.name === 'gradient' ? GRADIENT_OPTIONS : UNDERLINE_OPTIONS;
+        return (
+          <div className="col-span-12 md:col-span-6 bg-blue-50/30 p-3 rounded-lg border border-blue-100" key={index}>
+            <label htmlFor={inputId} className="block text-sm font-semibold text-blue-900 mb-2">{field.label}</label>
+
+            <div className="flex flex-wrap gap-2 mb-3">
+              {suggestions.map((opt, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onFieldChange(field.name, opt.value)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${value === opt.value
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                    : 'bg-white text-blue-700 border-blue-200 hover:border-blue-400'
+                    }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => onFieldChange(field.name, '')}
+                className="px-3 py-1.5 text-xs font-medium rounded-full border bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
+              >
+                Clear
+              </button>
+            </div>
+
+            <div className="relative">
+              <input
+                type="text"
+                name={field.name}
+                id={inputId}
+                value={value}
+                onChange={(e) => onFieldChange(field.name, e.target.value)}
+                placeholder="Or enter custom tailwind classes..."
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border bg-white"
+              />
+              {value && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-bold text-gray-400">Preview:</span>
+                  <div className={`h-4 flex-1 rounded ${field.name === 'gradient' ? value : 'bg-gradient-to-r ' + value}`}></div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      case 'icon_suggestion':
+        return (
+          <div className="col-span-12 md:col-span-6 bg-purple-50/30 p-3 rounded-lg border border-purple-100" key={index}>
+            <label htmlFor={inputId} className="block text-sm font-semibold text-purple-900 mb-2">{field.label}</label>
+
+            <div className="grid grid-cols-5 gap-2 mb-3">
+              {ICON_OPTIONS.map((opt, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onFieldChange(field.name, opt.value)}
+                  title={opt.value}
+                  className={`flex flex-col items-center justify-center p-2 rounded-md border transition-all ${value === opt.value
+                    ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                    : 'bg-white text-purple-700 border-purple-200 hover:border-purple-400'
+                    }`}
+                >
+                  <opt.icon className="h-4 w-4" />
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => onFieldChange(field.name, '')}
+                className="flex items-center justify-center p-2 rounded-md border bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
+              >
+                <span className="text-[10px] font-bold">Clear</span>
+              </button>
+            </div>
+
+            <div className="relative">
+              <input
+                type="text"
+                name={field.name}
+                id={inputId}
+                value={value}
+                onChange={(e) => onFieldChange(field.name, e.target.value)}
+                placeholder="Or enter custom React Icon name (e.g. FaHome)..."
+                className="focus:ring-purple-500 focus:border-purple-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border bg-white"
+              />
+              <p className="mt-1 text-[10px] text-gray-500">Supports Font Awesome names starting with 'Fa'</p>
+              {value && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-bold text-gray-400">Preview:</span>
+                  <div className="p-2 bg-purple-100 text-purple-700 rounded w-fit">
+                    {(() => {
+                      const DynamicIcon = FaIcons[value];
+                      return DynamicIcon ? <DynamicIcon className="h-5 w-5" /> : <span className="text-[10px] text-red-500 italic">Icon not found</span>;
+                    })()}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         );
       case 'number':
@@ -377,37 +518,6 @@ const SectionForm = ({ section, onClose, onSave }) => {
               </div>
               <div className="relative flex-1 py-6 px-4 sm:px-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
-                    <h3 className="text-sm font-medium text-gray-900 mb-4">Sidebar Configuration (Optional)</h3>
-                    <div className="grid grid-cols-6 gap-6">
-                      <div className="col-span-6 sm:col-span-3">
-                        <label htmlFor="sidebarTitle" className="block text-sm font-medium text-gray-700">Sidebar Title</label>
-                        <input
-                          type="text"
-                          name="sidebarTitle"
-                          id="sidebarTitle"
-                          value={formData.sidebarTitle || ''}
-                          onChange={handleChange}
-                          placeholder="e.g., Placement Services"
-                          className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
-                        />
-                        <p className="mt-1 text-xs text-gray-500">Overrides the section title in the sidebar.</p>
-                      </div>
-                      <div className="col-span-6 sm:col-span-3">
-                        <label htmlFor="sidebarIcon" className="block text-sm font-medium text-gray-700">Sidebar Icon</label>
-                        <input
-                          type="text"
-                          name="sidebarIcon"
-                          id="sidebarIcon"
-                          value={formData.sidebarIcon || ''}
-                          onChange={handleChange}
-                          placeholder="e.g., FaGraduationCap"
-                          className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
-                        />
-                        <p className="mt-1 text-xs text-gray-500">React Icon name (e.g., FaHome, FaInfoCircle)</p>
-                      </div>
-                    </div>
-                  </div>
 
                   <div className="grid grid-cols-6 gap-6">
                     {currentSchema.map((field, index) =>

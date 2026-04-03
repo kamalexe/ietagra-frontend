@@ -96,11 +96,14 @@ const StudentDataManager = () => {
     const downloadSample = () => {
         const headers = SAMPLE_HEADERS[activeTab] || ['studentName', 'batch', 'branch'];
 
-        // Create Data Sheet
-        const ws = XLSX.utils.json_to_sheet([
-            headers.reduce((acc, curr) => ({ ...acc, [curr]: "" }), {}), // Empty row
-            headers.reduce((acc, curr) => ({ ...acc, [curr]: `sample_${curr}` }), {}) // Sample
-        ], { header: headers });
+        // Create Data Sheet with 5 demo rows
+        const sampleRows = Array.from({ length: 5 }, (_, i) =>
+            headers.reduce((acc, curr) => ({
+                ...acc,
+                [curr]: i === 0 ? `demo_${curr}` : `demo_${curr}_${i + 1}`
+            }), {})
+        );
+        const ws = XLSX.utils.json_to_sheet(sampleRows, { header: headers });
 
         // Create Instructions Sheet
         const branches = departments.map(d => `${d.name} -> ${d.slug.toUpperCase()}`).join('\n');
@@ -129,10 +132,12 @@ const StudentDataManager = () => {
             const ws = wb.Sheets[wsname];
             const data = XLSX.utils.sheet_to_json(ws);
 
-            // Validate Data
             const validatedData = data.map(row => {
-                const isValid = row.studentName || row.StudentName || row.Name;
-                return { ...row, _isValid: !!isValid };
+                const name = row.studentName || row.StudentName || row.Name;
+                const isSample = name && String(name).toLowerCase().includes('sample_');
+                // demo_ rows are allowed to be imported for testing
+                const isValid = name && !isSample;
+                return { ...row, _isValid: !!isValid, _isSample: !!isSample };
             });
 
             setPreviewData(validatedData);
@@ -143,8 +148,8 @@ const StudentDataManager = () => {
     };
 
     const confirmUpload = async () => {
-        const validRecords = previewData.filter(r => r._isValid).map(r => {
-            const { _isValid, ...rest } = r;
+        const validRecords = previewData.filter(r => r._isValid && !r._isSample).map(r => {
+            const { _isValid, _isSample, ...rest } = r;
             // Normalize name
             const studentName = rest.studentName || rest.StudentName || rest.Name || 'Unknown';
             const enrollmentNo = rest.enrollmentNo || rest.EnrollmentNo;
@@ -169,12 +174,14 @@ const StudentDataManager = () => {
             return;
         }
 
+        console.log(`[confirmUpload] Sending ${validRecords.length} records for category: ${activeTab}`, validRecords);
         setUploading(true);
         try {
-            await axiosInstance.post('/student-records/bulk-json', {
+            const resp = await axiosInstance.post('/student-records/bulk-json', {
                 records: validRecords,
                 category: activeTab
             });
+            console.log("[confirmUpload] Success:", resp.data);
             alert(`Successfully uploaded ${validRecords.length} records!`);
             setIsPreviewOpen(false);
             setPreviewData([]);
@@ -378,60 +385,120 @@ const StudentDataManager = () => {
                 <div className="border-t pt-4">
                     <h4 className="text-sm font-bold text-gray-500 mb-2">Additional Data (Category Specific)</h4>
                     {activeTab === 'project' && (
-                        <div className="grid grid-cols-1 gap-4">
-                            <input placeholder="Project Name" className="border p-2 rounded"
-                                value={formData.projectName || ''} onChange={e => setFormData({ ...formData, projectName: e.target.value })} />
-                            <input placeholder="Technology (comma separated)" className="border p-2 rounded"
-                                value={formData.technology || ''} onChange={e => setFormData({ ...formData, technology: e.target.value })} />
-                            <input placeholder="Supervisor" className="border p-2 rounded"
-                                value={formData.supervisor || ''} onChange={e => setFormData({ ...formData, supervisor: e.target.value })} />
-                            <input placeholder="GitHub Link" className="border p-2 rounded"
-                                value={formData.githubLink || ''} onChange={e => setFormData({ ...formData, githubLink: e.target.value })} />
-                            <input placeholder="PPT Link" className="border p-2 rounded"
-                                value={formData.pptLink || ''} onChange={e => setFormData({ ...formData, pptLink: e.target.value })} />
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700">Project Name *</label>
+                                    <input placeholder="e.g. Smart Attendance System" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.projectName || ''} onChange={e => setFormData({ ...formData, projectName: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Technology Stack</label>
+                                    <input placeholder="e.g. React, Node.js, MongoDB" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.technology || ''} onChange={e => setFormData({ ...formData, technology: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Supervisor / Lab</label>
+                                    <input placeholder="e.g. Dr. A.K. Sharma" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.supervisor || ''} onChange={e => setFormData({ ...formData, supervisor: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">GitHub Link</label>
+                                    <input placeholder="https://github.com/..." className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.githubLink || ''} onChange={e => setFormData({ ...formData, githubLink: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">PPT / Document Link</label>
+                                    <input placeholder="https://drive.google.com/..." className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.pptLink || ''} onChange={e => setFormData({ ...formData, pptLink: e.target.value })} />
+                                </div>
+                            </div>
                         </div>
                     )}
                     {activeTab === 'gate' && (
-                        <div className="grid grid-cols-2 gap-4">
-                            <input placeholder="Gate Score" className="border p-2 rounded"
-                                value={formData.gateScore || ''} onChange={e => setFormData({ ...formData, gateScore: e.target.value })} />
-                            <input placeholder="All India Rank" className="border p-2 rounded"
-                                value={formData.rank || ''} onChange={e => setFormData({ ...formData, rank: e.target.value })} />
-                            <input placeholder="Year" className="border p-2 rounded"
-                                value={formData.year || ''} onChange={e => setFormData({ ...formData, year: e.target.value })} />
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Gate Score *</label>
+                                <input placeholder="e.g. 750" type="number" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    value={formData.gateScore || ''} onChange={e => setFormData({ ...formData, gateScore: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">All India Rank *</label>
+                                <input placeholder="e.g. 452" type="number" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    value={formData.rank || ''} onChange={e => setFormData({ ...formData, rank: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Year *</label>
+                                <input placeholder="e.g. 2024" type="number" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    value={formData.year || ''} onChange={e => setFormData({ ...formData, year: e.target.value })} />
+                            </div>
                         </div>
                     )}
                     {activeTab === 'placement' && (
-                        <div className="grid grid-cols-2 gap-4">
-                            <input placeholder="Company" className="border p-2 rounded"
-                                value={formData.company || ''} onChange={e => setFormData({ ...formData, company: e.target.value })} />
-                            <input placeholder="Package (LPA)" className="border p-2 rounded"
-                                value={formData.package || ''} onChange={e => setFormData({ ...formData, package: e.target.value })} />
-                            <input placeholder="Designation" className="border p-2 rounded"
-                                value={formData.designation || ''} onChange={e => setFormData({ ...formData, designation: e.target.value })} />
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Company Name *</label>
+                                    <input placeholder="e.g. Google, TCS" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.company || ''} onChange={e => setFormData({ ...formData, company: e.target.value })} />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Package (LPA) *</label>
+                                    <input placeholder="e.g. 12" type="number" step="0.1" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.package || ''} onChange={e => setFormData({ ...formData, package: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Designation</label>
+                                    <input placeholder="e.g. Software Engineer" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.designation || ''} onChange={e => setFormData({ ...formData, designation: e.target.value })} />
+                                </div>
+                            </div>
                         </div>
                     )}
                     {activeTab === 'achievement' && (
-                        <div className="grid grid-cols-1 gap-4">
-                            <input placeholder="Achievement Title" className="border p-2 rounded"
-                                value={formData.title || ''} onChange={e => setFormData({ ...formData, title: e.target.value })} />
-                            <textarea placeholder="Description" className="border p-2 rounded h-24"
-                                value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} />
-                            <input type="date" placeholder="Date" className="border p-2 rounded"
-                                value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Achievement Title *</label>
+                                <input placeholder="e.g. Won Smart India Hackathon" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    value={formData.title || ''} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea placeholder="Briefly describe the achievement..." className="mt-1 block w-full border border-gray-300 rounded-md p-2 h-24"
+                                    value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Date (Optional)</label>
+                                <input type="date" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                            </div>
                         </div>
                     )}
                     {activeTab === 'mooc' && (
-                        <div className="grid grid-cols-1 gap-4">
-                            <input placeholder="Course Name" className="border p-2 rounded"
-                                value={formData.courseName || ''} onChange={e => setFormData({ ...formData, courseName: e.target.value })} />
-                            <input placeholder="Platform (e.g. NPTEL, Coursera)" className="border p-2 rounded"
-                                value={formData.platform || ''} onChange={e => setFormData({ ...formData, platform: e.target.value })} />
-                            <div className="grid grid-cols-2 gap-4">
-                                <input placeholder="Score / Grade" className="border p-2 rounded"
-                                    value={formData.score || ''} onChange={e => setFormData({ ...formData, score: e.target.value })} />
-                                <input type="date" placeholder="Date of Completion" className="border p-2 rounded"
-                                    value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700">Course Name *</label>
+                                    <input placeholder="e.g. Introduction to Machine Learning" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.courseName || ''} onChange={e => setFormData({ ...formData, courseName: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Platform *</label>
+                                    <input placeholder="e.g. NPTEL, Coursera" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.platform || ''} onChange={e => setFormData({ ...formData, platform: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Score / Grade</label>
+                                    <input placeholder="e.g. 85% / Elite" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.score || ''} onChange={e => setFormData({ ...formData, score: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Date of Completion (Optional)</label>
+                                    <input type="date" className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                                </div>
                             </div>
                         </div>
                     )}
@@ -623,9 +690,15 @@ const StudentDataManager = () => {
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
                                             {previewData.map((row, idx) => (
-                                                <tr key={idx} className={row._isValid ? "bg-green-50" : "bg-red-50"}>
+                                                <tr key={idx} className={row._isValid ? "bg-green-50" : row._isSample ? "bg-gray-50" : "bg-red-50"}>
                                                     <td className="px-3 py-2 text-xs font-bold">
-                                                        {row._isValid ? <span className="text-green-600">Valid</span> : <span className="text-red-600">Invalid</span>}
+                                                        {row._isValid ? (
+                                                            <span className="text-green-600">Ready</span>
+                                                        ) : row._isSample ? (
+                                                            <span className="text-gray-500">Sample Row (Ignored)</span>
+                                                        ) : (
+                                                            <span className="text-red-600">Missing Name</span>
+                                                        )}
                                                     </td>
                                                     <td className="px-3 py-2 text-sm">{row.studentName || row.StudentName || row.Name || '-'}</td>
                                                     <td className="px-3 py-2 text-sm">{row.batch || row.Batch || '-'}</td>

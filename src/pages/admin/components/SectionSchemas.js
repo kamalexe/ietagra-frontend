@@ -5,8 +5,8 @@ const schemas = {
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'badge', label: 'Badge Text', type: 'text' },
         { name: 'backgroundImage', label: 'Background Image URL', type: 'image' },
-        { name: 'gradient', label: 'Gradient Class', type: 'text', placeholder: 'bg-gradient-to-r ...' },
-        { name: 'underlineColor', label: 'Underline Color Class', type: 'text', placeholder: 'from-blue-500 to-indigo-500' },
+        { name: 'gradient', label: 'Gradient Class (Hero Only)', type: 'color_suggestion', condition: { field: 'variant', value: 'hero' } },
+        { name: 'underlineColor', label: 'Underline Color Class (Simple Only)', type: 'color_suggestion', condition: { field: 'variant', value: 'simple' } },
         {
             name: 'buttons',
             label: 'Buttons List',
@@ -23,9 +23,9 @@ const schemas = {
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'backgroundImage', label: 'Background Image URL', type: 'image' },
-        { name: 'badge', label: 'Badge (Simple Only)', type: 'text' },
-        { name: 'underlineColor', label: 'Underline Color Class (Simple Only)', type: 'text', placeholder: 'from-blue-500 to-indigo-500' },
-        { name: 'gradient', label: 'Gradient Class (Hero Only)', type: 'text', placeholder: 'bg-gradient-to-r ...' },
+        { name: 'badge', label: 'Badge (Simple Only)', type: 'text', condition: { field: 'variant', value: 'simple' } },
+        { name: 'underlineColor', label: 'Underline Color Class (Simple Only)', type: 'color_suggestion', condition: { field: 'variant', value: 'simple' } },
+        { name: 'gradient', label: 'Gradient Class (Hero Only)', type: 'color_suggestion', condition: { field: 'variant', value: 'hero' } },
         {
             name: 'buttons',
             label: 'Buttons List (Hero Only)',
@@ -45,7 +45,7 @@ const schemas = {
             itemSchema: [
                 { name: 'title', label: 'Title', type: 'text' },
                 { name: 'description', label: 'Description', type: 'textarea' },
-                { name: 'icon', label: 'Icon (React Icon Name)', type: 'text' }
+                { name: 'icon', label: 'Icon (React Icon Name)', type: 'icon_suggestion' }
             ]
         }
     ],
@@ -57,7 +57,7 @@ const schemas = {
             itemSchema: [
                 { name: 'title', label: 'Title', type: 'text' },
                 { name: 'content', label: 'Content', type: 'textarea' },
-                { name: 'icon', label: 'Icon', type: 'text' },
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' },
                 { name: 'colorTheme', label: 'Color Theme (e.g. green, teal)', type: 'text' }
             ]
         }
@@ -101,7 +101,7 @@ const schemas = {
             itemSchema: [
                 { name: 'title', label: 'Title', type: 'text' },
                 { name: 'description', label: 'Description', type: 'textarea' },
-                { name: 'icon', label: 'Icon', type: 'text' }
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' }
             ]
         }
     ],
@@ -113,7 +113,7 @@ const schemas = {
             itemSchema: [
                 { name: 'id', label: 'Tab ID (unique)', type: 'text' },
                 { name: 'label', label: 'Tab Label', type: 'text' },
-                { name: 'icon', label: 'Icon (e.g. FaHome)', type: 'text' },
+                { name: 'icon', label: 'Icon (e.g. FaHome)', type: 'icon_suggestion' },
                 {
                     name: 'sections',
                     label: 'Sections in Tab',
@@ -147,7 +147,7 @@ const schemas = {
             itemSchema: [
                 { name: 'title', label: 'Title', type: 'text' },
                 { name: 'subtitle', label: 'Subtitle', type: 'text' },
-                { name: 'icon', label: 'Icon', type: 'text' }
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' }
             ]
         }
     ],
@@ -165,7 +165,7 @@ const schemas = {
                 { name: 'date', label: 'Date', type: 'text' },
                 { name: 'subtitle', label: 'Subtitle/Dept', type: 'text' },
                 { name: 'meta', label: 'Meta Info', type: 'text' },
-                { name: 'icon', label: 'Icon', type: 'text' }
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' }
             ]
         }
     ],
@@ -180,7 +180,7 @@ const schemas = {
             itemSchema: [
                 { name: 'title', label: 'Title', type: 'text' },
                 { name: 'description', label: 'Description', type: 'textarea' },
-                { name: 'icon', label: 'Icon', type: 'text' }
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' }
             ]
         }
     ],
@@ -226,15 +226,15 @@ const schemas = {
                 { name: 'title', label: 'Title/Name', type: 'text' },
                 { name: 'description', label: 'Description', type: 'textarea' },
                 { name: 'link', label: 'Link URL/Slug', type: 'text' },
-                { name: 'icon', label: 'Icon', type: 'text' },
-                { name: 'gradient', label: 'Gradient Class', type: 'text' }
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' },
+                { name: 'gradient', label: 'Gradient Class', type: 'color_suggestion' }
             ]
         }
     ],
     'design_fourteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'badge', label: 'Badge', type: 'text' },
-        { name: 'underlineColor', label: 'Underline Color Class', type: 'text', placeholder: 'from-blue-500 to-indigo-500' },
+        { name: 'underlineColor', label: 'Underline Color Class', type: 'color_suggestion' },
         { name: 'description', label: 'Description', type: 'textarea' },
         {
             name: 'items',
@@ -245,12 +245,12 @@ const schemas = {
                 { name: 'description', label: 'Description', type: 'textarea' },
                 { name: 'link', label: 'Link URL', type: 'text' },
                 { name: 'target', label: 'Link Target', type: 'select', options: ['_self', '_blank'] },
-                { name: 'icon', label: 'Icon (Emoji or Class)', type: 'text' },
-                { name: 'gradient', label: 'Gradient Class', type: 'text', placeholder: 'from-blue-500 to-cyan-500' }
+                { name: 'icon', label: 'Icon (Emoji or React Name)', type: 'icon_suggestion' },
+                { name: 'gradient', label: 'Gradient Class', type: 'color_suggestion' }
             ]
         },
         { name: 'backgroundImage', label: 'Background Image URL', type: 'image' },
-        { name: 'gradient', label: 'Gradient Class', type: 'text', placeholder: 'bg-gradient-to-r ...' },
+        { name: 'gradient', label: 'Gradient Class', type: 'color_suggestion' },
         {
             name: 'buttons',
             label: 'Buttons List',
@@ -298,7 +298,8 @@ const schemas = {
                 { name: 'supervisor', label: 'Supervisor', type: 'text' },
                 { name: 'technology', label: 'Technology', type: 'text' },
                 { name: 'githubLink', label: 'GitHub Link', type: 'text' },
-                { name: 'pptLink', label: 'PPT Link', type: 'text' }
+                { name: 'pptLink', label: 'PPT Link', type: 'text' },
+                { name: 'thumbnail', label: 'Preview Image (Upload)', type: 'image' }
             ]
         }
     ],
@@ -318,7 +319,7 @@ const schemas = {
     'design_eighteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
-        { name: 'icon', label: 'Main Icon/Emoji', type: 'text', placeholder: '💻' },
+        { name: 'icon', label: 'Main Icon/Emoji', type: 'icon_suggestion' },
         {
             name: 'stats',
             label: 'Statistics',
@@ -326,7 +327,7 @@ const schemas = {
             itemSchema: [
                 { name: 'value', label: 'Value (e.g. 12+)', type: 'text' },
                 { name: 'label', label: 'Label', type: 'text' },
-                { name: 'icon', label: 'Icon/Emoji', type: 'text' }
+                { name: 'icon', label: 'Icon/Emoji', type: 'icon_suggestion' }
             ]
         },
         {
@@ -366,7 +367,7 @@ const schemas = {
             itemSchema: [
                 { name: 'label', label: 'Label (e.g. Phone)', type: 'text' },
                 { name: 'value', label: 'Value', type: 'text' },
-                { name: 'icon', label: 'Icon', type: 'text' }
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' }
             ]
         }
     ],
@@ -382,7 +383,7 @@ const schemas = {
             itemSchema: [
                 { name: 'label', label: 'Label', type: 'text' },
                 { name: 'value', label: 'Value', type: 'text' },
-                { name: 'icon', label: 'Icon', type: 'text' }
+                { name: 'icon', label: 'Icon', type: 'icon_suggestion' }
             ]
         }
     ],
