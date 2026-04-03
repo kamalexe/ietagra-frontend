@@ -18,7 +18,7 @@ const SAMPLE_HEADERS = {
     gate: ['studentName', 'batch', 'branch', 'enrollmentNo', 'gateScore', 'rank', 'year'],
     placement: ['studentName', 'batch', 'branch', 'enrollmentNo', 'company', 'package', 'designation'],
     project: ['studentName', 'batch', 'branch', 'enrollmentNo', 'projectName', 'technology', 'supervisor', 'githubLink', 'pptLink'],
-    mooc: ['studentName', 'batch', 'branch', 'enrollmentNo', 'courseName', 'platform', 'score'],
+    mooc: ['studentName', 'batch', 'branch', 'enrollmentNo', 'courseName', 'platform', 'score', 'date'],
     achievement: ['studentName', 'batch', 'branch', 'enrollmentNo', 'title', 'description', 'date'],
     other: ['studentName', 'batch', 'branch', 'enrollmentNo', 'Class', 'Section', 'Admission No', 'Bus Number', 'Blood Group', 'Emergency Name', 'Emergency Phone']
 };
@@ -419,6 +419,20 @@ const StudentDataManager = () => {
                                 value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                             <input type="date" placeholder="Date" className="border p-2 rounded"
                                 value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                        </div>
+                    )}
+                    {activeTab === 'mooc' && (
+                        <div className="grid grid-cols-1 gap-4">
+                            <input placeholder="Course Name" className="border p-2 rounded"
+                                value={formData.courseName || ''} onChange={e => setFormData({ ...formData, courseName: e.target.value })} />
+                            <input placeholder="Platform (e.g. NPTEL, Coursera)" className="border p-2 rounded"
+                                value={formData.platform || ''} onChange={e => setFormData({ ...formData, platform: e.target.value })} />
+                            <div className="grid grid-cols-2 gap-4">
+                                <input placeholder="Score / Grade" className="border p-2 rounded"
+                                    value={formData.score || ''} onChange={e => setFormData({ ...formData, score: e.target.value })} />
+                                <input type="date" placeholder="Date of Completion" className="border p-2 rounded"
+                                    value={formData.date || ''} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                            </div>
                         </div>
                     )}
                 </div>

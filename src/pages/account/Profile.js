@@ -24,6 +24,7 @@ const Profile = () => {
 
     useEffect(() => {
         if (data && data.profile) {
+            console.log("[Profile] Loaded profile data:", data.profile);
             setFormData(data.profile);
         }
     }, [data]);

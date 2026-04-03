@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import axiosInstance from '../../../api/axiosConfig';
-const DesignTwentyFour = ({ id, title, description, subtitle, items = [], dataSource, departmentId }) => {
+
+const EMPTY_ARRAY = [];
+
+const DesignTwentyFour = ({ id, title, description, subtitle, items = EMPTY_ARRAY, dataSource, departmentId }) => {
+    console.log("[DesignTwentyFour] Rendered with:", { id, title, dataSource, departmentId, manualItemsCount: items.length });
     // State for dynamic data
     const [fetchedItems, setFetchedItems] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -22,13 +26,16 @@ const DesignTwentyFour = ({ id, title, description, subtitle, items = [], dataSo
                 try {
                     let url = `/student-records?category=${dataSource}`;
                     if (departmentId) url += `&department=${departmentId}`;
+                    console.log(`[DesignTwentyFour] Fetching from: ${url}`);
                     const response = await axiosInstance.get(url);
+                    console.log(`[DesignTwentyFour] Response:`, response.data);
                     if (response.data.success) {
                         const transformed = response.data.data.map(rec => ({
                             ...rec,
                             ...rec.metadata,
                             key: rec._id
                         }));
+                        console.log(`[DesignTwentyFour] Transformed Items:`, transformed);
                         setFetchedItems(transformed);
                     }
                 } catch (error) {
@@ -39,6 +46,7 @@ const DesignTwentyFour = ({ id, title, description, subtitle, items = [], dataSo
             };
             fetchData();
         } else {
+            console.log(`[DesignTwentyFour] No dataSource, using manual items:`, items);
             setFetchedItems(items || []);
         }
     }, [dataSource, items, departmentId]);

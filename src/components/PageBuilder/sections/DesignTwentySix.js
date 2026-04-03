@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FunnelIcon, MagnifyingGlassIcon, StarIcon, AcademicCapIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import axiosInstance from '../../../api/axiosConfig';
-const DesignTwentySix = ({ id, title, description, subtitle, items = [], dataSource, departmentId }) => {
+
+const EMPTY_ARRAY = [];
+
+const DesignTwentySix = ({ id, title, description, subtitle, items = EMPTY_ARRAY, dataSource, departmentId }) => {
+    console.log("[DesignTwentySix] Rendered with:", { id, title, dataSource, departmentId, manualItemsCount: items.length });
     // State for dynamic data
     const [fetchedItems, setFetchedItems] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -21,13 +25,16 @@ const DesignTwentySix = ({ id, title, description, subtitle, items = [], dataSou
                 try {
                     let url = `/student-records?category=${dataSource}`;
                     if (departmentId) url += `&department=${departmentId}`;
+                    console.log(`[DesignTwentySix] Fetching from: ${url}`);
                     const response = await axiosInstance.get(url);
+                    console.log(`[DesignTwentySix] Response:`, response.data);
                     if (response.data.success) {
                         const transformed = response.data.data.map(rec => ({
                             ...rec,
                             ...rec.metadata,
                             key: rec._id
                         }));
+                        console.log(`[DesignTwentySix] Transformed Items:`, transformed);
                         setFetchedItems(transformed);
                     }
                 } catch (error) {
@@ -38,6 +45,7 @@ const DesignTwentySix = ({ id, title, description, subtitle, items = [], dataSou
             };
             fetchData();
         } else {
+            console.log(`[DesignTwentySix] No dataSource, using manual items:`, items);
             setFetchedItems(items || []);
         }
     }, [dataSource, items, departmentId]);
