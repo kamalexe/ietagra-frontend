@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import * as XLSX from 'xlsx';
 
+const DEFAULT_STUDENT_PASSWORD = 'std@123';
+
 const StudentProfileManager = () => {
     const { role, department: userDept } = useSelector((state) => state.user);
     const [students, setStudents] = useState([]);
@@ -169,7 +171,8 @@ const StudentProfileManager = () => {
                 skills: student.skills ? student.skills.join(', ') : '',
                 achievements: student.achievements ? student.achievements.join(', ') : '',
                 isApproved: student.isApproved,
-                isPublic: student.isPublic
+                isPublic: student.isPublic,
+                password: '' // Always clear password on open for security/clarity
             });
         } else {
             const defaultDept = role === 'department_admin' ? (userDept?._id || userDept) : '';
@@ -178,7 +181,8 @@ const StudentProfileManager = () => {
                 branch: '',
                 batch: '',
                 isApproved: true,
-                isPublic: true
+                isPublic: true,
+                password: ''
             });
         }
         setIsModalOpen(true);
@@ -388,6 +392,35 @@ const StudentProfileManager = () => {
                                             onChange={e => setFormData({ ...formData, skills: e.target.value })}
                                         />
                                     </div>
+
+                                    {role === 'admin' && (
+                                        <div className="flex-1">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Password
+                                                <span className="ml-2 text-[10px] text-gray-500 font-normal">(Default: {DEFAULT_STUDENT_PASSWORD})</span>
+                                            </label>
+                                            <div className="mt-1 flex gap-2">
+                                                <input
+                                                    type="password"
+                                                    value={formData.password || ''}
+                                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                                    placeholder="Leave blank to keep current"
+                                                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (window.confirm(`Reset password to default (${DEFAULT_STUDENT_PASSWORD})?`)) {
+                                                            setFormData({ ...formData, password: DEFAULT_STUDENT_PASSWORD });
+                                                        }
+                                                    }}
+                                                    className="px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-xs font-medium text-gray-600 hover:bg-gray-100 whitespace-nowrap"
+                                                >
+                                                    Set Default
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                         <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:col-start-2 sm:text-sm">
