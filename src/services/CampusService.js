@@ -18,7 +18,8 @@ const CampusService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch campuses list');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch campuses list');
         }
 
         const resData = await response.json();
@@ -32,7 +33,8 @@ const CampusService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch campus');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch campus');
         }
 
         const resData = await response.json();
@@ -47,7 +49,7 @@ const CampusService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to create campus');
         }
 
@@ -63,7 +65,7 @@ const CampusService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to update campus');
         }
 
@@ -78,7 +80,8 @@ const CampusService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete campus');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete campus');
         }
 
         return true;
@@ -91,7 +94,7 @@ const CampusService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to seed campuses');
         }
 
@@ -107,7 +110,7 @@ const CampusService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to reorder campuses');
         }
 

@@ -30,8 +30,8 @@ const CompanyService = {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Upload failed');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Upload failed');
         }
 
         return await response.json();
@@ -45,7 +45,10 @@ const CompanyService = {
                 'Authorization': `Bearer ${access_token}`
             }
         });
-        if (!response.ok) throw new Error('Failed to fetch registrations');
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch registrations');
+        }
         return await response.json();
     },
 
@@ -59,7 +62,10 @@ const CompanyService = {
             },
             body: JSON.stringify({ status })
         });
-        if (!response.ok) throw new Error('Failed to update status');
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to update status');
+        }
         return await response.json();
     }
 };

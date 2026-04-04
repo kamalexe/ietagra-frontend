@@ -19,12 +19,8 @@ const FacultyService = {
         });
 
         if (!response.ok) {
-            let errorMessage = `Failed to fetch faculty list (${response.status})`;
-            try {
-                const error = await response.json();
-                errorMessage = error.error || error.message || errorMessage;
-            } catch (e) { }
-            throw new Error(errorMessage);
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || `Failed to fetch faculty list (${response.status})`);
         }
 
         const resData = await response.json();
@@ -38,7 +34,8 @@ const FacultyService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch department faculty');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch department faculty');
         }
 
         const resData = await response.json();
@@ -53,16 +50,8 @@ const FacultyService = {
         });
 
         if (!response.ok) {
-            let errorMessage = `Failed to create faculty member (${response.status})`;
-            try {
-                const error = await response.json();
-                errorMessage = error.error || error.message || errorMessage;
-            } catch (jsonErr) {
-                // Not JSON, maybe get text
-                const text = await response.text().catch(() => '');
-                if (text) errorMessage += `: ${text.substring(0, 100)}`;
-            }
-            throw new Error(errorMessage);
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || `Failed to create faculty member (${response.status})`);
         }
 
         const resData = await response.json();
@@ -77,15 +66,8 @@ const FacultyService = {
         });
 
         if (!response.ok) {
-            let errorMessage = `Failed to update faculty member (${response.status})`;
-            try {
-                const error = await response.json();
-                errorMessage = error.error || error.message || errorMessage;
-            } catch (jsonErr) {
-                const text = await response.text().catch(() => '');
-                if (text) errorMessage += `: ${text.substring(0, 100)}`;
-            }
-            throw new Error(errorMessage);
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || `Failed to update faculty member (${response.status})`);
         }
 
         const resData = await response.json();
@@ -99,7 +81,8 @@ const FacultyService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete faculty member');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete faculty member');
         }
 
         return true;
@@ -116,8 +99,8 @@ const FacultyService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to bulk upload faculty');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to bulk upload faculty');
         }
 
         return await response.json();

@@ -18,7 +18,8 @@ const DepartmentService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch published departments');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch published departments');
         }
 
         const resData = await response.json();
@@ -32,7 +33,8 @@ const DepartmentService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch departments list');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch departments list');
         }
 
         const resData = await response.json();
@@ -47,7 +49,7 @@ const DepartmentService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to create department');
         }
 
@@ -63,7 +65,7 @@ const DepartmentService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to update department');
         }
 
@@ -78,7 +80,8 @@ const DepartmentService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete department');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete department');
         }
 
         return true;

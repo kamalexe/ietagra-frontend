@@ -22,7 +22,8 @@ const CourseService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch courses list');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch courses list');
         }
 
         const resData = await response.json();
@@ -36,7 +37,8 @@ const CourseService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch course');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch course');
         }
 
         const resData = await response.json();
@@ -51,7 +53,7 @@ const CourseService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to create course');
         }
 
@@ -67,7 +69,7 @@ const CourseService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({}));
             throw new Error(error.error || error.message || 'Failed to update course');
         }
 
@@ -82,7 +84,8 @@ const CourseService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete course');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete course');
         }
 
         return true;

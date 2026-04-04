@@ -19,7 +19,8 @@ const ResearchService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch research list');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch research list');
         }
 
         const resData = await response.json();
@@ -34,8 +35,8 @@ const ResearchService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to create research');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to create research');
         }
 
         const resData = await response.json();
@@ -50,8 +51,8 @@ const ResearchService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to update research');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to update research');
         }
 
         const resData = await response.json();
@@ -65,7 +66,8 @@ const ResearchService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete research');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete research');
         }
 
         return true;

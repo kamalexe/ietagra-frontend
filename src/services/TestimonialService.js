@@ -19,7 +19,8 @@ const TestimonialService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch testimonials');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch testimonials');
         }
 
         const resData = await response.json();
@@ -37,7 +38,8 @@ const TestimonialService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch testimonials');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch testimonials');
         }
 
         const resData = await response.json();
@@ -51,7 +53,8 @@ const TestimonialService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch testimonials');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch testimonials');
         }
 
         const resDataEvent = await response.json();
@@ -66,8 +69,8 @@ const TestimonialService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to create testimonial');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to create testimonial');
         }
 
         const resData = await response.json();
@@ -82,8 +85,8 @@ const TestimonialService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to update testimonial');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to update testimonial');
         }
 
         const resData = await response.json();
@@ -97,7 +100,8 @@ const TestimonialService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete testimonial');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete testimonial');
         }
 
         return true;

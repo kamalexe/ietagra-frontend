@@ -19,12 +19,8 @@ const StudentService = {
         });
 
         if (!response.ok) {
-            let errorMessage = `Failed to fetch students list (${response.status})`;
-            try {
-                const error = await response.json();
-                errorMessage = error.error || error.message || errorMessage;
-            } catch (e) { }
-            throw new Error(errorMessage);
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || `Failed to fetch students list (${response.status})`);
         }
 
         const resData = await response.json();
@@ -39,15 +35,8 @@ const StudentService = {
         });
 
         if (!response.ok) {
-            let errorMessage = `Failed to create student (${response.status})`;
-            try {
-                const error = await response.json();
-                errorMessage = error.error || error.message || errorMessage;
-            } catch (jsonErr) {
-                const text = await response.text().catch(() => '');
-                if (text) errorMessage += `: ${text.substring(0, 100)}`;
-            }
-            throw new Error(errorMessage);
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || `Failed to create student (${response.status})`);
         }
 
         const resData = await response.json();
@@ -62,15 +51,8 @@ const StudentService = {
         });
 
         if (!response.ok) {
-            let errorMessage = `Failed to update student (${response.status})`;
-            try {
-                const error = await response.json();
-                errorMessage = error.error || error.message || errorMessage;
-            } catch (jsonErr) {
-                const text = await response.text().catch(() => '');
-                if (text) errorMessage += `: ${text.substring(0, 100)}`;
-            }
-            throw new Error(errorMessage);
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || `Failed to update student (${response.status})`);
         }
 
         const resData = await response.json();
@@ -84,7 +66,8 @@ const StudentService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete student');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete student');
         }
 
         return true;
@@ -102,8 +85,8 @@ const StudentService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to bulk upload students');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to bulk upload students');
         }
 
         return await response.json();

@@ -67,7 +67,8 @@ const StudentDataManager = () => {
             setSelectedIds([]);
         } catch (error) {
             console.error("Error fetching records:", error);
-            alert("Failed to fetch records");
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Failed to fetch records";
+            alert(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -188,7 +189,8 @@ const StudentDataManager = () => {
             fetchRecords();
         } catch (error) {
             console.error("Upload failed", error);
-            alert("Upload failed: " + (error.response?.data?.message || error.message));
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Upload failed";
+            alert(errorMsg);
         } finally {
             setUploading(false);
         }
@@ -201,7 +203,8 @@ const StudentDataManager = () => {
             setRecords(records.filter(r => r._id !== id));
         } catch (error) {
             console.error(error);
-            alert("Delete failed");
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Delete failed";
+            alert(errorMsg);
         }
     };
 
@@ -213,7 +216,8 @@ const StudentDataManager = () => {
             setSelectedIds([]);
         } catch (error) {
             console.error("Bulk delete failed", error);
-            alert("Bulk delete failed");
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Bulk delete failed";
+            alert(errorMsg);
         }
     };
 
@@ -282,7 +286,8 @@ const StudentDataManager = () => {
             fetchRecords();
         } catch (error) {
             console.error(error);
-            alert("Save failed");
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Save failed";
+            alert(errorMsg);
         }
     };
 

@@ -22,7 +22,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch events');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch events');
         }
 
         const resData = await response.json();
@@ -40,7 +41,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch admin events');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch admin events');
         }
 
         const resData = await response.json();
@@ -54,7 +56,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch event');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch event');
         }
 
         const resData = await response.json();
@@ -68,7 +71,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch event');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch event');
         }
 
         const resData = await response.json();
@@ -83,8 +87,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to create event');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to create event');
         }
 
         const resData = await response.json();
@@ -99,8 +103,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to update event');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to update event');
         }
 
         const resData = await response.json();
@@ -114,7 +118,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete event');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to delete event');
         }
 
         return true;
@@ -131,8 +136,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to bulk upload events');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to bulk upload events');
         }
 
         return await response.json();
@@ -145,8 +150,8 @@ const EventService = {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to register for event');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to register for event');
         }
 
         const resData = await response.json();

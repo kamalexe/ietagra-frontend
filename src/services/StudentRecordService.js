@@ -19,7 +19,8 @@ const StudentRecordService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch student records');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch student records');
         }
 
         const resData = await response.json();
