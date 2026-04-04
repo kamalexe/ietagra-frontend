@@ -16,7 +16,7 @@ const ContactSubmissions = () => {
             setLoading(false);
         } catch (err) {
             console.error(err);
-            setError('Failed to fetch contact submissions');
+            setError(err.message || 'Failed to fetch contact submissions');
             setLoading(false);
         }
     };
@@ -28,7 +28,7 @@ const ContactSubmissions = () => {
             await axiosInstance.delete(`/contacts/${id}`);
             setContacts(contacts.filter(contact => contact._id !== id));
         } catch (err) {
-            toast.error('Failed to delete message');
+            toast.error('Failed to delete message: ' + (err.message || 'Unknown error'));
         }
     };
 

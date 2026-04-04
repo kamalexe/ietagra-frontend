@@ -62,7 +62,7 @@ const PagesList = () => {
                 await PageService.deletePage(slug);
                 setPages(pages.filter(p => p.slug !== slug));
             } catch (error) {
-                toast.error('Failed to delete page');
+                toast.error('Failed to delete page: ' + error.message);
             }
         }
     };

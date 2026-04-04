@@ -15,7 +15,7 @@ const CompanyRegistrationsList = () => {
             const res = await CompanyService.getAllRegistrations();
             setRegistrations(res.data);
         } catch (error) {
-            toast.error('Failed to load registrations');
+            toast.error('Failed to load registrations: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -27,7 +27,7 @@ const CompanyRegistrationsList = () => {
             toast.success('Status updated');
             fetchRegistrations();
         } catch (error) {
-            toast.error('Failed to update status');
+            toast.error('Failed to update status: ' + error.message);
         }
     };
 

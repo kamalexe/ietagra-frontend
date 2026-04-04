@@ -54,7 +54,7 @@ const CampusesList = () => {
             // toast.success("Order updated"); // If toast is available, but alert might be too annoying here
         } catch (error) {
             console.error("Failed to update order", error);
-            toast.error("Failed to save new order");
+            toast.error("Failed to save new order: " + error.message);
             loadCampuses(); // Revert on failure
         }
     };

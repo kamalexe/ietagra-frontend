@@ -479,7 +479,7 @@ const EventsList = () => {
             setError(null);
         } catch (err) {
             console.error("Failed to load events:", err);
-            setError("Failed to load events.");
+            setError(err.message || "Failed to load events.");
         } finally {
             setLoading(false);
         }
@@ -604,7 +604,7 @@ const EventsList = () => {
                 loadEvents();
                 toast.success("Event deleted successfully");
             } catch (err) {
-                toast.error(err.message);
+                toast.error("Error deleting event: " + err.message);
             }
         }
     };
@@ -654,7 +654,7 @@ const EventsList = () => {
             return res.data.data.url;
         } catch (error) {
             console.error(error);
-            toast.error("Upload failed: " + (error.response?.data?.message || error.message));
+            toast.error("Upload failed: " + error.message);
             return null;
         }
     };
@@ -677,7 +677,7 @@ const EventsList = () => {
             toast.success("Image uploaded successfully");
         } catch (error) {
             console.error(error);
-            toast.error("Image upload failed: " + (error.response?.data?.message || error.message));
+            toast.error("Image upload failed: " + error.message);
         } finally {
             setUploading(false);
             e.target.value = null;
