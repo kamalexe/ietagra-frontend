@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosConfig';
 import { toast } from 'react-hot-toast';
 import { Plus, Trash2, FileText, ArrowLeft } from 'lucide-react';
 import UploadService from '../../services/UploadService';
-import { getToken } from '../../services/LocalStorageService';
 
 const SyllabusManager = () => {
     const [view, setView] = useState('list'); // 'list' or 'add'
@@ -30,16 +29,13 @@ const SyllabusManager = () => {
     const fetchSyllabuses = async () => {
         setLoading(true);
         try {
-            // Reusing the public API (or we can use a protected admin one if we make it)
-            // Querying all for now. Ideally should support filtering/pagination for admin too.
-            const url = `${process.env.REACT_APP_API_BASE_URL}/syllabus`;
-            const res = await axios.get(url);
+            const res = await axiosInstance.get('/syllabus');
             if (res.data.success) {
                 setSyllabuses(res.data.data);
             }
         } catch (err) {
             console.error("Failed to fetch syllabuses", err);
-            toast.error("Failed to load syllabuses");
+            toast.error(err.message || "Failed to load syllabuses");
         } finally {
             setLoading(false);
         }
@@ -47,11 +43,7 @@ const SyllabusManager = () => {
 
     const fetchDepartments = async () => {
         try {
-            const { access_token } = getToken();
-            const url = `${process.env.REACT_APP_API_BASE_URL}/admin/departments`;
-            const res = await axios.get(url, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            const res = await axiosInstance.get('/admin/departments');
             if (res.data.success || res.data.status === 'success') {
                 setDepartments(res.data.data);
             }
@@ -64,15 +56,12 @@ const SyllabusManager = () => {
         if (!window.confirm("Are you sure you want to delete this syllabus?")) return;
 
         try {
-            const { access_token } = getToken();
-            await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/syllabus/${id}`, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            await axiosInstance.delete(`/syllabus/${id}`);
             toast.success("Syllabus deleted successfully");
             fetchSyllabuses(); // Refresh list
         } catch (err) {
             console.error(err);
-            toast.error("Failed to delete syllabus");
+            toast.error(err.message || "Failed to delete syllabus");
         }
     };
 
@@ -104,16 +93,13 @@ const SyllabusManager = () => {
             const fileId = uploadRes.public_id;
 
             // 2. Create Syllabus
-            const { access_token } = getToken();
             const syllabusData = {
                 ...formData,
                 fileUrl,
                 fileId
             };
 
-            const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/syllabus`, syllabusData, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            const res = await axiosInstance.post('/syllabus', syllabusData);
 
             if (res.data.success) {
                 toast.success("Syllabus added successfully!");
@@ -132,7 +118,7 @@ const SyllabusManager = () => {
             }
         } catch (err) {
             console.error(err);
-            toast.error(err.response?.data?.message || err.message || "Failed to add syllabus");
+            toast.error(err.message || "Failed to add syllabus");
         } finally {
             setLoading(false);
         }

@@ -22,7 +22,8 @@ const FooterService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch footer configuration');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch footer configuration');
         }
 
         const resData = await response.json();
@@ -37,7 +38,7 @@ const FooterService = {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || errorData.message || 'Failed to update footer configuration');
         }
 

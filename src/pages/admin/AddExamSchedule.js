@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosConfig';
 import { toast } from 'react-hot-toast';
 import UploadService from '../../services/UploadService';
-import { getToken } from '../../services/LocalStorageService';
 
 const AddExamSchedule = () => {
     const [formData, setFormData] = useState({
@@ -21,17 +20,13 @@ const AddExamSchedule = () => {
     useEffect(() => {
         const fetchDepartments = async () => {
             try {
-                const { access_token } = getToken();
-                const url = `${process.env.REACT_APP_API_BASE_URL}/admin/departments`;
-                const res = await axios.get(url, {
-                    headers: { Authorization: `Bearer ${access_token}` }
-                });
+                const res = await axiosInstance.get('/admin/departments');
                 if (res.data.success || res.data.status === 'success') {
                     setDepartments(res.data.data);
                 }
             } catch (err) {
                 console.error("Failed to fetch departments", err);
-                toast.error("Could not load departments");
+                toast.error(err.message || "Could not load departments");
             }
         };
         fetchDepartments();
@@ -63,12 +58,9 @@ const AddExamSchedule = () => {
             const semesterArray = formData.semester.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
 
             // 3. Create Exam Schedule
-            const { access_token } = getToken();
             const examData = {
                 ...formData,
                 semester: semesterArray,
-                // If department is empty string, send null or omit (backend handles omit fine if not required)
-                // But schema says required: false. If empty string is sent, mongoose might complain cast to ObjectId failed
                 department: formData.department || null,
                 fileUrl,
                 fileId
@@ -77,9 +69,7 @@ const AddExamSchedule = () => {
             // Clean up null department if needed
             if (!examData.department) delete examData.department;
 
-            const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/exam-schedule`, examData, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            const res = await axiosInstance.post('/exam-schedule', examData);
 
             if (res.data.success) {
                 toast.success("Exam Schedule added successfully!");
@@ -97,7 +87,7 @@ const AddExamSchedule = () => {
             }
         } catch (err) {
             console.error(err);
-            toast.error(err.response?.data?.message || err.message || "Failed to add exam schedule");
+            toast.error(err.message || "Failed to add exam schedule");
         } finally {
             setLoading(false);
         }

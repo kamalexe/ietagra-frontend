@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosConfig';
 import { toast } from 'react-hot-toast';
 import { Plus, Trash2, FileText, ArrowLeft } from 'lucide-react';
 import UploadService from '../../services/UploadService';
-import { getToken } from '../../services/LocalStorageService';
-
 
 const ExamScheduleManager = () => {
     const [view, setView] = useState('list'); // 'list' or 'add'
@@ -33,14 +31,13 @@ const ExamScheduleManager = () => {
     const fetchSchedules = async () => {
         setLoading(true);
         try {
-            const url = `${process.env.REACT_APP_API_BASE_URL}/exam-schedule`; 
-            const res = await axios.get(url);
+            const res = await axiosInstance.get('/exam-schedule');
             if (res.data.success) {
                 setSchedules(res.data.data);
             }
         } catch (err) {
             console.error("Failed to fetch schedules", err);
-            toast.error("Failed to load exam schedules");
+            toast.error(err.message || "Failed to load exam schedules");
         } finally {
             setLoading(false);
         }
@@ -48,11 +45,7 @@ const ExamScheduleManager = () => {
 
     const fetchDepartments = async () => {
         try {
-            const { access_token } = getToken();
-            const url = `${process.env.REACT_APP_API_BASE_URL}/admin/departments`;
-            const res = await axios.get(url, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            const res = await axiosInstance.get('/admin/departments');
             if (res.data.success || res.data.status === 'success') {
                 setDepartments(res.data.data);
             }
@@ -65,15 +58,12 @@ const ExamScheduleManager = () => {
         if (!window.confirm("Are you sure you want to delete this schedule?")) return;
 
         try {
-            const { access_token } = getToken();
-            await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/exam-schedule/${id}`, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            await axiosInstance.delete(`/exam-schedule/${id}`);
             toast.success("Schedule deleted successfully");
             fetchSchedules(); // Refresh list
         } catch (err) {
             console.error(err);
-            toast.error("Failed to delete schedule");
+            toast.error(err.message || "Failed to delete schedule");
         }
     };
 
@@ -104,7 +94,6 @@ const ExamScheduleManager = () => {
             const semesterArray = String(formData.semester).split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
 
             // 3. Create Schedule
-            const { access_token } = getToken();
             const examData = {
                 ...formData,
                 semester: semesterArray,
@@ -114,9 +103,7 @@ const ExamScheduleManager = () => {
             };
             if (!examData.department) delete examData.department;
 
-            const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/exam-schedule`, examData, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            const res = await axiosInstance.post('/exam-schedule', examData);
 
             if (res.data.success) {
                 toast.success("Schedule added successfully!");
@@ -137,7 +124,7 @@ const ExamScheduleManager = () => {
             }
         } catch (err) {
             console.error(err);
-            toast.error(err.response?.data?.message || err.message || "Failed to add schedule");
+            toast.error(err.message || "Failed to add schedule");
         } finally {
             setLoading(false);
         }

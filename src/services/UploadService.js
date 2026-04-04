@@ -18,7 +18,8 @@ const UploadService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch files');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || error.message || 'Failed to fetch files');
         }
 
         const resData = await response.json();
@@ -43,7 +44,7 @@ const UploadService = {
             const textFn = await response.text();
             try {
                 const errorData = JSON.parse(textFn);
-                throw new Error(errorData.message || 'Failed to upload file');
+                throw new Error(errorData.error || errorData.message || 'Failed to upload file');
             } catch (e) {
                 console.error("Non-JSON Error Response:", textFn);
                 throw new Error(`Upload Failed: Server returned ${response.status} ${response.statusText}`);
@@ -65,8 +66,8 @@ const UploadService = {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to delete file');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || errorData.message || 'Failed to delete file');
         }
 
         return await response.json();

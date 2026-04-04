@@ -27,7 +27,11 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        // You could handle 401 Unauthorized (Logout) here
+        // Extract descriptive error message from backend
+        if (error.response && error.response.data) {
+            const data = error.response.data;
+            error.message = data.error || data.message || error.message;
+        }
         return Promise.reject(error);
     }
 );

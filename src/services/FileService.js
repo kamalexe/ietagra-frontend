@@ -25,7 +25,7 @@ const FileService = {
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || `Upload failed (${response.status})`);
+            throw new Error(error.error || error.message || `Upload failed (${response.status})`);
         }
 
         const resData = await response.json();

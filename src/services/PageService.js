@@ -32,7 +32,8 @@ const PageService = {
             if (response.status === 404) {
                 throw new Error('Page not found');
             }
-            throw new Error('Failed to fetch page data');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || errorData.message || 'Failed to fetch page data');
         }
 
         const resData = await response.json();
@@ -66,7 +67,7 @@ const PageService = {
         console.log('[DEBUG] PageService: Response status', response.status);
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             console.error('[DEBUG] PageService: Update failed', errorData);
             throw new Error(errorData.error || errorData.message || 'Failed to update page');
         }
@@ -85,8 +86,8 @@ const PageService = {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to delete page');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || errorData.message || 'Failed to delete page');
         }
 
         const resData = await response.json();
@@ -106,7 +107,8 @@ const PageService = {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch pages');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || errorData.message || 'Failed to fetch pages');
         }
 
         const resData = await response.json();

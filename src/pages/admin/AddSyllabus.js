@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosConfig';
 import { toast } from 'react-hot-toast';
 import UploadService from '../../services/UploadService';
-import { getToken } from '../../services/LocalStorageService';
 
 const AddSyllabus = () => {
     const [formData, setFormData] = useState({
@@ -20,20 +19,13 @@ const AddSyllabus = () => {
         // Fetch departments
         const fetchDepartments = async () => {
             try {
-                const { access_token } = getToken();
-                // Or public endpoint if available, but likely need auth
-                const url = `${process.env.REACT_APP_API_BASE_URL}/admin/departments`; // using admin route to be safe or public one
-                // Wait, departments.js routes has '/published' as public, '/' as protected.
-                // Admin page should use protected one probably
-                const res = await axios.get(url, {
-                    headers: { Authorization: `Bearer ${access_token}` }
-                });
+                const res = await axiosInstance.get('/admin/departments');
                 if (res.data.success || res.data.status === 'success') {
                     setDepartments(res.data.data);
                 }
             } catch (err) {
                 console.error("Failed to fetch departments", err);
-                toast.error("Could not load departments");
+                toast.error(err.message || "Could not load departments");
             }
         };
         fetchDepartments();
@@ -66,16 +58,13 @@ const AddSyllabus = () => {
             const fileId = uploadRes.public_id;
 
             // 2. Create Syllabus
-            const { access_token } = getToken();
             const syllabusData = {
                 ...formData,
                 fileUrl,
                 fileId
             };
 
-            const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/syllabus`, syllabusData, {
-                headers: { Authorization: `Bearer ${access_token}` }
-            });
+            const res = await axiosInstance.post('/syllabus', syllabusData);
 
             if (res.data.success) {
                 toast.success("Syllabus added successfully!");
@@ -92,7 +81,7 @@ const AddSyllabus = () => {
             }
         } catch (err) {
             console.error(err);
-            toast.error(err.response?.data?.message || err.message || "Failed to add syllabus");
+            toast.error(err.message || "Failed to add syllabus");
         } finally {
             setLoading(false);
         }
