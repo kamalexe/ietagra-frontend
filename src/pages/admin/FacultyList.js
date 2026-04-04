@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { PencilSquareIcon, TrashIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import FacultyService from '../../services/FacultyService';
 import DepartmentService from '../../services/DepartmentService';
@@ -109,8 +110,9 @@ const FacultyList = () => {
             try {
                 await FacultyService.deleteFaculty(id);
                 setFaculty(faculty.filter(f => f._id !== id));
+                toast.success("Faculty member deleted successfully");
             } catch (err) {
-                alert("Failed to delete faculty member: " + err.message);
+                toast.error("Failed to delete faculty member: " + err.message);
             }
         }
     }
@@ -120,11 +122,12 @@ const FacultyList = () => {
             // Optimistic update
             setFaculty(faculty.map(f => f._id === id ? { ...f, [field]: value } : f));
             await FacultyService.updateFaculty(id, { [field]: value });
+            toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated`);
         } catch (err) {
             console.error(`Failed to update ${field}:`, err);
             // Revert on failure
             loadFaculty();
-            alert(`Failed to update status: ${err.message}`);
+            toast.error(`Failed to update status: ${err.message}`);
         }
     };
 
@@ -137,11 +140,11 @@ const FacultyList = () => {
 
         try {
             await FacultyService.bulkUpload(formData);
-            alert("Upload Successful!");
+            toast.success("Bulk upload successful!");
             loadFaculty(); // Reload list
         } catch (error) {
             console.error("Upload failed:", error);
-            alert("Upload Failed: " + error.message);
+            toast.error("Upload Failed: " + error.message);
         } finally {
             e.target.value = null; // Reset input
         }
@@ -155,8 +158,9 @@ const FacultyList = () => {
             setUploading(true);
             const data = await FileService.uploadFile(file);
             setFormData(prev => ({ ...prev, image: data.url }));
+            toast.success("Image uploaded successfully");
         } catch (error) {
-            alert("Image upload failed: " + error.message);
+            toast.error("Image upload failed: " + error.message);
         } finally {
             setUploading(false);
             e.target.value = null;
@@ -176,14 +180,16 @@ const FacultyList = () => {
                 // Update
                 const updated = await FacultyService.updateFaculty(editingMember._id, payload);
                 setFaculty(faculty.map(f => f._id === editingMember._id ? updated : f));
+                toast.success("Faculty member updated successfully");
             } else {
                 // Create
                 const created = await FacultyService.createFaculty(payload);
                 setFaculty([...faculty, created]);
+                toast.success("Faculty member added successfully");
             }
             setIsModalOpen(false);
         } catch (err) {
-            alert("Failed to save faculty member: " + err.message);
+            toast.error("Failed to save faculty member: " + err.message);
         }
     };
 
@@ -204,9 +210,10 @@ const FacultyList = () => {
 
         try {
             await FacultyService.reorderFaculty(orders);
+            toast.success("Faculty order saved");
         } catch (err) {
             console.error("Failed to save reorder:", err);
-            alert("Failed to save new order: " + err.message);
+            toast.error("Failed to save new order: " + err.message);
             loadFaculty(); // Revert on failure
         }
     };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, XMarkIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
@@ -46,10 +47,10 @@ const PagesList = () => {
 
             setIsModalOpen(false);
             setNewPage({ title: '', slug: '' });
-            alert('Page created successfully!');
+            toast.success('Page created successfully!');
         } catch (error) {
             console.error(error);
-            alert(`Error: ${error.message}`);
+            toast.error(`Error: ${error.message}`);
         } finally {
             setIsCreating(false);
         }
@@ -61,7 +62,7 @@ const PagesList = () => {
                 await PageService.deletePage(slug);
                 setPages(pages.filter(p => p.slug !== slug));
             } catch (error) {
-                alert('Failed to delete page');
+                toast.error('Failed to delete page');
             }
         }
     };

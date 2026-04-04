@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 import { TrashIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 import axiosInstance from '../../api/axiosConfig';
@@ -27,7 +28,7 @@ const ContactSubmissions = () => {
             await axiosInstance.delete(`/contacts/${id}`);
             setContacts(contacts.filter(contact => contact._id !== id));
         } catch (err) {
-            alert('Failed to delete message');
+            toast.error('Failed to delete message');
         }
     };
 

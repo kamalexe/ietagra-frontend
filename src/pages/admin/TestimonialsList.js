@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import TestimonialService from '../../services/TestimonialService';
 import DepartmentService from '../../services/DepartmentService';
 import FileService from '../../services/FileService';
@@ -107,15 +108,15 @@ const TestimonialsList = () => {
 
             if (editingId) {
                 await TestimonialService.updateTestimonial(editingId, payload);
-                alert("Testimonial updated successfully!");
+                toast.success("Testimonial updated successfully!");
             } else {
                 await TestimonialService.createTestimonial(payload);
-                alert("Testimonial created successfully!");
+                toast.success("Testimonial created successfully!");
             }
             handleCloseModal();
             loadTestimonials();
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message);
         }
     };
 
@@ -124,8 +125,9 @@ const TestimonialsList = () => {
             try {
                 await TestimonialService.deleteTestimonial(id);
                 loadTestimonials();
+                toast.success("Testimonial deleted successfully");
             } catch (err) {
-                alert(err.message);
+                toast.error(err.message);
             }
         }
     };
@@ -138,9 +140,9 @@ const TestimonialsList = () => {
             setUploading(true);
             const data = await FileService.uploadFile(file);
             setFormData(prev => ({ ...prev, image: data.url }));
-            alert("Image uploaded successfully!");
+            toast.success("Image uploaded successfully!");
         } catch (error) {
-            alert("Image upload failed: " + error.message);
+            toast.error("Image upload failed: " + error.message);
         } finally {
             setUploading(false);
         }

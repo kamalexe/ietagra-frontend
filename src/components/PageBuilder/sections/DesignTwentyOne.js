@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 import EventService from '../../../services/EventService';
 import TestimonialService from '../../../services/TestimonialService';
@@ -53,11 +54,11 @@ const DesignTwentyOne = () => {
         try {
             await EventService.registerEvent(event._id);
             setRegistrationStatus('success');
-            alert('Successfully registered for the event!');
+            toast.success('Successfully registered for the event!');
         } catch (err) {
             console.error("Registration failed", err);
             setRegistrationStatus('error');
-            alert(err.message || 'Registration failed');
+            toast.error(err.message || 'Registration failed');
         } finally {
             setRegistering(false);
         }

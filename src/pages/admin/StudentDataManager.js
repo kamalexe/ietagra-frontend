@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../api/axiosConfig';
 import { PlusIcon, TrashIcon, PencilIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
@@ -68,7 +69,7 @@ const StudentDataManager = () => {
         } catch (error) {
             console.error("Error fetching records:", error);
             const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Failed to fetch records";
-            alert(errorMsg);
+            toast.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -171,7 +172,7 @@ const StudentDataManager = () => {
         });
 
         if (validRecords.length === 0) {
-            alert("No valid records to upload.");
+            toast.error("No valid records to upload.");
             return;
         }
 
@@ -183,14 +184,14 @@ const StudentDataManager = () => {
                 category: activeTab
             });
             console.log("[confirmUpload] Success:", resp.data);
-            alert(`Successfully uploaded ${validRecords.length} records!`);
+            toast.success(`Successfully uploaded ${validRecords.length} records!`);
             setIsPreviewOpen(false);
             setPreviewData([]);
             fetchRecords();
         } catch (error) {
             console.error("Upload failed", error);
             const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Upload failed";
-            alert(errorMsg);
+            toast.error(errorMsg);
         } finally {
             setUploading(false);
         }
@@ -201,10 +202,11 @@ const StudentDataManager = () => {
         try {
             await axiosInstance.delete(`/student-records/${id}`);
             setRecords(records.filter(r => r._id !== id));
+            toast.success("Record deleted successfully");
         } catch (error) {
             console.error(error);
             const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Delete failed";
-            alert(errorMsg);
+            toast.error(errorMsg);
         }
     };
 
@@ -214,10 +216,11 @@ const StudentDataManager = () => {
             await axiosInstance.post('/student-records/delete-many', { ids: selectedIds });
             fetchRecords();
             setSelectedIds([]);
+            toast.success("Bulk delete successful");
         } catch (error) {
             console.error("Bulk delete failed", error);
             const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Bulk delete failed";
-            alert(errorMsg);
+            toast.error(errorMsg);
         }
     };
 
@@ -277,8 +280,10 @@ const StudentDataManager = () => {
 
             if (editRecord) {
                 await axiosInstance.put(`/student-records/${editRecord._id}`, payload);
+                toast.success("Record updated successfully");
             } else {
                 await axiosInstance.post('/student-records', payload);
+                toast.success("Record created successfully");
             }
             setIsModalOpen(false);
             setEditRecord(null);
@@ -287,7 +292,7 @@ const StudentDataManager = () => {
         } catch (error) {
             console.error(error);
             const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || "Save failed";
-            alert(errorMsg);
+            toast.error(errorMsg);
         }
     };
 

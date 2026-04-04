@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import CourseService from '../../services/CourseService';
@@ -74,15 +75,15 @@ const CoursesList = () => {
         try {
             if (editingId) {
                 await CourseService.updateCourse(editingId, { ...formData, slug });
-                alert('Course updated successfully!');
+                toast.success('Course updated successfully!');
             } else {
                 await CourseService.createCourse({ ...formData, slug });
-                alert('Course created successfully!');
+                toast.success('Course created successfully!');
             }
             setIsModalOpen(false);
             loadCourses();
         } catch (error) {
-            alert('Error saving course: ' + error.message);
+            toast.error('Error saving course: ' + error.message);
         }
     };
 
@@ -100,7 +101,7 @@ const CoursesList = () => {
                 }
                 setCourses(courses.filter(c => c._id !== id));
             } catch (err) {
-                alert("Failed to delete: " + err.message);
+                toast.error("Failed to delete: " + err.message);
             }
         }
     };

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import GalleryService from '../../services/GalleryService';
 
 import { useSelector } from 'react-redux';
@@ -143,7 +144,7 @@ const GalleryList = () => {
             setFormData(prev => ({ ...prev, imageUrl: res.data.data.url }));
         } catch (error) {
             console.error(error);
-            alert("Image upload failed: " + (error.response?.data?.message || error.message));
+            toast.error("Image upload failed: " + (error.response?.data?.message || error.message));
         } finally {
             setUploading(false);
             e.target.value = null;
@@ -160,15 +161,15 @@ const GalleryList = () => {
 
             if (editingId) {
                 await GalleryService.updateGalleryImage(editingId, dataToSubmit);
-                alert("Gallery image updated successfully!");
+                toast.success("Gallery image updated successfully!");
             } else {
                 await GalleryService.createGalleryImage(dataToSubmit);
-                alert("Gallery image added successfully!");
+                toast.success("Gallery image added successfully!");
             }
             handleCloseModal();
             loadImages();
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message);
         }
     };
 
@@ -177,8 +178,9 @@ const GalleryList = () => {
             try {
                 await GalleryService.deleteGalleryImage(id);
                 loadImages();
+                toast.success("Gallery image deleted successfully");
             } catch (err) {
-                alert(err.message);
+                toast.error(err.message);
             }
         }
     };

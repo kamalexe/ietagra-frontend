@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { Link, useLocation } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, AcademicCapIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
@@ -102,7 +103,7 @@ const DepartmentsList = () => {
         };
         const updatedDept = await DepartmentService.updateDepartment(editingId, updateData);
         setDepartments(departments.map(d => d._id === editingId ? { ...updatedDept, lastModified: new Date().toISOString().split('T')[0] } : d));
-        alert('Department updated successfully!');
+        toast.success('Department updated successfully!');
       } else {
         // CREATE NEW
         // The backend now automatically handles Page creation and linking
@@ -118,14 +119,14 @@ const DepartmentsList = () => {
           ...createdDept,
           lastModified: new Date().toISOString().split('T')[0]
         }]);
-        alert('Department created successfully (Page also created)!');
+        toast.success('Department created successfully (Page also created)!');
       }
 
       setIsModalOpen(false);
       setNewDept({ name: '', slug: '', head: '', description: '' });
       setEditingId(null);
     } catch (error) {
-      alert('Error saving department: ' + error.message);
+      toast.error('Error saving department: ' + error.message);
     }
   };
 
@@ -145,7 +146,7 @@ const DepartmentsList = () => {
 
         setDepartments(departments.filter(d => d._id !== id));
       } catch (err) {
-        alert("Failed to delete: " + err.message);
+        toast.error("Failed to delete: " + err.message);
       }
     }
   };

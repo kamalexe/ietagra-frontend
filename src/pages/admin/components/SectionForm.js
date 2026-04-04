@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { XMarkIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import SectionSchemas from './SectionSchemas';
 import FileService from '../../../services/FileService';
@@ -113,7 +114,7 @@ const SectionForm = ({ section, onClose, onSave }) => {
       }
 
     } catch (err) {
-      alert("Image upload failed: " + err.message);
+      toast.error("Image upload failed: " + err.message);
     } finally {
       e.target.value = null;
     }
@@ -123,7 +124,7 @@ const SectionForm = ({ section, onClose, onSave }) => {
     e.preventDefault();
     // Block save if there are errors
     if (Object.keys(jsonErrors).length > 0) {
-      alert('Please fix JSON errors before saving.');
+      toast.error('Please fix JSON errors before saving.');
       return;
     }
     onSave(section.id, formData);

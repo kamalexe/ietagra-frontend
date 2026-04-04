@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import PageService from '../../services/PageService';
 import FileService from '../../services/FileService';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
@@ -73,10 +74,10 @@ const HomeConfig = () => {
       // If it's a new system, we might need a specific create check or ensure 'home' page exists.
       // Assuming 'home' page exists for this implementation.
       await PageService.updatePage('home', updatedPage);
-      alert('Home configuration saved successfully!');
+      toast.success('Home configuration saved successfully!');
     } catch (err) {
       console.error("Failed to save", err);
-      alert('Failed to save configuration.');
+      toast.error('Failed to save configuration: ' + err.message);
     } finally {
       setIsSaving(false);
     }
@@ -245,8 +246,9 @@ const HomeConfig = () => {
                           ...admissionConfig,
                           posters: [...admissionConfig.posters, data.url]
                         });
+                        toast.success("Poster uploaded successfully");
                       } catch (err) {
-                        alert("Upload failed: " + err.message);
+                        toast.error("Upload failed: " + err.message);
                       } finally {
                         e.target.value = null;
                       }

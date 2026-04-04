@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, BuildingLibraryIcon, XMarkIcon, Cog6ToothIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
@@ -53,7 +54,7 @@ const CampusesList = () => {
             // toast.success("Order updated"); // If toast is available, but alert might be too annoying here
         } catch (error) {
             console.error("Failed to update order", error);
-            alert("Failed to save new order");
+            toast.error("Failed to save new order");
             loadCampuses(); // Revert on failure
         }
     };
@@ -96,15 +97,15 @@ const CampusesList = () => {
         try {
             if (editingId) {
                 await CampusService.updateCampus(editingId, campusData);
-                alert('Campus updated successfully!');
+                toast.success('Campus updated successfully!');
             } else {
                 await CampusService.createCampus(campusData);
-                alert('Campus created successfully!');
+                toast.success('Campus created successfully!');
             }
             setIsModalOpen(false);
             loadCampuses();
         } catch (error) {
-            alert('Error saving campus: ' + error.message);
+            toast.error('Error saving campus: ' + error.message);
         }
     };
 
@@ -114,7 +115,7 @@ const CampusesList = () => {
                 await CampusService.deleteCampus(id);
                 setCampuses(campuses.filter(c => c._id !== id));
             } catch (err) {
-                alert("Failed to delete: " + err.message);
+                toast.error("Failed to delete: " + err.message);
             }
         }
     };
@@ -123,10 +124,10 @@ const CampusesList = () => {
         if (window.confirm("Warning: This will clear ALL existing campuses and courses and refill them with school-standard data. Do you want to proceed?")) {
             try {
                 await CampusService.seedCampuses();
-                alert('Data seeded successfully!');
+                toast.success('Data seeded successfully!');
                 loadCampuses();
             } catch (err) {
-                alert("Failed to seed: " + err.message);
+                toast.error("Failed to seed: " + err.message);
             }
         }
     };

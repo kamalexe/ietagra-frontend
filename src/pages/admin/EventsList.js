@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { toast } from 'react-hot-toast';
 import EventService from '../../services/EventService';
 
 import { useSelector } from 'react-redux';
@@ -25,7 +26,7 @@ const SpeakerManager = ({ speakers, onChange, onUpload }) => {
     };
 
     const addSpeaker = () => {
-        if (!newSpeaker.name) return alert('Name is required');
+        if (!newSpeaker.name) return toast.error('Name is required');
         onChange([...speakers, newSpeaker]);
         setNewSpeaker({ name: '', designation: '', image: '', bio: '' });
     };
@@ -71,7 +72,7 @@ const AgendaManager = ({ agenda, onChange }) => {
     const [newItem, setNewItem] = useState({ time: '', title: '', description: '', speakerName: '' });
 
     const addItem = () => {
-        if (!newItem.time || !newItem.title) return alert('Time and Title are required');
+        if (!newItem.time || !newItem.title) return toast.error('Time and Title are required');
         onChange([...agenda, newItem]);
         setNewItem({ time: '', title: '', description: '', speakerName: '' });
     };
@@ -125,7 +126,7 @@ const GalleryManager = ({ gallery, onChange, onUpload }) => {
     };
 
     const addItem = () => {
-        if (!newItem.url) return alert('URL is required');
+        if (!newItem.url) return toast.error('URL is required');
         // Ensure default sequence is array length (append to end)
         const itemWithDefaults = { ...newItem, sequence: gallery.length };
         onChange([...gallery, itemWithDefaults]);
@@ -242,7 +243,7 @@ const ResourcesManager = ({ resources, onChange, onUpload }) => {
     };
 
     const addItem = () => {
-        if (!newItem.title || !newItem.url) return alert('Title and URL are required');
+        if (!newItem.title || !newItem.url) return toast.error('Title and URL are required');
         onChange([...resources, newItem]);
         setNewItem({ title: '', url: '' });
     };
@@ -314,7 +315,7 @@ const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
     }, [eventId, fetchTestimonials]);
 
     const addItem = async () => {
-        if (!newItem.name || !newItem.message || !newItem.role) return alert('Name, Role and Message are required');
+        if (!newItem.name || !newItem.message || !newItem.role) return toast.error('Name, Role and Message are required');
 
         // Final safety check, though UI should prevent this
         // Department check removed per user request (General events allowed)
@@ -328,8 +329,9 @@ const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
             });
             setNewItem({ name: '', role: '', message: '', rating: 5, image: '', type: 'text', videoUrl: '', category: 'event', isPublished: true });
             fetchTestimonials();
+            toast.success("Testimonial added successfully");
         } catch (error) {
-            alert(error.message || "Failed to add testimonial");
+            toast.error(error.message || "Failed to add testimonial");
         }
     };
 
@@ -338,8 +340,9 @@ const EventTestimonialManager = ({ eventId, departmentId, onUpload }) => {
         try {
             await TestimonialService.deleteTestimonial(id);
             setTestimonials(testimonials.filter(t => t._id !== id));
+            toast.success("Testimonial deleted successfully");
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         }
     };
 
@@ -563,7 +566,7 @@ const EventsList = () => {
 
         // Validation
         if (!formData.title || !formData.date || !formData.place || !formData.description) {
-            alert("Please fill in all required fields: Title, Date, Place, and Description.");
+            toast.error("Please fill in all required fields: Title, Date, Place, and Description.");
             return;
         }
 
@@ -579,18 +582,18 @@ const EventsList = () => {
 
             if (editingId) {
                 await EventService.updateEvent(editingId, dataToSubmit);
-                alert("Event updated successfully!");
+                toast.success("Event updated successfully!");
                 handleCloseModal(); // Close ONLY on success
                 loadEvents();
             } else {
                 await EventService.createEvent(dataToSubmit);
-                alert("Event created successfully!");
+                toast.success("Event created successfully!");
                 handleCloseModal(); // Close ONLY on success
                 loadEvents();
             }
         } catch (err) {
             console.error("Submit Error:", err);
-            alert("Failed to save event: " + (err.message || "Unknown error"));
+            toast.error("Failed to save event: " + (err.message || "Unknown error"));
         }
     };
 
@@ -599,8 +602,9 @@ const EventsList = () => {
             try {
                 await EventService.deleteEvent(id);
                 loadEvents();
+                toast.success("Event deleted successfully");
             } catch (err) {
-                alert(err.message);
+                toast.error(err.message);
             }
         }
     };
@@ -626,11 +630,11 @@ const EventsList = () => {
 
         try {
             await EventService.bulkUpload(formData);
-            alert("Upload Successful!");
+            toast.success("Bulk upload successful!");
             loadEvents();
         } catch (error) {
             console.error("Upload failed:", error);
-            alert("Upload Failed: " + error.message);
+            toast.error("Upload Failed: " + error.message);
         } finally {
             e.target.value = null;
         }
@@ -650,7 +654,7 @@ const EventsList = () => {
             return res.data.data.url;
         } catch (error) {
             console.error(error);
-            alert("Upload failed: " + (error.response?.data?.message || error.message));
+            toast.error("Upload failed: " + (error.response?.data?.message || error.message));
             return null;
         }
     };
@@ -670,9 +674,10 @@ const EventsList = () => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setFormData(prev => ({ ...prev, image: res.data.data.url }));
+            toast.success("Image uploaded successfully");
         } catch (error) {
             console.error(error);
-            alert("Image upload failed: " + (error.response?.data?.message || error.message));
+            toast.error("Image upload failed: " + (error.response?.data?.message || error.message));
         } finally {
             setUploading(false);
             e.target.value = null;

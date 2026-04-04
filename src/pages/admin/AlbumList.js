@@ -1,5 +1,5 @@
-// AlbumList - Admin Interface for Gallery Albums
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import AlbumService from '../../services/AlbumService';
 import DepartmentService from '../../services/DepartmentService';
 import { useSelector } from 'react-redux';
@@ -121,9 +121,10 @@ const AlbumList = () => {
             }
             setIsAlbumModalOpen(false);
             loadAlbums();
+            toast.success(albumFormData._id ? "Album updated successfully" : "Album created successfully");
         } catch (err) {
             console.error(err);
-            alert(err.message); // Keep error alert for now or cleaner? Let's keep error alert as fallback but removing success alert is key.
+            toast.error(err.message); 
         }
     };
 
@@ -132,9 +133,10 @@ const AlbumList = () => {
             try {
                 await AlbumService.deleteAlbum(id);
                 loadAlbums();
+                toast.success("Album deleted successfully");
             } catch (err) {
                 console.error(err);
-                alert(err.message);
+                toast.error(err.message);
             }
         });
     };
@@ -158,9 +160,10 @@ const AlbumList = () => {
             setCurrentAlbum(updated);
             setIsMediaModalOpen(false);
             loadAlbums();
+            toast.success("Media added successfully");
         } catch (err) {
             console.error(err);
-            alert("Failed to add media: " + err.message);
+            toast.error("Failed to add media: " + err.message);
         }
     };
 
@@ -171,9 +174,10 @@ const AlbumList = () => {
                 const updated = await AlbumService.updateAlbum(currentAlbum._id, { media: updatedMedia });
                 setCurrentAlbum(updated);
                 loadAlbums();
+                toast.success("Media removed successfully");
             } catch (err) {
                 console.error(err);
-                alert("Failed to remove media: " + err.message);
+                toast.error("Failed to remove media: " + err.message);
             }
         });
     };
@@ -227,8 +231,9 @@ const AlbumList = () => {
             } else {
                 setMediaFormData(prev => ({ ...prev, src: res.data.data.url }));
             }
+            toast.success("Image uploaded successfully");
         } catch (error) {
-            alert("Upload failed: " + (error.response?.data?.message || error.message));
+            toast.error("Upload failed: " + (error.response?.data?.message || error.message));
         } finally {
             setUploading(false);
         }

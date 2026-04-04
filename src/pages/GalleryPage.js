@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     PhotoIcon,
@@ -126,7 +127,7 @@ const GalleryPage = () => {
 
     const openAlbum = (album) => {
         if (!album.media || album.media.length === 0) {
-            alert("This album is empty.");
+            toast.error("This album is empty.");
             return;
         }
         setSelectedAlbum(album);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import ResearchService from '../../services/ResearchService';
 import DepartmentService from '../../services/DepartmentService';
 import { useSelector } from 'react-redux';
@@ -94,15 +95,15 @@ const ResearchList = () => {
             };
             if (editingId) {
                 await ResearchService.updateResearch(editingId, payload);
-                alert("Research updated successfully!");
+                toast.success("Research updated successfully!");
             } else {
                 await ResearchService.createResearch(payload);
-                alert("Research created successfully!");
+                toast.success("Research created successfully!");
             }
             handleCloseModal();
             loadResearch();
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message);
         }
     };
 
@@ -111,8 +112,9 @@ const ResearchList = () => {
             try {
                 await ResearchService.deleteResearch(id);
                 loadResearch();
+                toast.success("Research deleted successfully");
             } catch (err) {
-                alert(err.message);
+                toast.error(err.message);
             }
         }
     };

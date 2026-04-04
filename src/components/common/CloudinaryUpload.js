@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import CloudinaryService from '../../services/CloudinaryService';
 
 const CloudinaryUpload = ({ 
@@ -25,7 +26,7 @@ const CloudinaryUpload = ({
             if (onUploadFailure) {
                 onUploadFailure(error);
             } else {
-                alert(`Upload Failed: ${error.message}`);
+                toast.error(`Upload Failed: ${error.message}`);
             }
         } finally {
             setUploading(false);
