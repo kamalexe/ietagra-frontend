@@ -263,10 +263,17 @@ const schemas = {
         }
     ],
     'design_fifteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
-        { name: 'title', label: 'Title', type: 'text' },
-        { name: 'videoUrl', label: 'Video URL', type: 'text' },
-        { name: 'thumbnail', label: 'Video Thumbnail', type: 'image' },
-        { name: 'description', label: 'Description', type: 'textarea' }
+        { name: 'title', label: 'Section Title', type: 'text' },
+        {
+            name: 'items',
+            label: 'Carousel Items',
+            type: 'list',
+            itemSchema: [
+                { name: 'image', label: 'Image URL', type: 'image' },
+                { name: 'title', label: 'Item Title', type: 'text' },
+                { name: 'description', label: 'Description', type: 'textarea' }
+            ]
+        }
     ],
     'design_sixteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
