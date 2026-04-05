@@ -1,5 +1,5 @@
 const schemas = {
-    'hero_section': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'hero_section': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'variant', label: 'Variant', type: 'select', options: ['simple', 'hero'] },
         { name: 'title', label: 'Heading / Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
@@ -18,7 +18,7 @@ const schemas = {
             ]
         }
     ],
-    'design_one': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_one': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'variant', label: 'Variant', type: 'select', options: ['simple', 'hero'] },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
@@ -37,7 +37,7 @@ const schemas = {
             ]
         }
     ],
-    'design_two': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_two': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         {
             name: 'items',
             label: 'Features List',
@@ -49,7 +49,7 @@ const schemas = {
             ]
         }
     ],
-    'design_three': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_three': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         {
             name: 'cards',
             label: 'Cards List',
@@ -62,7 +62,7 @@ const schemas = {
             ]
         }
     ],
-    'design_four': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_four': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         {
@@ -79,7 +79,7 @@ const schemas = {
             ]
         }
     ],
-    'design_five': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_five': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         {
@@ -92,7 +92,7 @@ const schemas = {
             ]
         }
     ],
-    'design_six': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_six': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         {
             name: 'items',
@@ -105,7 +105,7 @@ const schemas = {
             ]
         }
     ],
-    'design_seven': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_seven': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         {
             name: 'tabs',
             label: 'Tabs List',
@@ -127,7 +127,7 @@ const schemas = {
             ]
         }
     ],
-    'design_eight': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_eight': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'badge', label: 'Badge', type: 'text' },
         { name: 'content', label: 'Main Content', type: 'textarea' },
@@ -151,10 +151,20 @@ const schemas = {
             ]
         }
     ],
-    'design_nine': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_nine': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'variant', label: 'Variant', type: 'select', options: ['simple', 'publication', 'visit'] },
         { name: 'columns', label: 'Columns (2, 3, 4)', type: 'number' },
+        { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
+        {
+            name: 'dataSource',
+            label: 'Dynamic Data Source',
+            type: 'select',
+            options: [
+                { label: 'None (Use Manual Items)', value: '' },
+                { label: 'Research Papers', value: 'research' }
+            ]
+        },
         {
             name: 'items',
             label: 'Items List',
@@ -169,7 +179,7 @@ const schemas = {
             ]
         }
     ],
-    'design_ten': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_ten': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'image', label: 'Image', type: 'image' },
@@ -184,7 +194,7 @@ const schemas = {
             ]
         }
     ],
-    'design_eleven': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_eleven': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'image', label: 'Image', type: 'image' },
@@ -192,7 +202,7 @@ const schemas = {
         { name: 'buttonLink', label: 'Button Link', type: 'text' },
         { name: 'reverse', label: 'Reverse Layout', type: 'select', options: ['true', 'false'] }
     ],
-    'design_twelve': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twelve': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'departmentId', label: 'Department (for dynamic fetching)', type: 'department_select' },
         {
@@ -216,7 +226,7 @@ const schemas = {
             ]
         }
     ],
-    'design_thirteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_thirteen': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         {
             name: 'items',
@@ -231,7 +241,7 @@ const schemas = {
             ]
         }
     ],
-    'design_fourteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_fourteen': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'badge', label: 'Badge', type: 'text' },
         { name: 'underlineColor', label: 'Underline Color Class', type: 'color_suggestion' },
@@ -262,7 +272,7 @@ const schemas = {
             ]
         }
     ],
-    'design_fifteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_fifteen': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         {
             name: 'items',
@@ -275,7 +285,7 @@ const schemas = {
             ]
         }
     ],
-    'design_sixteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_sixteen': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
@@ -310,7 +320,7 @@ const schemas = {
             ]
         }
     ],
-    'design_seventeen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_seventeen': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         { name: 'description', label: 'Description', type: 'textarea' },
         {
@@ -323,7 +333,7 @@ const schemas = {
             ]
         }
     ],
-    'design_eighteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_eighteen': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
         { name: 'icon', label: 'Main Icon/Emoji', type: 'icon_suggestion' },
@@ -348,7 +358,7 @@ const schemas = {
             ]
         }
     ],
-    'design_nineteen': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_nineteen': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         { name: 'image', label: 'Person Image', type: 'image' },
         { name: 'name', label: 'Name', type: 'text' },
@@ -357,14 +367,15 @@ const schemas = {
         { name: 'quote', label: 'Quote', type: 'textarea' },
         { name: 'content', label: 'Content (HTML supported)', type: 'textarea' }
     ],
-    'design_twenty': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twenty': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         { name: 'subtitle', label: 'Subtitle', type: 'text' },
         { name: 'content', label: 'Content (HTML)', type: 'textarea' },
         { name: 'backgroundImage', label: 'Header Background Image', type: 'image' },
+        { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
         { name: 'limit', label: 'Number of Events (leave empty for all)', type: 'number' }
     ],
-    'design_twenty_one': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twenty_one': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'mapEmbedUrl', label: 'Map Embed URL', type: 'text' },
         {
@@ -378,11 +389,11 @@ const schemas = {
             ]
         }
     ],
-    'about_brief': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'about_brief': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Title', type: 'text' },
         { name: 'text', label: 'Content', type: 'textarea' }
     ],
-    'stats_grid': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'stats_grid': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         {
             name: 'stats',
             label: 'Statistics',
@@ -394,7 +405,7 @@ const schemas = {
             ]
         }
     ],
-    'department_hero': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'department_hero': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Department Title', type: 'text' },
         { name: 'subtitle', label: 'Subtitle', type: 'text' },
         { name: 'backgroundImage', label: 'Hero Image', type: 'image' },
@@ -408,7 +419,7 @@ const schemas = {
             ]
         }
     ],
-    'design_twenty_two': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twenty_two': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Form Title', type: 'text', placeholder: 'Feedback/Query Form' },
         { name: 'subtitle', label: 'Form Subtitle', type: 'text' },
         { name: 'buttonText', label: 'Button Text', type: 'text', placeholder: 'Send' },
@@ -418,7 +429,7 @@ const schemas = {
         { name: 'mapEmbedUrl', label: 'Google Maps Embed URL', type: 'text' },
         { name: 'backgroundImage', label: 'Background Image', type: 'image' }
     ],
-    'design_twenty_three': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twenty_three': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Gallery Title', type: 'text' },
         { name: 'subtitle', label: 'Subtitle', type: 'text' },
         {
@@ -450,13 +461,13 @@ const schemas = {
             ]
         }
     ],
-    'hod_message': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'hod_message': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'name', label: 'HOD Name', type: 'text' },
         { name: 'designation', label: 'Designation', type: 'text' },
         { name: 'image', label: 'HOD Photo', type: 'image' },
         { name: 'message', label: 'Message', type: 'textarea' }
     ],
-    'vision_mission': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'vision_mission': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'vision', label: 'Vision Statement', type: 'textarea' },
         {
             name: 'mission',
@@ -473,7 +484,7 @@ const schemas = {
         { name: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Online Certifications' },
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'departmentId', label: 'Limit to Department (Optional)', type: 'department_select' },
-        { 
+        {
             name: 'dataSource',
             label: 'Data Source (Dynamic)',
             type: 'select',
@@ -568,7 +579,7 @@ const schemas = {
             ]
         }
     ],
-    'design_twenty_seven': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twenty_seven': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title1', label: 'Main Title', type: 'text' },
         { name: 'title2', label: 'Italic/Accent Title', type: 'text' },
         {
@@ -583,7 +594,7 @@ const schemas = {
             ]
         }
     ],
-    'design_twenty_eight': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twenty_eight': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },
         { name: 'name', label: 'Director Name', type: 'text' },
         { name: 'designation', label: 'Designation', type: 'text' },
@@ -592,7 +603,7 @@ const schemas = {
         { name: 'content', label: 'Message Content (HTML)', type: 'textarea' },
         { name: 'themeColor', label: 'Theme Color Class', type: 'color_suggestion' }
     ],
-    'design_twenty_nine': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+    'design_twenty_nine': [{ name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Marquee Title', type: 'text' },
         {
             name: 'announcements',

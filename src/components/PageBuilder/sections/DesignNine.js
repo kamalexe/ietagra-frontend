@@ -1,13 +1,46 @@
-// src/components/PageBuilder/sections/DesignNine.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 // import { fadeIn } from '../../../utils/animations';
 import * as FaIcons from 'react-icons/fa';
+import ResearchService from '../../../services/ResearchService';
 
 import SectionWrapper from '../SectionWrapper';
 
-const DesignNine = ({ id, title, variant = 'simple', items, cards, columns = 2, badge, underlineColor, description, backgroundImage, buttons, gradient }) => {
-    const dataItems = items || cards || [];
+const DesignNine = ({ id, title, variant = 'simple', items: initialItems = [], cards, columns = 2, badge, underlineColor, description, backgroundImage, buttons, gradient, departmentId, dataSource }) => {
+    const [items, setItems] = useState(initialItems || cards || []);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (dataSource === 'research' && departmentId) {
+            const fetchResearch = async () => {
+                setLoading(true);
+                try {
+                    const data = await ResearchService.getAllResearch({ department: departmentId });
+                    // Map research model to design_nine item structure
+                    const formatted = data.map(r => ({
+                        title: r.title,
+                        subtitle: r.authors?.join(', ') || r.type,
+                        description: r.description || r.abstract,
+                        date: r.year || new Date(r.date).getFullYear(),
+                        meta: r.journal || r.publisher,
+                        icon: 'FaBook'
+                    }));
+                    setItems(formatted);
+                } catch (error) {
+                    console.error("DesignNine: Failed to fetch research", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchResearch();
+        } else {
+            setItems(initialItems || cards || []);
+        }
+    }, [initialItems, cards, departmentId, dataSource]);
+
+    const dataItems = items || [];
+
+    if (loading) return <div className="text-center py-10">Loading items...</div>;
 
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
@@ -34,13 +67,18 @@ const DesignNine = ({ id, title, variant = 'simple', items, cards, columns = 2, 
             className="mb-16"
         >
 
-            <motion.div
-                className={`grid ${getGridClass()} gap-6`}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-            >
-                {dataItems.map((item, index) => {
+            {dataItems.length === 0 ? (
+                <div className="text-center py-10 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No items found.</p>
+                </div>
+            ) : (
+                    <motion.div
+                        className={`grid ${getGridClass()} gap-6`}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                    >
+                        {dataItems.map((item, index) => {
                     // Variant: Publication / Book Chapter
                     if (variant === 'publication') {
                         return (
@@ -107,7 +145,8 @@ const DesignNine = ({ id, title, variant = 'simple', items, cards, columns = 2, 
                         </motion.div>
                     );
                 })}
-            </motion.div>
+                    </motion.div>
+            )}
         </SectionWrapper >
     );
 };

@@ -7,7 +7,8 @@ const DesignTwenty = ({ id,
     subtitle = "",
     content = "",
     backgroundImage = "https://picsum.photos/200/300",
-    limit
+    limit,
+    departmentId
 }) => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,8 +16,13 @@ const DesignTwenty = ({ id,
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const data = await EventService.getAllEvents();
-                // If limit is provided, slice the data
+                // Pass departmentId if available (backend expects 'department' query param)
+                const params = {};
+                if (limit) params.limit = limit;
+                if (departmentId) params.department = departmentId;
+
+                const data = await EventService.getAllEvents(params);
+                // If limit is provided, slice the data (redundant if backend handles it but safe)
                 const displayedEvents = limit ? data.slice(0, parseInt(limit)) : data;
                 setEvents(displayedEvents);
             } catch (err) {
@@ -26,7 +32,7 @@ const DesignTwenty = ({ id,
             }
         };
         fetchEvents();
-    }, [limit]); 
+    }, [limit, departmentId]); 
 
     if (loading) return <div className="text-center py-10">Loading events...</div>;
 
