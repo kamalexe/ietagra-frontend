@@ -22,6 +22,19 @@ const UNDERLINE_OPTIONS = [
   { label: 'Purple', value: 'from-purple-500 to-pink-500' },
 ];
 
+const THEME_COLOR_OPTIONS = [
+  { label: 'Blue', value: 'blue-600' },
+  { label: 'Red', value: 'red-600' },
+  { label: 'Green', value: 'green-600' },
+  { label: 'Yellow', value: 'yellow-500' },
+  { label: 'Indigo', value: 'indigo-600' },
+  { label: 'Purple', value: 'purple-600' },
+  { label: 'Pink', value: 'pink-600' },
+  { label: 'Teal', value: 'teal-600' },
+  { label: 'Orange', value: 'orange-500' },
+  { label: 'Slate', value: 'slate-700' },
+];
+
 const ICON_OPTIONS = [
   { value: 'FaGraduationCap', icon: FaIcons.FaGraduationCap },
   { value: 'FaBook', icon: FaIcons.FaBook },
@@ -268,7 +281,10 @@ const SectionForm = ({ section, onClose, onSave }) => {
           </div>
         );
       case 'color_suggestion':
-        const suggestions = field.name === 'gradient' ? GRADIENT_OPTIONS : UNDERLINE_OPTIONS;
+        let suggestions = UNDERLINE_OPTIONS;
+        if (field.name === 'gradient') suggestions = GRADIENT_OPTIONS;
+        else if (field.name === 'themeColor' || field.name === 'colorTheme' || field.name.toLowerCase().includes('theme')) suggestions = THEME_COLOR_OPTIONS;
+
         return (
           <div className="col-span-12 md:col-span-6 bg-blue-50/30 p-3 rounded-lg border border-blue-100" key={index}>
             <label htmlFor={inputId} className="block text-sm font-semibold text-blue-900 mb-2">{field.label}</label>
@@ -309,7 +325,12 @@ const SectionForm = ({ section, onClose, onSave }) => {
               {value && (
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-[10px] uppercase font-bold text-gray-400">Preview:</span>
-                  <div className={`h-4 flex-1 rounded ${field.name === 'gradient' ? value : 'bg-gradient-to-r ' + value}`}></div>
+                  <div className={`h-4 flex-1 rounded ${field.name === 'gradient'
+                    ? value
+                    : (field.name === 'themeColor' || field.name === 'colorTheme' || field.name.toLowerCase().includes('theme'))
+                      ? (value.startsWith('bg-') ? value : 'bg-' + value)
+                      : 'bg-gradient-to-r ' + value
+                    }`}></div>
                 </div>
               )}
             </div>

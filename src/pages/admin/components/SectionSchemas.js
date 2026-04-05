@@ -58,7 +58,7 @@ const schemas = {
                 { name: 'title', label: 'Title', type: 'text' },
                 { name: 'content', label: 'Content', type: 'textarea' },
                 { name: 'icon', label: 'Icon', type: 'icon_suggestion' },
-                { name: 'colorTheme', label: 'Color Theme (e.g. green, teal)', type: 'text' }
+                { name: 'colorTheme', label: 'Theme Color Class', type: 'color_suggestion' }
             ]
         }
     ],
@@ -583,7 +583,7 @@ const schemas = {
         { name: 'image', label: 'Director Image', type: 'image' },
         { name: 'greeting', label: 'Greeting Text', type: 'text' },
         { name: 'content', label: 'Message Content (HTML)', type: 'textarea' },
-        { name: 'themeColor', label: 'Theme Color Class (e.g. blue-600)', type: 'text' }
+        { name: 'themeColor', label: 'Theme Color Class', type: 'color_suggestion' }
     ],
     'design_twenty_nine': [ { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Marquee Title', type: 'text' },
@@ -596,7 +596,7 @@ const schemas = {
                 { name: 'link', label: 'Link URL', type: 'text' }
             ]
         },
-        { name: 'themeColor', label: 'Theme Background Color (Tailwind class, e.g. bg-red-600)', type: 'text' },
+        { name: 'themeColor', label: 'Theme Color Class (Background)', type: 'color_suggestion' },
         { name: 'speed', label: 'Animation Speed (e.g. 20s)', type: 'text' }
     ],
     'design_thirty_four': [
