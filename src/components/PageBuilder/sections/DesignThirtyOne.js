@@ -5,7 +5,7 @@ import TestimonialService from '../../../services/TestimonialService';
 import SectionWrapper from '../SectionWrapper';
 import { StarIcon } from '@heroicons/react/24/solid';
 
-const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, eventId, items: initialItems = [] }) => {
+const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, contentType = "All", eventId, items: initialItems = [] }) => {
     const [testimonials, setTestimonials] = useState(initialItems);
     const [loading, setLoading] = useState(false);
 
@@ -18,16 +18,14 @@ const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, eventId, it
             const fetchTestimonials = async () => {
                 setLoading(true);
                 try {
-                    let data;
-                    if (eventId) {
-                        // Assuming TestimonialService has this method, if not I need to add it.
-                        // For now let's assume I'll add getTestimonialsByEvent
-                        data = await TestimonialService.getTestimonialsByEvent(eventId);
-                    } else if (departmentId) {
-                        data = await TestimonialService.getTestimonialsByDepartment(departmentId);
-                    } else {
-                        data = await TestimonialService.getAllTestimonials();
+                    const params = {};
+                    if (departmentId) params.department = departmentId;
+                    if (eventId) params.event = eventId;
+                    if (contentType && contentType.length > 0) {
+                        params.type = Array.isArray(contentType) ? contentType.join(',') : contentType;
                     }
+
+                    const data = await TestimonialService.getAllTestimonials(params);
                     setTestimonials(data);
                 } catch (error) {
                     console.error("DesignThirtyOne: Failed to fetch testimonials", error);
@@ -37,7 +35,7 @@ const DesignThirtyOne = ({ id, title, subtitle, badge, departmentId, eventId, it
             };
             fetchTestimonials();
         }
-    }, [initialItems, departmentId, eventId]);
+    }, [initialItems, departmentId, eventId, contentType]);
 
     const renderMedia = (item) => {
         if (item.type === 'video' && item.videoUrl) {

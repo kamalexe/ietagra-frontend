@@ -617,6 +617,37 @@ const schemas = {
         { name: 'themeColor', label: 'Theme Color Class (Background)', type: 'color_suggestion' },
         { name: 'speed', label: 'Animation Speed (e.g. 20s)', type: 'text' }
     ],
+    'design_thirty': [
+        { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Section Title', type: 'text' },
+        { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+        { name: 'category', label: 'Category', type: 'select', options: ['All', 'Events', 'Campus', 'Academic', 'Sports', 'Others'] },
+        { name: 'departmentId', label: 'Department', type: 'department_select' },
+        { name: 'limit', label: 'Item Limit', type: 'number' },
+        { name: 'backgroundColor', label: 'Background Color', type: 'color_suggestion' }
+    ],
+    'design_thirty_one': [
+        { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
+        { name: 'title', label: 'Section Title', type: 'text' },
+        { name: 'subtitle', label: 'Subtitle', type: 'textarea' },
+        { name: 'badge', label: 'Badge Text', type: 'text' },
+        { name: 'departmentId', label: 'Department', type: 'department_select' },
+        { name: 'contentType', label: 'Content Type', type: 'checkbox_group', options: ['text', 'image', 'video'] },
+        {
+            name: 'items',
+            label: 'Manual Testimonials (Optional)',
+            type: 'list',
+            itemSchema: [
+                { name: 'name', label: 'Name', type: 'text' },
+                { name: 'role', label: 'Role', type: 'text' },
+                { name: 'message', label: 'Message', type: 'textarea' },
+                { name: 'image', label: 'Image', type: 'image' },
+                { name: 'type', label: 'Type', type: 'select', options: ['text', 'image', 'video'] },
+                { name: 'videoUrl', label: 'Video URL', type: 'text' },
+                { name: 'rating', label: 'Rating (1-5)', type: 'number' }
+            ]
+        }
+    ],
     'design_thirty_four': [
         { name: 'id', label: 'Section ID (for scrolling)', type: 'text' },
         { name: 'title', label: 'Section Title', type: 'text' },

@@ -280,6 +280,41 @@ const SectionForm = ({ section, onClose, onSave }) => {
             <p className="mt-1 text-xs text-gray-500">Overrides or acts as the department ID for fetching dynamic items.</p>
           </div>
         );
+      case 'checkbox_group':
+        const selectedValues = Array.isArray(value) ? value : [];
+        return (
+          <div className="col-span-6" key={index}>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{field.label}</label>
+            <div className="flex flex-wrap gap-4 px-3 py-2 border border-gray-300 rounded-md bg-white">
+              {field.options.map((opt, i) => {
+                const isObject = typeof opt === 'object' && opt !== null;
+                const optValue = isObject ? opt.value : opt;
+                const optLabel = isObject ? opt.label : opt;
+                const isChecked = selectedValues.includes(optValue);
+
+                return (
+                  <label key={i} className="inline-flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        let newValues;
+                        if (e.target.checked) {
+                          newValues = [...selectedValues, optValue];
+                        } else {
+                          newValues = selectedValues.filter(v => v !== optValue);
+                        }
+                        onFieldChange(field.name, newValues);
+                      }}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-700">{optLabel}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        );
       case 'color_suggestion':
         let suggestions = UNDERLINE_OPTIONS;
         if (field.name === 'gradient') suggestions = GRADIENT_OPTIONS;

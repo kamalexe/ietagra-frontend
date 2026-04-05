@@ -20,7 +20,7 @@ const getEmbedUrl = (url) => {
     }
 };
 
-const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", backgroundColor = "#ffffff" }) => {
+const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", departmentId, backgroundColor = "#ffffff" }) => {
     const [albums, setAlbums] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedAlbum, setSelectedAlbum] = useState(null);
@@ -80,13 +80,14 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", backgr
 
     useEffect(() => {
         const fetchAlbums = async () => {
+            setLoading(true);
             try {
-                const data = await AlbumService.getAlbums();
-                let filtered = data;
-                if (category !== "All") {
-                    filtered = data.filter(a => a.category === category);
-                }
-                setAlbums(filtered.slice(0, limit));
+                const params = {};
+                if (category && category !== "All") params.category = category;
+                if (departmentId) params.department = departmentId;
+
+                const data = await AlbumService.getAlbums(params);
+                setAlbums(data.slice(0, limit));
             } catch (error) {
                 console.error("DesignThirty: Failed to load albums", error);
             } finally {
@@ -94,7 +95,7 @@ const DesignThirty = ({ id, title, subtitle, limit = 6, category = "All", backgr
             }
         };
         fetchAlbums();
-    }, [category, limit]);
+    }, [category, limit, departmentId]);
 
     useEffect(() => {
         if (selectedAlbum) {
