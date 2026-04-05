@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, BuildingLibraryIcon, XMarkIcon, Cog6ToothIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CampusService from '../../services/CampusService';
+import axiosInstance from '../../api/axiosConfig';
 
 const CampusesList = () => {
     const [campuses, setCampuses] = useState([]);
@@ -11,8 +12,10 @@ const CampusesList = () => {
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
         name: '', slug: '', address: '', description: '',
+        image: '',
         phone: '', email: '', website: '', mapUrl: '', facilities: '', order: 0
     });
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         loadCampuses();
@@ -63,6 +66,7 @@ const CampusesList = () => {
         setEditingId(null);
         setFormData({
             name: '', slug: '', address: '', description: '',
+            image: '',
             phone: '', email: '', website: '', mapUrl: '', facilities: '', order: 0
         });
         setIsModalOpen(true);
@@ -75,6 +79,7 @@ const CampusesList = () => {
             slug: campus.slug,
             address: campus.address || '',
             description: campus.description || '',
+            image: campus.image || '',
             phone: campus.phone || '',
             email: campus.email || '',
             website: campus.website || '',
@@ -83,6 +88,29 @@ const CampusesList = () => {
             order: campus.order || 0
         });
         setIsModalOpen(true);
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+
+        setUploading(true);
+        try {
+            const res = await axiosInstance.post('/upload', uploadData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setFormData(prev => ({ ...prev, image: res.data.data.url }));
+            toast.success("Image uploaded successfully");
+        } catch (error) {
+            console.error(error);
+            toast.error("Image upload failed: " + (error.response?.data?.message || error.message));
+        } finally {
+            setUploading(false);
+            e.target.value = null;
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -170,6 +198,7 @@ const CampusesList = () => {
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-3 py-3 w-10"></th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Image</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campus Name</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
@@ -196,6 +225,15 @@ const CampusesList = () => {
                                                         <div {...provided.dragHandleProps} className="cursor-move">
                                                             <Bars3Icon className="h-5 w-5" />
                                                         </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        {campus.image ? (
+                                                            <img src={campus.image} alt={campus.name} className="h-10 w-10 rounded-md object-cover border border-gray-200" />
+                                                        ) : (
+                                                            <div className="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center border border-gray-200">
+                                                                <BuildingLibraryIcon className="h-6 w-6 text-gray-400" />
+                                                            </div>
+                                                        )}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{campus.name}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">/campus/{campus.slug}</td>
@@ -277,75 +315,103 @@ const CampusesList = () => {
                                     />
                                 </div>
                                 <div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Description</label>
-                                        <textarea
-                                            rows={3}
-                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Phone</label>
+                                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                                    <textarea
+                                        rows={3}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Campus Image</label>
+                                    <div className="mt-1 flex items-center space-x-4">
+                                        {formData.image && (
+                                            <div className="relative h-20 w-20 border rounded overflow-hidden bg-gray-100 flex-shrink-0">
+                                                <img src={formData.image} alt="Campus" className="h-full w-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, image: '' })}
+                                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-bl p-1"
+                                                >
+                                                    <XMarkIcon className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        )}
+                                        <div className="flex-1">
                                             <input
                                                 type="text"
-                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                                value={formData.phone}
-                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                placeholder="Image URL"
+                                                className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm mb-2"
+                                                value={formData.image}
+                                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                                             />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Email</label>
-                                            <input
-                                                type="email"
-                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                                value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            />
+                                            <label className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                                                {uploading ? 'Uploading...' : 'Upload Image'}
+                                                <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                            </label>
                                         </div>
                                     </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Website</label>
-                                        <input
-                                            type="url"
-                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                            value={formData.website}
-                                            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Display Order (Lower comes first)</label>
-                                        <input
-                                            type="number"
-                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                            value={formData.order}
-                                            onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Facilities (comma separated)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Wi-Fi, Library, Hostel, etc."
-                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                            value={formData.facilities}
-                                            onChange={(e) => setFormData({ ...formData, facilities: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Google Maps Embed URL</label>
+                                        <label className="block text-sm font-medium text-gray-700">Phone</label>
                                         <input
                                             type="text"
                                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                            value={formData.mapUrl}
-                                            onChange={(e) => setFormData({ ...formData, mapUrl: e.target.value })}
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                                        <input
+                                            type="email"
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         />
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Website</label>
+                                    <input
+                                        type="url"
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        value={formData.website}
+                                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Display Order (Lower comes first)</label>
+                                    <input
+                                        type="number"
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        value={formData.order}
+                                        onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Facilities (comma separated)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Wi-Fi, Library, Hostel, etc."
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        value={formData.facilities}
+                                        onChange={(e) => setFormData({ ...formData, facilities: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Google Maps Embed URL</label>
+                                    <input
+                                        type="text"
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        value={formData.mapUrl}
+                                        onChange={(e) => setFormData({ ...formData, mapUrl: e.target.value })}
+                                    />
+                                </div>
                                 <div className="mt-5 sm:flex sm:flex-row-reverse">
-                                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">
+                                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm" disabled={uploading}>
                                         {editingId ? 'Update' : 'Create'}
                                     </button>
                                     <button type="button" onClick={() => setIsModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">
