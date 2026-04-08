@@ -714,7 +714,7 @@ const EventsList = () => {
 
             {error && <div className="bg-red-50 text-red-700 p-4 rounded mb-4">{error}</div>}
 
-            <div className="bg-white shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+            <div className="bg-white shadow overflow-x-auto border-b border-gray-200 sm:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
