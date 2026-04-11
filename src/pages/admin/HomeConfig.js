@@ -62,11 +62,17 @@ const HomeConfig = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // Ensure each section has an updated order matching its current index in the array
+      const sectionsWithOrder = sections.map((section, index) => ({
+        ...section,
+        order: index
+      }));
+
       const updatedPage = {
         title: pageData?.title || 'Home',
         slug: 'home',
         status: 'published',
-        sections: sections,
+        sections: sectionsWithOrder,
         admissionModalConfig: admissionConfig
       };
 
