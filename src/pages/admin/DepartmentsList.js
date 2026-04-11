@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { Link, useLocation } from 'react-router-dom';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, AcademicCapIcon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';

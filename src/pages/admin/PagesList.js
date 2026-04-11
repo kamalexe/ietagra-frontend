@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+// eslint-disable-next-line
+import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { PencilSquareIcon, TrashIcon, EyeIcon, PlusIcon, XMarkIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
