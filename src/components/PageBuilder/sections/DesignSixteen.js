@@ -8,7 +8,7 @@ const EMPTY_ARRAY = [];
 // Configuration for different data sources
 const COLUMN_CONFIG = {
     project: [
-        { key: 'thumbnail', label: 'Preview', render: (val) => val ? <img src={val} className="w-16 h-10 object-cover rounded shadow-sm hover:scale-150 transition-transform cursor-zoom-in" alt="Project Preview" /> : <div className="w-16 h-10 bg-gray-100 rounded flex items-center justify-center text-[10px] text-gray-400">No Preview</div> },
+        // { key: 'thumbnail', label: 'Preview', render: (val) => val ? <img src={val} className="w-16 h-10 object-cover rounded shadow-sm hover:scale-150 transition-transform cursor-zoom-in" alt="Project Preview" /> : <div className="w-16 h-10 bg-gray-100 rounded flex items-center justify-center text-[10px] text-gray-400">No Preview</div> },
         { key: 'batch', label: 'Batch', render: (val) => <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-400">{val}</span> },
         { key: 'studentName', label: 'Student Name', className: 'font-medium text-gray-900' },
         { key: 'projectName', label: 'Project Name', className: 'text-gray-800 font-medium' },
