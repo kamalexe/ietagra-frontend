@@ -50,8 +50,8 @@ const  PageRenderer = ({ slug, data }) => {
         keywords={pageData.metaKeywords}
         schemaType={pageData.type === 'department' ? 'Department' : (pageData.type === 'course_page' ? 'Course' : 'CollegeOrUniversity')}
       />
-      {pageData.sections
-        .sort((a, b) => a.order - b.order)
+      {[...pageData.sections]
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .map((section) => {
           const Component = SectionRegistry[section.templateKey];
           if (!Component || !section.visible) {

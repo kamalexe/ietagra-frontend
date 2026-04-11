@@ -134,10 +134,16 @@ const PageBuilder = ({ slug: propSlug }) => { // Accept slug as prop
         setIsSaving(true);
         try {
             // In a real app, you might want to validate or format data before saving
+            // Ensure each section has an updated order matching its current index in the array
+            const sectionsWithOrder = sections.map((section, index) => ({
+                ...section,
+                order: index
+            }));
+
             const pageData = {
                 title: pageTitle || slug,
                 slug: slug,
-                sections: sections,
+                sections: sectionsWithOrder,
                 status: status,
                 ...seoData
             };
