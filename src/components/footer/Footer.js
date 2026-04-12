@@ -52,7 +52,8 @@ function Footer() {
         return null;
     }
 
-    const { institute, contact, usefulLinks, helpLinks, socialMedia, credits } = config;
+    const { institute, contact, usefulLinks, helpLinks, socialMedia } = config;
+    // const { institute, contact, usefulLinks, helpLinks, socialMedia, credits } = config;
 
     return (
         <footer className="bg-gray-900 text-white pt-16 pb-8 border-t border-gray-800">
@@ -172,14 +173,14 @@ function Footer() {
                         &copy; {new Date().getFullYear()} IET Agra. All Rights Reserved.
                     </p>
                     <div className="flex items-center space-x-1">
-                        <span>{credits?.text?.split('IOTA')[0] || 'Designed and Developed by'}</span>
+                        <span>Designed and Developed by</span>
                         <a
                             href="/"
                             className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
                         >
                             IOTA
                         </a>
-                        <span className={`${credits?.heartColor || 'text-red-500'} animate-pulse`}>❤️</span>
+                        <span className="text-red-500 animate-pulse">❤️</span>
                     </div>
                 </div>
             </div>

@@ -272,7 +272,7 @@ const FooterConfig = () => {
                     ))}
                 </section>
 
-                {/* Credits */}
+                {/* Credits
                 <section>
                     <h2 className="text-xl font-semibold mb-4 border-b pb-2">Credits & Branding</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -286,7 +286,7 @@ const FooterConfig = () => {
                             />
                         </div>
                     </div>
-                </section>
+                </section> */}
 
                 <div className="flex justify-end pt-5">
                     <button
