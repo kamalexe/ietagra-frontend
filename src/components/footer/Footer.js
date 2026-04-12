@@ -175,7 +175,9 @@ function Footer() {
                     <div className="flex items-center space-x-1">
                         <span>Designed and Developed by</span>
                         <a
-                            href="/"
+                            href="https://www.linkedin.com/in/kamal-maurya/"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
                         >
                             IOTA
