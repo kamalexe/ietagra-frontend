@@ -51,13 +51,13 @@ const DesignTwentySix = ({ id, title, description, subtitle, items = EMPTY_ARRAY
     }, [dataSource, items, departmentId]);
 
     // Extract unique values for dropdowns
-    const uniqueBatches = useMemo(() => [...new Set(fetchedItems.map(item => item.batch).filter(Boolean))], [fetchedItems]);
+    const uniqueBatches = useMemo(() => [...new Set(fetchedItems.map(item => String(item.batch || '')).filter(Boolean))], [fetchedItems]);
     const uniqueBranches = useMemo(() => [...new Set(fetchedItems.map(item => item.branch).filter(Boolean))], [fetchedItems]);
 
     // Filter logic
     const filteredItems = useMemo(() => {
         return fetchedItems.filter(item => {
-            const matchesBatch = !filters.batch || String(item.batch) === String(filters.batch);
+            const matchesBatch = !filters.batch || String(item.batch || '') === String(filters.batch);
             const matchesBranch = !filters.branch || item.branch === filters.branch;
             const matchesSearch = !filters.search || 
                 item.title?.toLowerCase().includes(filters.search.toLowerCase()) || 
@@ -137,14 +137,14 @@ const DesignTwentySix = ({ id, title, description, subtitle, items = EMPTY_ARRAY
                                     <div className="w-full md:w-1/2 px-4">
                                         <div className={`bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 relative group overflow-hidden ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                                             {/* Decorative Background Icon */}
-                                            <StarIcon className={`absolute -bottom-6 -right-6 h-32 w-32 text-gray-50 transform rotate-12 group-hover:scale-110 transition-transform duration-500 ${index % 2 === 0 ? 'left-[-1.5rem] right-auto' : 'right-[-1.5rem]'}`} />
+                                            <StarIcon className={`absolute -bottom-6 h-32 w-32 text-gray-50 transform rotate-12 group-hover:scale-110 transition-transform duration-500 ${index % 2 === 0 ? 'left-[-1.5rem]' : 'right-[-1.5rem]'}`} />
                                             
                                             <div className="relative z-10">
                                                 <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full mb-3 uppercase tracking-wider">
                                                     {item.batch} • {item.branch}
                                                 </span>
                                                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title || item.courseName || item.projectName || 'Dynamic Record'}</h3>
-                                                <p className="text-gray-600 mb-4 line-clamp-3">{item.description || item.technology || 'Achievement Record'}</p>
+                                                <p className="text-gray-600 mb-4 line-clamp-3">{item.description || item.courseDescription || item.technology || 'Achievement Record'}</p>
                                                 
                                                 <div className={`flex items-center gap-4 ${index % 2 === 0 ? 'md:justify-end' : 'md:justify-start'}`}>
                                                     <div className="flex items-center text-sm text-gray-500">

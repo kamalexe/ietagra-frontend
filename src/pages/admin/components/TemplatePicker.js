@@ -317,8 +317,8 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             name: 'Student Projects Table',
             description: 'Table listing student projects with details and links.',
             demoData: {
-                title: "Student Projects",
                 description: "List of major projects by final year students.",
+                dataSource: 'project',
                 projects: projects.length > 0 ? projects : [
                     {
                         batch: "2024",
@@ -349,7 +349,8 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
             description: 'Dedicated table for GATE Qualified student records.',
             demoData: {
                 title: "GATE Qualifiers",
-                description: "List of students who qualified GATE."
+                description: "List of students who qualified GATE.",
+                dataSource: 'gate'
             }
         },
         {
@@ -442,6 +443,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 title: "Student MOOC Achievements",
                 subtitle: "Online Certifications & Courses",
                 description: "<p>Explore the online certifications completed by our students across various platforms.</p>",
+                dataSource: 'mooc',
                 items: moocs.length > 0 ? moocs : [
                     { studentName: "Rohan Sharma", enrollmentNo: "123456", courseName: "Data Structures", platform: "NPTEL", score: "90", batch: "2024", branch: "CSE" },
                     { studentName: "Priya Singh", enrollmentNo: "123457", courseName: "Machine Learning", platform: "Coursera", score: "95", batch: "2024", branch: "ECE" },
@@ -460,6 +462,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 title: "Placement Highlights",
                 subtitle: "Celebrating Success Stories",
                 description: "<p>Our students continue to shine in the corporate world with top-tier placements.</p>",
+                dataSource: 'placement',
                 items: placements.length > 0 ? placements : [
                     { studentName: "Aarav Patel", batch: "2024", branch: "CSE", company: "Microsoft", package: "45 LPA", designation: "SDE I" },
                     { studentName: "Sanya Mir", batch: "2024", branch: "CSE", company: "Amazon", package: "42 LPA", designation: "SDE" },
@@ -480,6 +483,7 @@ const TemplatePicker = ({ onClose, onSelect, currentSlug }) => {
                 title: "Hall of Fame",
                 subtitle: "Recognizing Excellence",
                 description: "<p>A timeline of our students' remarkable achievements in various fields.</p>",
+                dataSource: 'achievement',
                 // Fetch Data from Achievement Model Dynamically
                 items: achievements.length > 0 ? achievements.map(item => ({
                     title: item.title,
