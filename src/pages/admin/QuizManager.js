@@ -14,7 +14,8 @@ import {
     CalendarIcon,
     XMarkIcon,
     AcademicCapIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    TrashIcon
 } from '@heroicons/react/24/outline';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -28,7 +29,15 @@ const QuizManager = () => {
     const [shuffleOptions, setShuffleOptions] = useState(false);
     const [scheduledStartTime, setScheduledStartTime] = useState('');
     const [scheduledEndTime, setScheduledEndTime] = useState('');
-    const [customChipText, setCustomChipText] = useState('In collaboration with IET DBRAU');
+    const [customChipText, setCustomChipText] = useState('In collaboration with District Institute of Education & Training, Agra (DIET Agra)');
+    const [organizerLogoUrl, setOrganizerLogoUrl] = useState('');
+    const [organizerName, setOrganizerName] = useState('');
+    const [pageTitle, setPageTitle] = useState('');
+    const [metaTitle, setMetaTitle] = useState('');
+    const [metaDescription, setMetaDescription] = useState('');
+    const [metaKeywords, setMetaKeywords] = useState('');
+    const [faviconUrl, setFaviconUrl] = useState('');
+    const [excludeFromSitemap, setExcludeFromSitemap] = useState(false);
     const [metadataEntries, setMetadataEntries] = useState([{ key: 'Course Code', value: '' }, { key: 'Instructor', value: '' }]);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -47,7 +56,16 @@ const QuizManager = () => {
     const [editScheduledStartTime, setEditScheduledStartTime] = useState('');
     const [editScheduledEndTime, setEditScheduledEndTime] = useState('');
     const [editCustomChipText, setEditCustomChipText] = useState('');
+    const [editOrganizerLogoUrl, setEditOrganizerLogoUrl] = useState('');
+    const [editOrganizerName, setEditOrganizerName] = useState('');
+    const [editPageTitle, setEditPageTitle] = useState('');
+    const [editMetaTitle, setEditMetaTitle] = useState('');
+    const [editMetaDescription, setEditMetaDescription] = useState('');
+    const [editMetaKeywords, setEditMetaKeywords] = useState('');
+    const [editFaviconUrl, setEditFaviconUrl] = useState('');
+    const [editExcludeFromSitemap, setEditExcludeFromSitemap] = useState(false);
     const [editMetadataEntries, setEditMetadataEntries] = useState([]);
+    const [editFile, setEditFile] = useState(null);
 
     useEffect(() => {
         fetchQuizzes();
@@ -93,6 +111,26 @@ const QuizManager = () => {
             minute: '2-digit',
             hour12: true
         });
+    };
+
+    const handleResetQuiz = async () => {
+        if (!window.confirm("Are you sure you want to completely reset this quiz? This will delete ALL participant data permanently and cannot be undone.")) {
+            return;
+        }
+
+        try {
+            const { access_token } = getToken();
+            toast.loading("Resetting quiz data...", { id: 'resetQuiz' });
+            const res = await axios.delete(`${API_URL}/quiz/${scoreboardQuizId}/reset`, {
+                headers: { Authorization: `Bearer ${access_token}` },
+                withCredentials: true
+            });
+            toast.success(res.data.message || "Quiz reset successfully", { id: 'resetQuiz' });
+            fetchScoreboard(scoreboardQuizId);
+        } catch (error) {
+            console.error('Reset quiz error:', error);
+            toast.error(error.response?.data?.message || "Failed to reset quiz", { id: 'resetQuiz' });
+        }
     };
 
     const exportToExcel = () => {
@@ -157,6 +195,14 @@ const QuizManager = () => {
         if (scheduledStartTime) formData.append('scheduledStartTime', scheduledStartTime);
         if (scheduledEndTime) formData.append('scheduledEndTime', scheduledEndTime);
         if (customChipText) formData.append('customChipText', customChipText);
+        if (organizerLogoUrl) formData.append('organizerLogoUrl', organizerLogoUrl);
+        if (organizerName) formData.append('organizerName', organizerName);
+        if (pageTitle) formData.append('pageTitle', pageTitle);
+        if (metaTitle) formData.append('metaTitle', metaTitle);
+        if (metaDescription) formData.append('metaDescription', metaDescription);
+        if (metaKeywords) formData.append('metaKeywords', metaKeywords);
+        if (faviconUrl) formData.append('faviconUrl', faviconUrl);
+        formData.append('excludeFromSitemap', excludeFromSitemap);
 
         const metadataObj = {};
         metadataEntries.forEach(item => {
@@ -183,7 +229,15 @@ const QuizManager = () => {
             setDescription('');
             setScheduledStartTime('');
             setScheduledEndTime('');
-            setCustomChipText('In collaboration with IET DBRAU');
+            setCustomChipText('In collaboration with District Institute of Education & Training, Agra (DIET Agra)');
+            setOrganizerLogoUrl('');
+            setOrganizerName('');
+            setPageTitle('');
+            setMetaTitle('');
+            setMetaDescription('');
+            setMetaKeywords('');
+            setFaviconUrl('');
+            setExcludeFromSitemap(false);
             setMetadataEntries([{ key: 'Course Code', value: '' }, { key: 'Instructor', value: '' }]);
             setFile(null);
             fetchQuizzes();
@@ -228,10 +282,19 @@ const QuizManager = () => {
         setEditShuffleOptions(!!quiz.shuffleOptions);
         setEditScheduledStartTime(toLocalISOString(quiz.scheduledStartTime));
         setEditScheduledEndTime(toLocalISOString(quiz.scheduledEndTime));
-        setEditCustomChipText(quiz.customChipText || 'In collaboration with IET DBRAU');
+        setEditCustomChipText(quiz.customChipText || 'In collaboration with District Institute of Education & Training, Agra (DIET Agra)');
+        setEditOrganizerLogoUrl(quiz.organizerLogoUrl || '');
+        setEditOrganizerName(quiz.organizerName || '');
+        setEditPageTitle(quiz.pageTitle || '');
+        setEditMetaTitle(quiz.metaTitle || '');
+        setEditMetaDescription(quiz.metaDescription || '');
+        setEditMetaKeywords(quiz.metaKeywords || '');
+        setEditFaviconUrl(quiz.faviconUrl || '');
+        setEditExcludeFromSitemap(!!quiz.excludeFromSitemap);
         const metaObj = quiz.metadata || {};
         const metaList = Object.entries(metaObj).map(([key, value]) => ({ key, value }));
         setEditMetadataEntries(metaList.length > 0 ? metaList : [{ key: 'Course Code', value: '' }]);
+        setEditFile(null);
     };
 
     const handleUpdateQuiz = async (e) => {
@@ -247,18 +310,34 @@ const QuizManager = () => {
                 }
             });
 
-            await axios.put(`${API_URL}/quiz/${editingQuiz._id}`, {
-                title: editTitle,
-                description: editDescription,
-                durationMinutes: editDurationMinutes,
-                rules: editRules,
-                shuffleOptions: editShuffleOptions,
-                scheduledStartTime: editScheduledStartTime || null,
-                scheduledEndTime: editScheduledEndTime || null,
-                customChipText: editCustomChipText,
-                metadata: metadataObj
-            }, {
-                headers: { Authorization: `Bearer ${access_token}` },
+            const formData = new FormData();
+            formData.append('title', editTitle);
+            formData.append('description', editDescription);
+            formData.append('durationMinutes', editDurationMinutes);
+            formData.append('rules', editRules);
+            formData.append('shuffleOptions', editShuffleOptions);
+            if (editScheduledStartTime) formData.append('scheduledStartTime', editScheduledStartTime);
+            if (editScheduledEndTime) formData.append('scheduledEndTime', editScheduledEndTime);
+            if (editCustomChipText) formData.append('customChipText', editCustomChipText);
+            if (editOrganizerLogoUrl) formData.append('organizerLogoUrl', editOrganizerLogoUrl);
+            if (editOrganizerName) formData.append('organizerName', editOrganizerName);
+            if (editPageTitle) formData.append('pageTitle', editPageTitle);
+            if (editMetaTitle) formData.append('metaTitle', editMetaTitle);
+            if (editMetaDescription) formData.append('metaDescription', editMetaDescription);
+            if (editMetaKeywords) formData.append('metaKeywords', editMetaKeywords);
+            if (editFaviconUrl) formData.append('faviconUrl', editFaviconUrl);
+            formData.append('excludeFromSitemap', editExcludeFromSitemap);
+            formData.append('metadata', JSON.stringify(metadataObj));
+            
+            if (editFile) {
+                formData.append('file', editFile);
+            }
+
+            await axios.put(`${API_URL}/quiz/${editingQuiz._id}`, formData, {
+                headers: { 
+                    Authorization: `Bearer ${access_token}`,
+                    'Content-Type': 'multipart/form-data'
+                },
                 withCredentials: true
             });
             toast.success('Quiz updated successfully');
@@ -269,6 +348,30 @@ const QuizManager = () => {
             toast.error('Failed to update quiz');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleImageUpload = async (e, setUrlFn, label = "image") => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            const { access_token } = getToken();
+            toast.loading(`Uploading ${label}...`, { id: "imageUpload" });
+            const res = await axios.post(`${API_URL}/upload`, formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${access_token}`
+                },
+                withCredentials: true
+            });
+            setUrlFn(res.data.data.url);
+            toast.success(`${label} uploaded successfully`, { id: "imageUpload" });
+        } catch (error) {
+            toast.error(`Upload failed: ` + (error.response?.data?.message || error.message), { id: "imageUpload" });
         }
     };
 
@@ -508,6 +611,111 @@ const QuizManager = () => {
                                 placeholder="e.g. In collaboration with XYZ"
                             />
                         </div>
+                        <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl space-y-4">
+                            <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-2">Page Settings & SEO</h3>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Page Title</label>
+                                <input
+                                    type="text"
+                                    value={pageTitle}
+                                    onChange={(e) => setPageTitle(e.target.value)}
+                                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-900 text-sm"
+                                    placeholder="Internal title for the page"
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Meta Title</label>
+                                    <input
+                                        type="text"
+                                        value={metaTitle}
+                                        onChange={(e) => setMetaTitle(e.target.value)}
+                                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-900 text-sm"
+                                        placeholder="Displayed in search results"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Meta Keywords</label>
+                                    <input
+                                        type="text"
+                                        value={metaKeywords}
+                                        onChange={(e) => setMetaKeywords(e.target.value)}
+                                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-900 text-sm"
+                                        placeholder="Comma separated keywords"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Organizer Logo (Optional)</label>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0 border border-gray-300">
+                                        {organizerLogoUrl ? <img src={organizerLogoUrl} alt="Logo Preview" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-bold">IMG</div>}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={organizerLogoUrl}
+                                        onChange={(e) => setOrganizerLogoUrl(e.target.value)}
+                                        className="flex-1 bg-white border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-900 text-sm"
+                                        placeholder="URL or Upload"
+                                    />
+                                    <label className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-4 py-2.5 rounded-xl cursor-pointer transition-colors whitespace-nowrap">
+                                        Upload
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, setOrganizerLogoUrl, "Logo")} />
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Organizer Name (Optional - Shows Above Chip)</label>
+                                <input
+                                    type="text"
+                                    value={organizerName}
+                                    onChange={(e) => setOrganizerName(e.target.value)}
+                                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-900 text-sm"
+                                    placeholder="e.g. Acme Corporation"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Favicon / Browser Icon</label>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0 border border-gray-300">
+                                        {faviconUrl ? <img src={faviconUrl} alt="Favicon Preview" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-bold">ICO</div>}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={faviconUrl}
+                                        onChange={(e) => setFaviconUrl(e.target.value)}
+                                        className="flex-1 bg-white border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-900 text-sm"
+                                        placeholder="URL or Upload"
+                                    />
+                                    <label className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-4 py-2.5 rounded-xl cursor-pointer transition-colors whitespace-nowrap">
+                                        Upload
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, setFaviconUrl, "Favicon")} />
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Meta Description</label>
+                                <textarea
+                                    value={metaDescription}
+                                    onChange={(e) => setMetaDescription(e.target.value)}
+                                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-900 text-sm"
+                                    rows="2"
+                                    placeholder="Brief summary of the page content"
+                                ></textarea>
+                            </div>
+                            <div className="flex items-center mt-2">
+                                <input
+                                    id="excludeFromSitemap"
+                                    type="checkbox"
+                                    checked={excludeFromSitemap}
+                                    onChange={(e) => setExcludeFromSitemap(e.target.checked)}
+                                    className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                                />
+                                <label htmlFor="excludeFromSitemap" className="ml-3 block text-sm font-medium text-gray-700 cursor-pointer">
+                                    Exclude from Sitemap
+                                </label>
+                            </div>
+                        </div>
                         <div>
                             <div className="flex justify-between items-center mb-2">
                                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Metadata Attributes (Optional)</label>
@@ -632,6 +840,14 @@ const QuizManager = () => {
                                 className="px-4 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-bold text-sm transition-colors cursor-pointer"
                             >
                                 ← Back to Quizzes
+                            </button>
+                            <button
+                                onClick={handleResetQuiz}
+                                className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 font-bold py-2.5 px-4 rounded-xl shadow-sm flex items-center transition-colors text-sm cursor-pointer"
+                                title="Delete all participants for this quiz"
+                            >
+                                <TrashIcon className="w-4 h-4 mr-1.5 stroke-[2.5]" />
+                                Reset Quiz
                             </button>
                             <button
                                 onClick={exportToExcel}
@@ -797,6 +1013,111 @@ const QuizManager = () => {
                                     placeholder="e.g. In collaboration with XYZ"
                                 />
                             </div>
+                            <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl space-y-4">
+                                <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-2">Page Settings & SEO</h3>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Page Title</label>
+                                    <input
+                                        type="text"
+                                        value={editPageTitle}
+                                        onChange={(e) => setEditPageTitle(e.target.value)}
+                                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium text-gray-900 text-sm"
+                                        placeholder="Internal title for the page"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Meta Title</label>
+                                        <input
+                                            type="text"
+                                            value={editMetaTitle}
+                                            onChange={(e) => setEditMetaTitle(e.target.value)}
+                                            className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium text-gray-900 text-sm"
+                                            placeholder="Displayed in search results"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Meta Keywords</label>
+                                        <input
+                                            type="text"
+                                            value={editMetaKeywords}
+                                            onChange={(e) => setEditMetaKeywords(e.target.value)}
+                                            className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium text-gray-900 text-sm"
+                                            placeholder="Comma separated keywords"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Organizer Logo (Optional)</label>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0 border border-gray-300">
+                                            {editOrganizerLogoUrl ? <img src={editOrganizerLogoUrl} alt="Logo Preview" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-bold">IMG</div>}
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={editOrganizerLogoUrl}
+                                            onChange={(e) => setEditOrganizerLogoUrl(e.target.value)}
+                                            className="flex-1 bg-white border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium text-gray-900 text-sm"
+                                            placeholder="URL or Upload"
+                                        />
+                                        <label className="text-xs font-bold text-amber-600 hover:text-amber-800 bg-amber-50 px-4 py-2.5 rounded-xl cursor-pointer transition-colors whitespace-nowrap">
+                                            Upload
+                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, setEditOrganizerLogoUrl, "Logo")} />
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Organizer Name (Optional - Shows Above Chip)</label>
+                                    <input
+                                        type="text"
+                                        value={editOrganizerName}
+                                        onChange={(e) => setEditOrganizerName(e.target.value)}
+                                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium text-gray-900 text-sm"
+                                        placeholder="e.g. Acme Corporation"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Favicon / Browser Icon</label>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0 border border-gray-300">
+                                            {editFaviconUrl ? <img src={editFaviconUrl} alt="Favicon Preview" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-bold">ICO</div>}
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={editFaviconUrl}
+                                            onChange={(e) => setEditFaviconUrl(e.target.value)}
+                                            className="flex-1 bg-white border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium text-gray-900 text-sm"
+                                            placeholder="URL or Upload"
+                                        />
+                                        <label className="text-xs font-bold text-amber-600 hover:text-amber-800 bg-amber-50 px-4 py-2.5 rounded-xl cursor-pointer transition-colors whitespace-nowrap">
+                                            Upload
+                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, setEditFaviconUrl, "Favicon")} />
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Meta Description</label>
+                                    <textarea
+                                        value={editMetaDescription}
+                                        onChange={(e) => setEditMetaDescription(e.target.value)}
+                                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium text-gray-900 text-sm"
+                                        rows="2"
+                                        placeholder="Brief summary of the page content"
+                                    ></textarea>
+                                </div>
+                                <div className="flex items-center mt-2">
+                                    <input
+                                        id="editExcludeFromSitemap"
+                                        type="checkbox"
+                                        checked={editExcludeFromSitemap}
+                                        onChange={(e) => setEditExcludeFromSitemap(e.target.checked)}
+                                        className="h-5 w-5 text-amber-600 focus:ring-amber-500 border-gray-300 rounded cursor-pointer"
+                                    />
+                                    <label htmlFor="editExcludeFromSitemap" className="ml-3 block text-sm font-medium text-gray-700 cursor-pointer">
+                                        Exclude from Sitemap
+                                    </label>
+                                </div>
+                            </div>
                             <div>
                                 <div className="flex justify-between items-center mb-2">
                                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Metadata Attributes</label>
@@ -856,6 +1177,48 @@ const QuizManager = () => {
                                 <label htmlFor="editShuffleOptions" className="ml-3 block text-sm font-bold text-amber-900 cursor-pointer">
                                     Shuffle answer options randomly for each participant
                                 </label>
+                            </div>
+                            
+                            {/* Update Excel File */}
+                            <div className="bg-amber-50 border border-amber-200 p-6 rounded-xl space-y-4">
+                                <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-2">Update Questions (Optional)</h3>
+                                <p className="text-xs text-amber-700 mb-3">Upload a new Excel file to replace all current questions in this quiz. Leave this empty to keep existing questions.</p>
+                                
+                                <div className="flex items-center justify-center w-full">
+                                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-amber-300 border-dashed rounded-2xl cursor-pointer bg-white hover:bg-amber-50/50 transition-colors">
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <svg className="w-8 h-8 mb-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                            <p className="mb-2 text-sm text-gray-600 font-medium">
+                                                <span className="font-bold text-amber-600">Click to upload new Excel file</span>
+                                            </p>
+                                            <p className="text-xs text-gray-500 font-medium">.xlsx format only</p>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            accept=".xlsx, .xls"
+                                            onChange={(e) => setEditFile(e.target.files[0])}
+                                        />
+                                    </label>
+                                </div>
+                                {editFile && (
+                                    <div className="flex items-center gap-3 p-4 bg-white border border-amber-200 rounded-xl shadow-xs">
+                                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-bold text-gray-900 truncate">New file selected:</p>
+                                            <p className="text-xs text-gray-500 truncate">{editFile.name}</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditFile(null)}
+                                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                        >
+                                            <XMarkIcon className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="pt-4 border-t border-gray-100 flex justify-end gap-3 flex-shrink-0">

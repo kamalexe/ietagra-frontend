@@ -174,6 +174,55 @@ const LiveQuiz = () => {
         }
     }, [participant, activeQuiz, isCompleted, fetchCurrentQuestion]);
 
+    // SEO effect
+    useEffect(() => {
+        if (activeQuiz) {
+            if (activeQuiz.pageTitle || activeQuiz.metaTitle || activeQuiz.title) {
+                document.title = activeQuiz.pageTitle || activeQuiz.metaTitle || activeQuiz.title;
+            }
+            
+            if (activeQuiz.metaDescription) {
+                let metaDesc = document.querySelector('meta[name="description"]');
+                if (!metaDesc) {
+                    metaDesc = document.createElement('meta');
+                    metaDesc.name = "description";
+                    document.head.appendChild(metaDesc);
+                }
+                metaDesc.content = activeQuiz.metaDescription;
+            }
+            
+            if (activeQuiz.metaKeywords) {
+                let metaKw = document.querySelector('meta[name="keywords"]');
+                if (!metaKw) {
+                    metaKw = document.createElement('meta');
+                    metaKw.name = "keywords";
+                    document.head.appendChild(metaKw);
+                }
+                metaKw.content = activeQuiz.metaKeywords;
+            }
+            
+            if (activeQuiz.faviconUrl) {
+                let linkFavicon = document.querySelector("link[rel~='icon']");
+                if (!linkFavicon) {
+                    linkFavicon = document.createElement('link');
+                    linkFavicon.rel = 'icon';
+                    document.head.appendChild(linkFavicon);
+                }
+                linkFavicon.href = activeQuiz.faviconUrl;
+            }
+            
+            if (activeQuiz.excludeFromSitemap) {
+                let metaRobots = document.querySelector('meta[name="robots"]');
+                if (!metaRobots) {
+                    metaRobots = document.createElement('meta');
+                    metaRobots.name = "robots";
+                    document.head.appendChild(metaRobots);
+                }
+                metaRobots.content = "noindex, nofollow";
+            }
+        }
+    }, [activeQuiz]);
+
     // Timer effect
     useEffect(() => {
         if (timeLeft === null || isCompleted) return;
@@ -526,7 +575,7 @@ const LiveQuiz = () => {
             };
         }
         return {
-            text: activeQuiz.customChipText || "In collaboration with IET DBRAU",
+            text: activeQuiz.customChipText || "In collaboration with District Institute of Education & Training, Agra (DIET Agra)",
             bg: "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-2xs",
             icon: (
                 <span className="relative flex h-2.5 w-2.5 mr-2.5 inline-flex items-center flex-shrink-0">
@@ -548,6 +597,18 @@ const LiveQuiz = () => {
                         
                         {/* Title Section */}
                         <div className="text-center mb-10 sm:mb-12">
+                            {(activeQuiz?.organizerLogoUrl || activeQuiz?.organizerName) && (
+                                <div className="flex flex-col items-center justify-center mb-6">
+                                    {activeQuiz?.organizerLogoUrl && (
+                                        <img src={activeQuiz.organizerLogoUrl} alt="Organizer" className="h-20 w-auto object-contain mb-3" />
+                                    )}
+                                    {activeQuiz?.organizerName && (
+                                        <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800 tracking-tight text-center">
+                                            {activeQuiz.organizerName}
+                                        </h3>
+                                    )}
+                                </div>
+                            )}
                             <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border ${portalBadge.bg}`}>
                                 {portalBadge.icon} {portalBadge.text}
                             </span>
