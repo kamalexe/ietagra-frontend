@@ -21,6 +21,7 @@ const LiveQuiz = () => {
     const [violations, setViolations] = useState(0);
     const [fullscreenExits, setFullscreenExits] = useState(0);
     const [rightClickViolations, setRightClickViolations] = useState(0);
+    const [copyPasteViolations, setCopyPasteViolations] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [questionIds, setQuestionIds] = useState([]);
     
@@ -77,6 +78,7 @@ const LiveQuiz = () => {
                 if (res.data.tabSwitches !== undefined) setViolations(res.data.tabSwitches);
                 if (res.data.fullscreenExits !== undefined) setFullscreenExits(res.data.fullscreenExits);
                 if (res.data.rightClickViolations !== undefined) setRightClickViolations(res.data.rightClickViolations);
+                if (res.data.copyPasteViolations !== undefined) setCopyPasteViolations(res.data.copyPasteViolations);
                 
                 const qId = res.data.data?._id;
                 const existingAns = (res.data.answers || []).find(a => (a.questionId && a.questionId.toString()) === (qId && qId.toString()));
@@ -229,6 +231,19 @@ const LiveQuiz = () => {
             }
         };
 
+        const handleCopyPaste = async (e) => {
+            e.preventDefault();
+            if (participant && !isCompleted && activeQuiz?.isActive) {
+                setCopyPasteViolations(prev => prev + 1);
+                toast.error('Copy/Paste is disabled during the quiz! Warning recorded.', { duration: 5000 });
+                try {
+                    await axios.post(`${API_URL}/quiz/${id}/participant/${participant._id}/violation/copypaste`);
+                } catch (err) {
+                    console.error('Failed to record copy-paste violation', err);
+                }
+            }
+        };
+
         const handleKeyDown = (e) => {
             // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
             if (
@@ -240,6 +255,11 @@ const LiveQuiz = () => {
                 recordViolation();
                 toast.error('Developer tools are disabled during the quiz.');
             }
+            // Prevent Ctrl+C, Ctrl+V, Ctrl+X
+            if (e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V' || e.key === 'x' || e.key === 'X')) {
+                e.preventDefault();
+                toast.error('Copy/Paste shortcuts are disabled.');
+            }
         };
 
         document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -247,6 +267,9 @@ const LiveQuiz = () => {
         window.addEventListener('beforeunload', handleBeforeUnload);
         document.addEventListener('contextmenu', handleContextMenu);
         document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('copy', handleCopyPaste);
+        document.addEventListener('cut', handleCopyPaste);
+        document.addEventListener('paste', handleCopyPaste);
 
         const fullscreenInterval = setInterval(() => {
             if (!document.fullscreenElement) {
@@ -277,6 +300,9 @@ const LiveQuiz = () => {
             document.removeEventListener('fullscreenchange', handleFullscreenChange);
             document.removeEventListener('contextmenu', handleContextMenu);
             document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('copy', handleCopyPaste);
+            document.removeEventListener('cut', handleCopyPaste);
+            document.removeEventListener('paste', handleCopyPaste);
             clearInterval(fullscreenInterval);
         };
     }, [participant, isCompleted, activeQuiz]);
@@ -347,6 +373,10 @@ const LiveQuiz = () => {
                 toast.success('Answer saved successfully!');
             }
             
+            if (res.data.participant?.answers) {
+                setAnswersHistory(res.data.participant.answers);
+            }
+            
             setTimeout(() => {
                 fetchCurrentQuestion();
                 setIsSubmitting(false);
@@ -404,21 +434,6 @@ const LiveQuiz = () => {
                         <div className="flex items-center bg-gray-50 border border-gray-200 px-3.5 py-1.5 rounded-full shadow-sm">
                             <UserIcon className="w-4 h-4 mr-1.5 text-gray-500" />
                             <span className="text-xs font-bold text-gray-800 tracking-wide">{participant.name}</span>
-                            {violations > 0 && (
-                                <span title="Tab Switch Warnings" className="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide inline-flex items-center shadow-2xs">
-                                    Tab Switch: {violations}
-                                </span>
-                            )}
-                            {fullscreenExits > 0 && (
-                                <span title="Fullscreen Exit Warnings" className="text-[10px] bg-red-100 text-red-800 border border-red-300 px-2.5 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide inline-flex items-center shadow-2xs">
-                                    Fullscreen Exits: {fullscreenExits}
-                                </span>
-                            )}
-                            {rightClickViolations > 0 && (
-                                <span title="Right-Click Warnings" className="text-[10px] bg-purple-100 text-purple-800 border border-purple-300 px-2.5 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide inline-flex items-center shadow-2xs">
-                                    Right-Clicks: {rightClickViolations}
-                                </span>
-                            )}
                         </div>
                     )}
                 </div>
@@ -877,7 +892,7 @@ const LiveQuiz = () => {
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">Fullscreen Required</h2>
                         <p className="text-gray-600 mb-8 text-base sm:text-lg font-medium leading-relaxed">
                             You have exited fullscreen mode. Your exam is temporarily blurred and locked to ensure security.
-                            {(violations > 0 || fullscreenExits > 0 || rightClickViolations > 0) && (
+                            {(violations > 0 || fullscreenExits > 0 || rightClickViolations > 0 || copyPasteViolations > 0) && (
                                 <div className="mt-6 flex flex-wrap gap-3 justify-center">
                                     {violations > 0 && (
                                         <span className="bg-amber-100 text-amber-800 font-bold px-4 py-2 rounded-xl text-sm border border-amber-300 shadow-2xs">
@@ -892,6 +907,11 @@ const LiveQuiz = () => {
                                     {rightClickViolations > 0 && (
                                         <span className="bg-purple-100 text-purple-800 font-bold px-4 py-2 rounded-xl text-sm border border-purple-300 shadow-2xs">
                                             Right-Clicks: {rightClickViolations}
+                                        </span>
+                                    )}
+                                    {copyPasteViolations > 0 && (
+                                        <span className="bg-rose-100 text-rose-800 font-bold px-4 py-2 rounded-xl text-sm border border-rose-300 shadow-2xs">
+                                            Copy / Paste: {copyPasteViolations}
                                         </span>
                                     )}
                                 </div>
@@ -921,7 +941,7 @@ const LiveQuiz = () => {
             )}
 
             {/* Main Content Area */}
-            <div className={`flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col lg:flex-row gap-8 transition-all duration-300 ${!isFullscreen ? 'filter blur-lg pointer-events-none select-none opacity-40' : ''}`}>
+            <div className={`flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col lg:flex-row gap-8 transition-all duration-300 select-none ${!isFullscreen ? 'filter blur-lg pointer-events-none opacity-40' : ''}`}>
                 
                 {/* Left: Heatmap Palette */}
                 <div className="lg:w-1/4 flex-shrink-0">
@@ -937,14 +957,16 @@ const LiveQuiz = () => {
                             {Array.from({ length: totalQuestions }).map((_, idx) => {
                                 let statusClass = "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200"; 
                                 const qId = questionIds && questionIds[idx];
-                                const answer = answersHistory.find(a => (a.questionId && a.questionId.toString()) === (qId && qId.toString()));
+                                const answer = answersHistory.find(a => (a.questionId && (a.questionId._id || a.questionId).toString()) === (qId && (qId._id || qId).toString()));
 
-                                if (idx === currentIndex) {
-                                    statusClass = "bg-blue-600 border-blue-600 text-white font-black shadow-lg shadow-blue-500/30 scale-105 transform ring-4 ring-blue-100";
+                                if (answer && !answer.isSkipped && answer.selectedOption) {
+                                    statusClass = "bg-emerald-600 border-emerald-600 text-white font-bold shadow-2xs";
                                 } else if (answer?.isSkipped) {
                                     statusClass = "bg-amber-100 border-amber-300 text-amber-800 font-bold shadow-2xs";
-                                } else if (answer && !answer.isSkipped) {
-                                    statusClass = "bg-emerald-600 border-emerald-600 text-white font-bold shadow-2xs";
+                                }
+
+                                if (idx === currentIndex) {
+                                    statusClass += " ring-4 ring-blue-500 ring-offset-2 scale-110 z-10 shadow-lg transform";
                                 }
 
                                 return (
@@ -970,11 +992,11 @@ const LiveQuiz = () => {
                                 <div className="w-3.5 h-3.5 rounded-lg bg-gray-100 border border-gray-200 mr-2.5 flex-shrink-0 shadow-2xs"></div> Unattempted
                             </div>
                             <div className="flex items-center text-xs text-gray-700">
-                                <div className="w-3.5 h-3.5 rounded-lg bg-blue-600 border border-blue-600 mr-2.5 flex-shrink-0 shadow-2xs"></div> Active Question
+                                <div className="w-3.5 h-3.5 rounded-lg border-2 border-blue-500 mr-2.5 flex-shrink-0 shadow-2xs"></div> Active Question (Blue Ring)
                             </div>
                         </div>
 
-                        {(violations > 0 || fullscreenExits > 0 || rightClickViolations > 0) && (
+                        {(violations > 0 || fullscreenExits > 0 || rightClickViolations > 0 || copyPasteViolations > 0) && (
                             <div className="mt-6 pt-4 border-t border-gray-100 animate-scale-in">
                                 <h4 className="text-xs font-black text-red-700 uppercase tracking-wider mb-3 flex items-center font-sans tracking-tight">
                                     <ExclamationTriangleIcon className="w-4 h-4 mr-1.5 text-red-600 inline-block flex-shrink-0 animate-pulse" /> Security Logs
@@ -996,6 +1018,12 @@ const LiveQuiz = () => {
                                         <div className="flex items-center justify-between text-xs bg-purple-50 text-purple-900 px-3 py-2 rounded-xl border border-purple-200 shadow-2xs font-medium tracking-tight">
                                             <span>Right-Clicks</span>
                                             <span className="bg-purple-200 text-purple-950 font-black px-2 py-0.5 rounded-lg">{rightClickViolations}</span>
+                                        </div>
+                                    )}
+                                    {copyPasteViolations > 0 && (
+                                        <div className="flex items-center justify-between text-xs bg-rose-50 text-rose-900 px-3 py-2 rounded-xl border border-rose-200 shadow-2xs font-medium tracking-tight">
+                                            <span>Copy / Paste</span>
+                                            <span className="bg-rose-200 text-rose-950 font-black px-2 py-0.5 rounded-lg">{copyPasteViolations}</span>
                                         </div>
                                     )}
                                 </div>
