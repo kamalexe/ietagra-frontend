@@ -19,6 +19,7 @@ const LiveQuiz = () => {
     const [rollNo, setRollNo] = useState('');
     const [participant, setParticipant] = useState(null);
     const [violations, setViolations] = useState(0);
+    const [fullscreenExits, setFullscreenExits] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [questionIds, setQuestionIds] = useState([]);
     
@@ -73,7 +74,15 @@ const LiveQuiz = () => {
                 setAnswersHistory(res.data.answers || []);
                 setTotalQuestions(res.data.totalQuestions);
                 if (res.data.tabSwitches !== undefined) setViolations(res.data.tabSwitches);
-                setSelectedOption(null);
+                if (res.data.fullscreenExits !== undefined) setFullscreenExits(res.data.fullscreenExits);
+                
+                const qId = res.data.data?._id;
+                const existingAns = (res.data.answers || []).find(a => (a.questionId && a.questionId.toString()) === (qId && qId.toString()));
+                if (existingAns && !existingAns.isSkipped && existingAns.selectedOption) {
+                    setSelectedOption(existingAns.selectedOption);
+                } else {
+                    setSelectedOption(null);
+                }
                 
                 if (res.data.joinedAt && activeQuiz.durationMinutes) {
                     const joinTime = new Date(res.data.joinedAt).getTime();
@@ -236,8 +245,18 @@ const LiveQuiz = () => {
             }
         }, 10000);
 
-        const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
+        const handleFullscreenChange = async () => {
+            const isFull = !!document.fullscreenElement;
+            setIsFullscreen(isFull);
+            if (!isFull && participant && !isCompleted && activeQuiz?.isActive) {
+                setFullscreenExits(prev => prev + 1);
+                toast.error('Exited fullscreen mode! Warning recorded.', { duration: 5000 });
+                try {
+                    await axios.post(`${API_URL}/quiz/${id}/participant/${participant._id}/violation/fullscreen`);
+                } catch (err) {
+                    console.error('Failed to record fullscreen violation', err);
+                }
+            }
         };
         
         document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -315,10 +334,8 @@ const LiveQuiz = () => {
             
             if (isSkip) {
                 toast('Question skipped', { icon: '⏭️' });
-            } else if (res.data.correct) {
-                toast.success('Correct answer!');
             } else {
-                toast.error('Incorrect answer.');
+                toast.success('Answer saved successfully!');
             }
             
             setTimeout(() => {
@@ -327,9 +344,12 @@ const LiveQuiz = () => {
             }, 800);
             
         } catch (err) {
-            if (err.response?.data?.error === 'Time limit exceeded') {
+            const errorMsg = err.response?.data?.error || err.response?.data?.message;
+            if (errorMsg === 'Time limit exceeded' || errorMsg === 'Time limit exceeded or session concluded') {
                 toast.error('Time limit exceeded!');
                 setIsCompleted(true);
+            } else if (errorMsg) {
+                toast.error(errorMsg);
             } else {
                 toast.error('Failed to submit answer');
             }
@@ -376,8 +396,13 @@ const LiveQuiz = () => {
                             <UserIcon className="w-4 h-4 mr-1.5 text-gray-500" />
                             <span className="text-xs font-bold text-gray-800 tracking-wide">{participant.name}</span>
                             {violations > 0 && (
-                                <span className="text-[10px] bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide">
-                                    {violations} Warning{violations > 1 ? 's' : ''}
+                                <span title="Tab Switch Warnings" className="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide">
+                                    Tab Switch: {violations}
+                                </span>
+                            )}
+                            {fullscreenExits > 0 && (
+                                <span title="Fullscreen Exit Warnings" className="text-[10px] bg-red-100 text-red-800 border border-red-300 px-2 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide">
+                                    Fullscreen Exits: {fullscreenExits}
                                 </span>
                             )}
                         </div>
@@ -447,6 +472,42 @@ const LiveQuiz = () => {
     const isFutureStart = activeQuiz && activeQuiz.scheduledStartTime && new Date(activeQuiz.scheduledStartTime) > now;
     const isPastEnd = activeQuiz && activeQuiz.scheduledEndTime && new Date(activeQuiz.scheduledEndTime) < now;
 
+    const getPortalBadge = () => {
+        if (isFutureStart) {
+            return {
+                text: "Scheduled Assessment Session",
+                bg: "bg-amber-50 text-amber-800 border-amber-300",
+                icon: <ClockIcon className="w-4 h-4 mr-2 text-amber-600 inline-block flex-shrink-0" />
+            };
+        }
+        if (isPastEnd) {
+            return {
+                text: "Concluded Assessment Session",
+                bg: "bg-gray-100 text-gray-700 border-gray-300",
+                icon: <CheckCircleIcon className="w-4 h-4 mr-2 text-gray-600 inline-block flex-shrink-0" />
+            };
+        }
+        if (!activeQuiz.isActive) {
+            return {
+                text: "Deactivated / Locked Assessment",
+                bg: "bg-red-50 text-red-700 border-red-200",
+                icon: <ExclamationTriangleIcon className="w-4 h-4 mr-2 text-red-600 inline-block flex-shrink-0" />
+            };
+        }
+        return {
+            text: "Live Assessment Portal",
+            bg: "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-2xs",
+            icon: (
+                <span className="relative flex h-2.5 w-2.5 mr-2.5 inline-flex items-center flex-shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+            )
+        };
+    };
+
+    const portalBadge = getPortalBadge();
+
     // Step 1: Join & Landing Screen
     if (!participant) {
         if (viewMode === 'landing' || viewMode === 'scoreboard') {
@@ -456,11 +517,23 @@ const LiveQuiz = () => {
                         
                         {/* Title Section */}
                         <div className="text-center mb-10 sm:mb-12">
-                            <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 mb-4 border border-blue-200">
-                                <AcademicCapIcon className="w-4 h-4 mr-2" /> Live Assessment Portal
+                            <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border ${portalBadge.bg}`}>
+                                {portalBadge.icon} {portalBadge.text}
                             </span>
                             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">{activeQuiz.title}</h2>
-                            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">{activeQuiz.description}</p>
+                            <div 
+                                className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-6 prose prose-blue"
+                                dangerouslySetInnerHTML={{ __html: activeQuiz.description }}
+                            />
+                            {activeQuiz.metadata && Object.keys(activeQuiz.metadata).length > 0 && (
+                                <div className="flex flex-wrap gap-2.5 justify-center mt-6">
+                                    {Object.entries(activeQuiz.metadata).map(([key, value]) => (
+                                        <span key={key} className="inline-flex items-center px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-700 shadow-2xs transition-colors hover:bg-gray-100">
+                                            <strong className="text-gray-900 font-bold mr-1.5">{key}:</strong> <span>{value}</span>
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Rules Box */}
@@ -685,51 +758,7 @@ const LiveQuiz = () => {
         );
     }
 
-    // Fullscreen Overlay
-    if (!isFullscreen && participant && !isCompleted) {
-        return (
-            <div className="fixed inset-0 z-[100] flex flex-col justify-center items-center bg-white/30 backdrop-blur-xl transition-all duration-300">
-                <div className="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-lg border border-red-200">
-                    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
-                        <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Quiz Paused (Fullscreen Required)</h2>
-                    <p className="text-gray-600 mb-8 text-lg">
-                        You have exited fullscreen mode. Your actions are being recorded. Please return to fullscreen to resume your quiz.
-                        {violations > 0 && (
-                            <>
-                                <br /><br />
-                                <strong className="text-red-600 bg-red-100 px-4 py-2 rounded-xl inline-block shadow-sm">
-                                    Total Warnings: {violations}
-                                </strong>
-                            </>
-                        )}
-                    </p>
-                    <button
-                        onClick={async () => {
-                            try {
-                                const elem = document.documentElement;
-                                if (elem.requestFullscreen) {
-                                    await elem.requestFullscreen();
-                                } else if (elem.webkitRequestFullscreen) {
-                                    await elem.webkitRequestFullscreen();
-                                } else if (elem.msRequestFullscreen) {
-                                    await elem.msRequestFullscreen();
-                                }
-                            } catch (err) {
-                                toast.error('Failed to enter fullscreen');
-                            }
-                        }}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transition-colors text-lg"
-                    >
-                        Return to Fullscreen
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    // Fullscreen Overlay is now rendered as a modal above blurred quiz content
 
     // Step 3: Completed Screen
     if (isCompleted) {
@@ -822,11 +851,58 @@ const LiveQuiz = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col font-sans">
+        <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col relative font-sans overflow-x-hidden">
             {renderTopBar()}
 
+            {!isFullscreen && participant && !isCompleted && (
+                <div className="fixed inset-0 z-[100] flex flex-col justify-center items-center bg-gray-900/40 backdrop-blur-md transition-all duration-300 p-4">
+                    <div className="bg-white p-8 sm:p-10 rounded-3xl shadow-2xl text-center max-w-lg w-full border border-red-200 animate-scale-in">
+                        <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6 shadow-sm">
+                            <ExclamationTriangleIcon className="h-8 w-8 text-red-600" />
+                        </div>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">Fullscreen Required</h2>
+                        <p className="text-gray-600 mb-8 text-base sm:text-lg font-medium leading-relaxed">
+                            You have exited fullscreen mode. Your exam is temporarily blurred and locked to ensure security.
+                            {(violations > 0 || fullscreenExits > 0) && (
+                                <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                                    {violations > 0 && (
+                                        <span className="bg-amber-100 text-amber-800 font-bold px-4 py-2 rounded-xl text-sm border border-amber-300 shadow-2xs">
+                                            Tab Switches: {violations}
+                                        </span>
+                                    )}
+                                    {fullscreenExits > 0 && (
+                                        <span className="bg-red-100 text-red-800 font-bold px-4 py-2 rounded-xl text-sm border border-red-300 shadow-2xs">
+                                            Fullscreen Exits: {fullscreenExits}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </p>
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const elem = document.documentElement;
+                                    if (elem.requestFullscreen) {
+                                        await elem.requestFullscreen();
+                                    } else if (elem.webkitRequestFullscreen) {
+                                        await elem.webkitRequestFullscreen();
+                                    } else if (elem.msRequestFullscreen) {
+                                        await elem.msRequestFullscreen();
+                                    }
+                                } catch (err) {
+                                    toast.error('Failed to enter fullscreen');
+                                }
+                            }}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-4 px-8 rounded-2xl shadow-lg shadow-red-500/20 transition-all text-lg tracking-wide cursor-pointer"
+                        >
+                            Return to Fullscreen & Resume
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Main Content Area */}
-            <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col lg:flex-row gap-8">
+            <div className={`flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col lg:flex-row gap-8 transition-all duration-300 ${!isFullscreen ? 'filter blur-lg pointer-events-none select-none opacity-40' : ''}`}>
                 
                 {/* Left: Heatmap Palette */}
                 <div className="lg:w-1/4 flex-shrink-0">
@@ -841,17 +917,15 @@ const LiveQuiz = () => {
                         <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-5 gap-2.5 max-h-40 lg:max-h-none overflow-y-auto overflow-x-hidden p-1">
                             {Array.from({ length: totalQuestions }).map((_, idx) => {
                                 let statusClass = "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200"; 
-                                const qId = questionIds[idx];
-                                const answer = answersHistory.find(a => a.questionId === qId);
+                                const qId = questionIds && questionIds[idx];
+                                const answer = answersHistory.find(a => (a.questionId && a.questionId.toString()) === (qId && qId.toString()));
 
                                 if (idx === currentIndex) {
                                     statusClass = "bg-blue-600 border-blue-600 text-white font-black shadow-lg shadow-blue-500/30 scale-105 transform ring-4 ring-blue-100";
                                 } else if (answer?.isSkipped) {
                                     statusClass = "bg-amber-100 border-amber-300 text-amber-800 font-bold shadow-2xs";
-                                } else if (answer?.isCorrect) {
-                                    statusClass = "bg-green-100 border-green-300 text-green-800 font-bold shadow-2xs";
-                                } else if (answer && !answer.isCorrect) {
-                                    statusClass = "bg-red-100 border-red-300 text-red-800 font-bold shadow-2xs";
+                                } else if (answer && !answer.isSkipped) {
+                                    statusClass = "bg-emerald-600 border-emerald-600 text-white font-bold shadow-2xs";
                                 }
 
                                 return (
@@ -866,15 +940,15 @@ const LiveQuiz = () => {
                             })}
                         </div>
                         
-                        <div className="mt-6 pt-4 border-t border-gray-100 space-y-2.5 flex justify-between lg:flex-col lg:justify-start lg:space-y-3 font-medium">
+                        <div className="mt-6 pt-4 border-t border-gray-100 space-y-2.5 flex flex-wrap gap-2 justify-between lg:flex-col lg:justify-start lg:space-y-3 font-medium">
                             <div className="flex items-center text-xs text-gray-700">
-                                <div className="w-3.5 h-3.5 rounded-lg bg-green-100 border border-green-300 mr-2.5 flex-shrink-0 shadow-2xs"></div> Solved (Correct)
-                            </div>
-                            <div className="flex items-center text-xs text-gray-700">
-                                <div className="w-3.5 h-3.5 rounded-lg bg-red-100 border border-red-300 mr-2.5 flex-shrink-0 shadow-2xs"></div> Solved (Incorrect)
+                                <div className="w-3.5 h-3.5 rounded-lg bg-emerald-600 border border-emerald-600 mr-2.5 flex-shrink-0 shadow-2xs"></div> Attempted / Saved
                             </div>
                             <div className="flex items-center text-xs text-gray-700">
                                 <div className="w-3.5 h-3.5 rounded-lg bg-amber-100 border border-amber-300 mr-2.5 flex-shrink-0 shadow-2xs"></div> Skipped
+                            </div>
+                            <div className="flex items-center text-xs text-gray-700">
+                                <div className="w-3.5 h-3.5 rounded-lg bg-gray-100 border border-gray-200 mr-2.5 flex-shrink-0 shadow-2xs"></div> Unattempted
                             </div>
                             <div className="flex items-center text-xs text-gray-700">
                                 <div className="w-3.5 h-3.5 rounded-lg bg-blue-600 border border-blue-600 mr-2.5 flex-shrink-0 shadow-2xs"></div> Active Question
@@ -897,18 +971,21 @@ const LiveQuiz = () => {
 
                         <div className="space-y-4">
                             {currentQuestion.options.map((option, index) => {
-                                const isSelected = selectedOption === option;
+                                const isSelected = Boolean(selectedOption && option && selectedOption.trim().toLowerCase() === option.trim().toLowerCase());
+
                                 return (
                                     <div 
                                         key={index}
-                                        onClick={() => !isSubmitting && setSelectedOption(option)}
+                                        onClick={() => {
+                                            if (!isSubmitting) setSelectedOption(option);
+                                        }}
                                         className={`
-                                            p-4 border rounded-xl cursor-pointer transition-colors flex items-center
+                                            p-4 border rounded-xl transition-colors flex items-center
                                             ${isSelected 
-                                                ? 'border-blue-600 bg-blue-50/80 ring-1 ring-blue-600' 
+                                                ? 'border-blue-600 bg-blue-50/80 ring-1 ring-blue-600 font-bold' 
                                                 : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50/50'
                                             }
-                                            ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}
+                                            ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                                         `}
                                     >
                                         <div className={`
@@ -927,40 +1004,49 @@ const LiveQuiz = () => {
                         </div>
 
                         <div className="mt-10 sm:mt-12 pt-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-between items-center gap-4">
-                            <button
-                                onClick={() => handleSubmitAnswer(true)}
-                                disabled={isSubmitting}
-                                className={`
-                                    w-full sm:w-auto px-6 py-3.5 rounded-lg border border-gray-300 text-sm font-bold flex items-center justify-center transition-colors cursor-pointer
-                                    ${isSubmitting ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}
-                                `}
-                            >
-                                Skip Question <ChevronRightIcon className="w-4 h-4 ml-1.5" />
-                            </button>
+                            {(() => {
+                                const answeredObj = answersHistory.find(a => (a.questionId && a.questionId.toString()) === (currentQuestion._id && currentQuestion._id.toString()));
+                                const isAlreadyAnswered = answeredObj && !answeredObj.isSkipped;
+                                
+                                return (
+                                    <>
+                                        <button
+                                            onClick={() => handleSubmitAnswer(true)}
+                                            disabled={isSubmitting}
+                                            className={`
+                                                w-full sm:w-auto px-6 py-3.5 rounded-lg border border-gray-300 text-sm font-bold flex items-center justify-center transition-colors cursor-pointer
+                                                ${isSubmitting ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}
+                                            `}
+                                        >
+                                            Skip Question <ChevronRightIcon className="w-4 h-4 ml-1.5" />
+                                        </button>
 
-                            <button
-                                onClick={() => handleSubmitAnswer(false)}
-                                disabled={!selectedOption || isSubmitting}
-                                className={`
-                                    w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-bold shadow transition-all flex justify-center items-center tracking-wide cursor-pointer
-                                    ${!selectedOption || isSubmitting
-                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-                                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                                    }
-                                `}
-                            >
-                                <span className="flex items-center">
-                                    {isSubmitting ? (
-                                        <>
-                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Submitting...
-                                        </>
-                                    ) : 'Save & Next'}
-                                </span>
-                            </button>
+                                        <button
+                                            onClick={() => handleSubmitAnswer(false)}
+                                            disabled={!selectedOption || isSubmitting}
+                                            className={`
+                                                w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-bold shadow transition-all flex justify-center items-center tracking-wide cursor-pointer
+                                                ${!selectedOption || isSubmitting
+                                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                                                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                }
+                                            `}
+                                        >
+                                            <span className="flex items-center">
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        Submitting...
+                                                    </>
+                                                ) : (isAlreadyAnswered ? 'Update Answer & Next' : 'Save & Next')}
+                                            </span>
+                                        </button>
+                                    </>
+                                );
+                            })()}
                         </div>
                     </div>
                 </div>

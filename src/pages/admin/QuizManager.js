@@ -28,6 +28,7 @@ const QuizManager = () => {
     const [shuffleOptions, setShuffleOptions] = useState(false);
     const [scheduledStartTime, setScheduledStartTime] = useState('');
     const [scheduledEndTime, setScheduledEndTime] = useState('');
+    const [metadataEntries, setMetadataEntries] = useState([{ key: 'Course Code', value: '' }, { key: 'Instructor', value: '' }]);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('list'); // 'list', 'upload', 'scoreboard'
@@ -44,6 +45,7 @@ const QuizManager = () => {
     const [editShuffleOptions, setEditShuffleOptions] = useState(false);
     const [editScheduledStartTime, setEditScheduledStartTime] = useState('');
     const [editScheduledEndTime, setEditScheduledEndTime] = useState('');
+    const [editMetadataEntries, setEditMetadataEntries] = useState([]);
 
     useEffect(() => {
         fetchQuizzes();
@@ -150,6 +152,15 @@ const QuizManager = () => {
         formData.append('shuffleOptions', shuffleOptions);
         if (scheduledStartTime) formData.append('scheduledStartTime', scheduledStartTime);
         if (scheduledEndTime) formData.append('scheduledEndTime', scheduledEndTime);
+
+        const metadataObj = {};
+        metadataEntries.forEach(item => {
+            if (item.key.trim() && item.value.trim()) {
+                metadataObj[item.key.trim()] = item.value.trim();
+            }
+        });
+        formData.append('metadata', JSON.stringify(metadataObj));
+
         formData.append('file', file);
 
         setLoading(true);
@@ -167,6 +178,7 @@ const QuizManager = () => {
             setDescription('');
             setScheduledStartTime('');
             setScheduledEndTime('');
+            setMetadataEntries([{ key: 'Course Code', value: '' }, { key: 'Instructor', value: '' }]);
             setFile(null);
             fetchQuizzes();
             setActiveTab('list');
@@ -210,6 +222,9 @@ const QuizManager = () => {
         setEditShuffleOptions(!!quiz.shuffleOptions);
         setEditScheduledStartTime(toLocalISOString(quiz.scheduledStartTime));
         setEditScheduledEndTime(toLocalISOString(quiz.scheduledEndTime));
+        const metaObj = quiz.metadata || {};
+        const metaList = Object.entries(metaObj).map(([key, value]) => ({ key, value }));
+        setEditMetadataEntries(metaList.length > 0 ? metaList : [{ key: 'Course Code', value: '' }]);
     };
 
     const handleUpdateQuiz = async (e) => {
@@ -218,6 +233,13 @@ const QuizManager = () => {
         setLoading(true);
         try {
             const { access_token } = getToken();
+            const metadataObj = {};
+            editMetadataEntries.forEach(item => {
+                if (item.key.trim() && item.value.trim()) {
+                    metadataObj[item.key.trim()] = item.value.trim();
+                }
+            });
+
             await axios.put(`${API_URL}/quiz/${editingQuiz._id}`, {
                 title: editTitle,
                 description: editDescription,
@@ -226,6 +248,7 @@ const QuizManager = () => {
                 shuffleOptions: editShuffleOptions,
                 scheduledStartTime: editScheduledStartTime || null,
                 scheduledEndTime: editScheduledEndTime || null,
+                metadata: metadataObj
             }, {
                 headers: { Authorization: `Bearer ${access_token}` },
                 withCredentials: true
@@ -467,6 +490,54 @@ const QuizManager = () => {
                                 rows="4"
                             ></textarea>
                         </div>
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Metadata Attributes (Optional)</label>
+                                <button
+                                    type="button"
+                                    onClick={() => setMetadataEntries([...metadataEntries, { key: '', value: '' }])}
+                                    className="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 cursor-pointer"
+                                >
+                                    + Add Field
+                                </button>
+                            </div>
+                            <div className="space-y-2.5">
+                                {metadataEntries.map((entry, idx) => (
+                                    <div key={idx} className="flex gap-3 items-center">
+                                        <input
+                                            type="text"
+                                            placeholder="Key (e.g. Course Code)"
+                                            value={entry.key}
+                                            onChange={(e) => {
+                                                const updated = [...metadataEntries];
+                                                updated[idx].key = e.target.value;
+                                                setMetadataEntries(updated);
+                                            }}
+                                            className="w-1/2 bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 font-medium text-gray-900"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Value (e.g. CS101)"
+                                            value={entry.value}
+                                            onChange={(e) => {
+                                                const updated = [...metadataEntries];
+                                                updated[idx].value = e.target.value;
+                                                setMetadataEntries(updated);
+                                            }}
+                                            className="w-1/2 bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 font-medium text-gray-900"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setMetadataEntries(metadataEntries.filter((_, i) => i !== idx))}
+                                            className="text-gray-400 hover:text-red-600 p-1 cursor-pointer transition-colors flex-shrink-0"
+                                            title="Remove field"
+                                        >
+                                            <XMarkIcon className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                         <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex items-center shadow-2xs">
                             <input
                                 id="shuffleOptions"
@@ -689,6 +760,54 @@ const QuizManager = () => {
                                     className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-medium text-gray-900 text-sm"
                                     rows="4"
                                 ></textarea>
+                            </div>
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Metadata Attributes</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditMetadataEntries([...editMetadataEntries, { key: '', value: '' }])}
+                                        className="text-xs text-amber-600 hover:text-amber-800 font-bold flex items-center gap-1 cursor-pointer"
+                                    >
+                                        + Add Field
+                                    </button>
+                                </div>
+                                <div className="space-y-2.5">
+                                    {editMetadataEntries.map((entry, idx) => (
+                                        <div key={idx} className="flex gap-3 items-center">
+                                            <input
+                                                type="text"
+                                                placeholder="Key (e.g. Course Code)"
+                                                value={entry.key}
+                                                onChange={(e) => {
+                                                    const updated = [...editMetadataEntries];
+                                                    updated[idx].key = e.target.value;
+                                                    setEditMetadataEntries(updated);
+                                                }}
+                                                className="w-1/2 bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 font-medium text-gray-900"
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Value (e.g. CS101)"
+                                                value={entry.value}
+                                                onChange={(e) => {
+                                                    const updated = [...editMetadataEntries];
+                                                    updated[idx].value = e.target.value;
+                                                    setEditMetadataEntries(updated);
+                                                }}
+                                                className="w-1/2 bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 font-medium text-gray-900"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setEditMetadataEntries(editMetadataEntries.filter((_, i) => i !== idx))}
+                                                className="text-gray-400 hover:text-red-600 p-1 cursor-pointer transition-colors flex-shrink-0"
+                                                title="Remove field"
+                                            >
+                                                <XMarkIcon className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                             <div className="bg-amber-50/80 border border-amber-200 p-4 rounded-xl flex items-center shadow-2xs">
                                 <input
