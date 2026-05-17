@@ -305,7 +305,7 @@ const LiveQuiz = () => {
             document.removeEventListener('paste', handleCopyPaste);
             clearInterval(fullscreenInterval);
         };
-    }, [participant, isCompleted, activeQuiz]);
+    }, [participant, isCompleted, activeQuiz, id]);
 
     // Scoreboard effect
     useEffect(() => {
@@ -953,27 +953,27 @@ const LiveQuiz = () => {
                             </span>
                         </div>
                         
-                        <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-5 gap-2.5 max-h-40 lg:max-h-none overflow-y-auto overflow-x-hidden p-1">
+                        <div className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-5 gap-3 sm:gap-4 max-h-64 lg:max-h-none overflow-y-auto overflow-x-hidden p-3">
                             {Array.from({ length: totalQuestions }).map((_, idx) => {
-                                let statusClass = "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200"; 
+                                let statusClass = "bg-gray-50 border-2 border-gray-300 text-gray-800 hover:bg-gray-200 shadow-sm font-bold"; 
                                 const qId = questionIds && questionIds[idx];
                                 const answer = answersHistory.find(a => (a.questionId && (a.questionId._id || a.questionId).toString()) === (qId && (qId._id || qId).toString()));
 
                                 if (answer && !answer.isSkipped && answer.selectedOption) {
-                                    statusClass = "bg-emerald-600 border-emerald-600 text-white font-bold shadow-2xs";
+                                    statusClass = "bg-emerald-500 border-2 border-emerald-600 text-emerald-950 font-black shadow-sm";
                                 } else if (answer?.isSkipped) {
-                                    statusClass = "bg-amber-100 border-amber-300 text-amber-800 font-bold shadow-2xs";
+                                    statusClass = "bg-amber-400 border-2 border-amber-500 text-amber-950 font-black shadow-sm";
                                 }
 
                                 if (idx === currentIndex) {
-                                    statusClass += " ring-4 ring-blue-500 ring-offset-2 scale-110 z-10 shadow-lg transform";
+                                    statusClass += " ring-4 ring-blue-600 ring-offset-2 scale-110 z-10 shadow-md transform";
                                 }
 
                                 return (
                                     <div 
                                         key={idx}
                                         onClick={() => !isSubmitting && fetchCurrentQuestion(idx)}
-                                        className={`flex items-center justify-center h-9 w-9 sm:h-11 sm:w-11 rounded-xl border text-xs sm:text-sm font-bold cursor-pointer transition-all ${statusClass}`}
+                                        className={`flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-2xl text-base sm:text-lg cursor-pointer transition-all duration-200 select-none ${statusClass}`}
                                     >
                                         {idx + 1}
                                     </div>
@@ -981,18 +981,18 @@ const LiveQuiz = () => {
                             })}
                         </div>
                         
-                        <div className="mt-6 pt-4 border-t border-gray-100 space-y-2.5 flex flex-wrap gap-2 justify-between lg:flex-col lg:justify-start lg:space-y-3 font-medium">
-                            <div className="flex items-center text-xs text-gray-700">
-                                <div className="w-3.5 h-3.5 rounded-lg bg-emerald-600 border border-emerald-600 mr-2.5 flex-shrink-0 shadow-2xs"></div> Attempted / Saved
+                        <div className="mt-6 pt-4 border-t border-gray-100 space-y-2.5 flex flex-wrap gap-2 justify-between lg:flex-col lg:justify-start lg:space-y-3 font-semibold text-gray-800 text-xs sm:text-sm tracking-tight">
+                            <div className="flex items-center text-gray-800">
+                                <div className="w-4 h-4 rounded-lg bg-emerald-600 border border-emerald-700 mr-3 flex-shrink-0 shadow-2xs"></div> Attempted / Saved
                             </div>
-                            <div className="flex items-center text-xs text-gray-700">
-                                <div className="w-3.5 h-3.5 rounded-lg bg-amber-100 border border-amber-300 mr-2.5 flex-shrink-0 shadow-2xs"></div> Skipped
+                            <div className="flex items-center text-gray-800">
+                                <div className="w-4 h-4 rounded-lg bg-amber-500 border border-amber-600 mr-3 flex-shrink-0 shadow-2xs"></div> Skipped
                             </div>
-                            <div className="flex items-center text-xs text-gray-700">
-                                <div className="w-3.5 h-3.5 rounded-lg bg-gray-100 border border-gray-200 mr-2.5 flex-shrink-0 shadow-2xs"></div> Unattempted
+                            <div className="flex items-center text-gray-800">
+                                <div className="w-4 h-4 rounded-lg bg-gray-50 border-2 border-gray-300 mr-3 flex-shrink-0 shadow-2xs"></div> Unattempted
                             </div>
-                            <div className="flex items-center text-xs text-gray-700">
-                                <div className="w-3.5 h-3.5 rounded-lg border-2 border-blue-500 mr-2.5 flex-shrink-0 shadow-2xs"></div> Active Question (Blue Ring)
+                            <div className="flex items-center text-gray-800">
+                                <div className="w-4 h-4 rounded-lg border-2 border-blue-600 ring-4 ring-blue-300 mr-3 flex-shrink-0 shadow-2xs"></div> Active Question (Blue Ring)
                             </div>
                         </div>
 
