@@ -38,6 +38,65 @@ const LiveQuiz = () => {
     const [scoreboardData, setScoreboardData] = useState([]);
     const [countdownText, setCountdownText] = useState('');
 
+    const fetchActiveQuiz = useCallback(async () => {
+        try {
+            const res = await axios.get(`${API_URL}/quiz/${id}`);
+            if (res.data.success) {
+                setActiveQuiz(res.data.data);
+            }
+        } catch (err) {
+            console.log('Quiz not found');
+        } finally {
+            setLoading(false);
+        }
+    }, [id]);
+
+    const fetchCurrentQuestion = useCallback(async (targetIdx) => {
+        if (!participant || !activeQuiz) return;
+        
+        try {
+            const url = targetIdx !== undefined 
+                ? `${API_URL}/quiz/${activeQuiz._id}/participant/${participant._id}/question?targetIndex=${targetIdx}`
+                : `${API_URL}/quiz/${activeQuiz._id}/participant/${participant._id}/question`;
+                
+            const res = await axios.get(url);
+            
+            if (res.data.completed) {
+                setIsCompleted(true);
+                setFinalScore(res.data.score);
+                setAnswersHistory(res.data.answers || []);
+                if (res.data.tabSwitches !== undefined) setViolations(res.data.tabSwitches);
+            } else {
+                setCurrentQuestion(res.data.data);
+                if (res.data.currentIndex !== undefined) setCurrentIndex(res.data.currentIndex);
+                if (res.data.questionIds) setQuestionIds(res.data.questionIds);
+                setAnswersHistory(res.data.answers || []);
+                setTotalQuestions(res.data.totalQuestions);
+                if (res.data.tabSwitches !== undefined) setViolations(res.data.tabSwitches);
+                setSelectedOption(null);
+                
+                if (res.data.joinedAt && activeQuiz.durationMinutes) {
+                    const joinTime = new Date(res.data.joinedAt).getTime();
+                    const now = new Date().getTime();
+                    const elapsedSeconds = Math.floor((now - joinTime) / 1000);
+                    const totalSeconds = activeQuiz.durationMinutes * 60;
+                    const remaining = totalSeconds - elapsedSeconds;
+                    
+                    if (remaining <= 0) {
+                        setIsCompleted(true);
+                    } else {
+                        setTimeLeft(remaining);
+                    }
+                }
+            }
+        } catch (err) {
+            if (err.response?.status === 400 && err.response?.data?.error === 'Time limit exceeded') {
+                setIsCompleted(true);
+            }
+            console.error('Error fetching question:', err);
+        }
+    }, [participant, activeQuiz]);
+
     useEffect(() => {
         if (!activeQuiz || !activeQuiz.scheduledStartTime) return;
         const startTime = new Date(activeQuiz.scheduledStartTime).getTime();
@@ -214,19 +273,6 @@ const LiveQuiz = () => {
         };
     }, [isCompleted, viewMode, activeQuiz]);
 
-    const fetchActiveQuiz = useCallback(async () => {
-        try {
-            const res = await axios.get(`${API_URL}/quiz/${id}`);
-            if (res.data.success) {
-                setActiveQuiz(res.data.data);
-            }
-        } catch (err) {
-            console.log('Quiz not found');
-        } finally {
-            setLoading(false);
-        }
-    }, [id]);
-
     const handleJoin = async (e) => {
         e.preventDefault();
         if (!name.trim() || !email.trim()) return toast.error('Please enter your name and email');
@@ -256,52 +302,6 @@ const LiveQuiz = () => {
             toast.error(err.response?.data?.error || 'Failed to join quiz');
         }
     };
-
-    const fetchCurrentQuestion = useCallback(async (targetIdx) => {
-        if (!participant || !activeQuiz) return;
-        
-        try {
-            const url = targetIdx !== undefined 
-                ? `${API_URL}/quiz/${activeQuiz._id}/participant/${participant._id}/question?targetIndex=${targetIdx}`
-                : `${API_URL}/quiz/${activeQuiz._id}/participant/${participant._id}/question`;
-                
-            const res = await axios.get(url);
-            
-            if (res.data.completed) {
-                setIsCompleted(true);
-                setFinalScore(res.data.score);
-                setAnswersHistory(res.data.answers || []);
-                if (res.data.tabSwitches !== undefined) setViolations(res.data.tabSwitches);
-            } else {
-                setCurrentQuestion(res.data.data);
-                if (res.data.currentIndex !== undefined) setCurrentIndex(res.data.currentIndex);
-                if (res.data.questionIds) setQuestionIds(res.data.questionIds);
-                setAnswersHistory(res.data.answers || []);
-                setTotalQuestions(res.data.totalQuestions);
-                if (res.data.tabSwitches !== undefined) setViolations(res.data.tabSwitches);
-                setSelectedOption(null);
-                
-                if (res.data.joinedAt && activeQuiz.durationMinutes) {
-                    const joinTime = new Date(res.data.joinedAt).getTime();
-                    const now = new Date().getTime();
-                    const elapsedSeconds = Math.floor((now - joinTime) / 1000);
-                    const totalSeconds = activeQuiz.durationMinutes * 60;
-                    const remaining = totalSeconds - elapsedSeconds;
-                    
-                    if (remaining <= 0) {
-                        setIsCompleted(true);
-                    } else {
-                        setTimeLeft(remaining);
-                    }
-                }
-            }
-        } catch (err) {
-            if (err.response?.status === 400 && err.response?.data?.error === 'Time limit exceeded') {
-                setIsCompleted(true);
-            }
-            console.error('Error fetching question:', err);
-        }
-    }, [participant, activeQuiz]);
 
     const handleSubmitAnswer = async (isSkip = false) => {
         if (!isSkip && !selectedOption) return toast.error('Please select an option');
