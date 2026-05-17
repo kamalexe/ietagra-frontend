@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { ClockIcon, UserIcon, CheckCircleIcon, DocumentTextIcon, TrophyIcon, AcademicCapIcon, ChevronRightIcon, ExclamationTriangleIcon, ArrowPathIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const LiveQuiz = () => {
     const { id } = useParams();
