@@ -48,6 +48,7 @@ const NAVIGATION_STRUCTURE = [
       { name: 'Profiles', href: '/admin/student-profiles', icon: UserGroupIcon, roles: ['admin', 'department_admin'], permission: 'manage_student_data' },
       { name: 'Exams', href: '/admin/add-exam-schedule', icon: CalendarIcon, roles: ['admin', 'department_admin'], permission: 'manage_exam_schedule' },
       { name: 'Syllabus', href: '/admin/add-syllabus', icon: DocumentTextIcon, roles: ['admin', 'department_admin'], permission: 'manage_syllabus' },
+      { name: 'Quiz Manager', href: '/admin/quiz', icon: AcademicCapIcon, roles: ['admin'] },
     ]
   },
   {

@@ -41,6 +41,8 @@ import Profile from './pages/account/Profile';
 import StudentProfileManager from './pages/admin/StudentProfileManager';
 import CampusesList from './pages/admin/CampusesList';
 import CoursesList from './pages/admin/CoursesList';
+import QuizManager from './pages/admin/QuizManager';
+import LiveQuiz from './pages/LiveQuiz';
 
 function App() {
     const { access_token } = useSelector((state) => state.auth);
@@ -80,6 +82,7 @@ function App() {
                         <Route path="add-syllabus" element={<SyllabusManager />} />
                         <Route path="add-exam-schedule" element={<ExamScheduleManager />} />
                         <Route path="company-registrations" element={<CompanyRegistrationsList />} />
+                        <Route path="quiz" element={<QuizManager />} />
                         <Route path="settings" element={<div>Settings Page</div>} />
                     </Route>
 
@@ -105,6 +108,8 @@ function App() {
                         <Route path="/company-registration" element={<CompanyRegistration />} />
                         <Route path="*" element={<h1>Error 404 Page not found !!</h1>} />
                     </Route>
+                    {/* Standalone Route for Live Quiz */}
+                    <Route path="/live-quiz/:id" element={<LiveQuiz />} />
                 </Routes>
             </BrowserRouter>
         </>
