@@ -135,7 +135,7 @@ const LiveQuiz = () => {
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [activeQuiz?.scheduledStartTime, fetchActiveQuiz]);
+    }, [activeQuiz, fetchActiveQuiz]);
 
     useEffect(() => {
         fetchActiveQuiz();
