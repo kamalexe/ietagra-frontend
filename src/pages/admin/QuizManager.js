@@ -28,6 +28,7 @@ const QuizManager = () => {
     const [shuffleOptions, setShuffleOptions] = useState(false);
     const [scheduledStartTime, setScheduledStartTime] = useState('');
     const [scheduledEndTime, setScheduledEndTime] = useState('');
+    const [customChipText, setCustomChipText] = useState('In collaboration with IET DBRAU');
     const [metadataEntries, setMetadataEntries] = useState([{ key: 'Course Code', value: '' }, { key: 'Instructor', value: '' }]);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -45,6 +46,7 @@ const QuizManager = () => {
     const [editShuffleOptions, setEditShuffleOptions] = useState(false);
     const [editScheduledStartTime, setEditScheduledStartTime] = useState('');
     const [editScheduledEndTime, setEditScheduledEndTime] = useState('');
+    const [editCustomChipText, setEditCustomChipText] = useState('');
     const [editMetadataEntries, setEditMetadataEntries] = useState([]);
 
     useEffect(() => {
@@ -152,6 +154,7 @@ const QuizManager = () => {
         formData.append('shuffleOptions', shuffleOptions);
         if (scheduledStartTime) formData.append('scheduledStartTime', scheduledStartTime);
         if (scheduledEndTime) formData.append('scheduledEndTime', scheduledEndTime);
+        if (customChipText) formData.append('customChipText', customChipText);
 
         const metadataObj = {};
         metadataEntries.forEach(item => {
@@ -178,6 +181,7 @@ const QuizManager = () => {
             setDescription('');
             setScheduledStartTime('');
             setScheduledEndTime('');
+            setCustomChipText('In collaboration with IET DBRAU');
             setMetadataEntries([{ key: 'Course Code', value: '' }, { key: 'Instructor', value: '' }]);
             setFile(null);
             fetchQuizzes();
@@ -222,6 +226,7 @@ const QuizManager = () => {
         setEditShuffleOptions(!!quiz.shuffleOptions);
         setEditScheduledStartTime(toLocalISOString(quiz.scheduledStartTime));
         setEditScheduledEndTime(toLocalISOString(quiz.scheduledEndTime));
+        setEditCustomChipText(quiz.customChipText || 'In collaboration with IET DBRAU');
         const metaObj = quiz.metadata || {};
         const metaList = Object.entries(metaObj).map(([key, value]) => ({ key, value }));
         setEditMetadataEntries(metaList.length > 0 ? metaList : [{ key: 'Course Code', value: '' }]);
@@ -248,6 +253,7 @@ const QuizManager = () => {
                 shuffleOptions: editShuffleOptions,
                 scheduledStartTime: editScheduledStartTime || null,
                 scheduledEndTime: editScheduledEndTime || null,
+                customChipText: editCustomChipText,
                 metadata: metadataObj
             }, {
                 headers: { Authorization: `Bearer ${access_token}` },
@@ -489,6 +495,16 @@ const QuizManager = () => {
                                 className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium text-gray-900 text-sm"
                                 rows="4"
                             ></textarea>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Custom Portal Badge / Chip Text</label>
+                            <input
+                                type="text"
+                                value={customChipText}
+                                onChange={(e) => setCustomChipText(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium text-gray-900 text-sm"
+                                placeholder="e.g. In collaboration with XYZ"
+                            />
                         </div>
                         <div>
                             <div className="flex justify-between items-center mb-2">
@@ -760,6 +776,16 @@ const QuizManager = () => {
                                     className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-medium text-gray-900 text-sm"
                                     rows="4"
                                 ></textarea>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Custom Portal Badge / Chip Text</label>
+                                <input
+                                    type="text"
+                                    value={editCustomChipText}
+                                    onChange={(e) => setEditCustomChipText(e.target.value)}
+                                    className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-medium text-gray-900 text-sm"
+                                    placeholder="e.g. In collaboration with XYZ"
+                                />
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-2">

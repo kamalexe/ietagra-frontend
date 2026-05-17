@@ -524,7 +524,7 @@ const LiveQuiz = () => {
             };
         }
         return {
-            text: "In collaboration with IET DBRAU",
+            text: activeQuiz.customChipText || "In collaboration with IET DBRAU",
             bg: "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-2xs",
             icon: (
                 <span className="relative flex h-2.5 w-2.5 mr-2.5 inline-flex items-center flex-shrink-0">
@@ -650,7 +650,7 @@ const LiveQuiz = () => {
                         </div>
 
                         {/* Directly show Leaderboard */}
-                        <div className="pt-8 border-t border-gray-100">
+                        {/* <div className="pt-8 border-t border-gray-100">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
                                 <h3 className="text-xl font-bold text-gray-900 flex items-center">
                                     <TrophyIcon className="w-6 h-6 mr-2.5 text-blue-600" /> Live Standings & Leaderboard
@@ -711,7 +711,7 @@ const LiveQuiz = () => {
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             );
