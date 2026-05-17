@@ -524,7 +524,7 @@ const LiveQuiz = () => {
             };
         }
         return {
-            text: "Live Assessment Portal",
+            text: "In collaboration with IET DBRAU",
             bg: "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-2xs",
             icon: (
                 <span className="relative flex h-2.5 w-2.5 mr-2.5 inline-flex items-center flex-shrink-0">
