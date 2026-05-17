@@ -17,6 +17,8 @@ const LiveQuiz = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [rollNo, setRollNo] = useState('');
+    const [fatherName, setFatherName] = useState('');
+    const [studentClass, setStudentClass] = useState('');
     const [participant, setParticipant] = useState(null);
     const [violations, setViolations] = useState(0);
     const [fullscreenExits, setFullscreenExits] = useState(0);
@@ -329,10 +331,10 @@ const LiveQuiz = () => {
 
     const handleJoin = async (e) => {
         e.preventDefault();
-        if (!name.trim() || !email.trim()) return toast.error('Please enter your name and email');
+        if (!name.trim() || !email.trim() || !rollNo.trim() || !fatherName.trim() || !studentClass.trim()) return toast.error('Please enter all required fields');
         
         try {
-            const res = await axios.post(`${API_URL}/quiz/${activeQuiz._id}/join`, { name, email, rollNo });
+            const res = await axios.post(`${API_URL}/quiz/${activeQuiz._id}/join`, { name, email, rollNo, fatherName, studentClass });
             const newParticipant = res.data.data;
             setParticipant(newParticipant);
             setViewMode('quiz');
@@ -762,12 +764,43 @@ const LiveQuiz = () => {
                         </div>
 
                         <div>
+                            <label htmlFor="fatherName" className="block text-xs font-bold text-gray-700 mb-2 ml-1 uppercase tracking-wider">
+                                Father Name *
+                            </label>
+                            <input
+                                id="fatherName"
+                                type="text"
+                                required
+                                value={fatherName}
+                                onChange={(e) => setFatherName(e.target.value)}
+                                className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                                placeholder="Enter father's name"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="studentClass" className="block text-xs font-bold text-gray-700 mb-2 ml-1 uppercase tracking-wider">
+                                Class / Course *
+                            </label>
+                            <input
+                                id="studentClass"
+                                type="text"
+                                required
+                                value={studentClass}
+                                onChange={(e) => setStudentClass(e.target.value)}
+                                className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                                placeholder="e.g. B.Tech CS 3rd Year"
+                            />
+                        </div>
+
+                        <div>
                             <label htmlFor="rollNo" className="block text-xs font-bold text-gray-700 mb-2 ml-1 uppercase tracking-wider">
-                                Roll Number / ID (Optional)
+                                Roll Number / ID *
                             </label>
                             <input
                                 id="rollNo"
                                 type="text"
+                                required
                                 value={rollNo}
                                 onChange={(e) => setRollNo(e.target.value)}
                                 className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"

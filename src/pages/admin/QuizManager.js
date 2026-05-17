@@ -103,6 +103,8 @@ const QuizManager = () => {
             Name: p.name,
             Email: p.email || 'N/A',
             'Roll No / ID': p.rollNo || 'N/A',
+            'Father Name': p.fatherName || 'N/A',
+            'Class': p.studentClass || 'N/A',
             Score: `${p.score} / ${totalScoreboardQuestions}`,
             'Time Taken': formatDuration(p.durationSeconds),
             'Warnings (Tab Switches)': p.tabSwitches,
@@ -646,6 +648,8 @@ const QuizManager = () => {
                                 <tr>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Rank</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Participant</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Father Name</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Class</th>
                                     <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Score</th>
                                     <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Time Taken</th>
                                     <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Warnings</th>
@@ -666,6 +670,12 @@ const QuizManager = () => {
                                                 <div className="text-sm font-bold text-gray-900">{participant.name}</div>
                                                 <div className="text-xs text-gray-500 font-medium">{participant.email} {participant.rollNo ? `| Roll: ${participant.rollNo}` : ''}</div>
                                                 {participant.completed && <span className="text-[11px] bg-green-100 text-green-800 border border-green-200 font-bold px-2 py-0.5 rounded uppercase tracking-wider mt-1.5 inline-block">Completed</span>}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-700 font-medium">{participant.fatherName || 'N/A'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-700 font-medium">{participant.studentClass || 'N/A'}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 font-mono">
@@ -692,7 +702,7 @@ const QuizManager = () => {
                                 })}
                                 {scoreboardData.length === 0 && (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-12 text-center text-gray-400 font-medium text-sm">No participant telemetry recorded yet. Share the examination link!</td>
+                                        <td colSpan="8" className="px-6 py-12 text-center text-gray-400 font-medium text-sm">No participant telemetry recorded yet. Share the examination link!</td>
                                     </tr>
                                 )}
                             </tbody>
