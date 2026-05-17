@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
@@ -42,11 +42,24 @@ const LiveQuiz = () => {
         if (!activeQuiz || !activeQuiz.scheduledStartTime) return;
         const startTime = new Date(activeQuiz.scheduledStartTime).getTime();
 
+        if (Date.now() >= startTime) {
+            setCountdownText('');
+            return;
+        }
+
+        let interval;
+        let isFinished = false;
+
         const updateCountdown = () => {
-            const now = new Date().getTime();
+            if (isFinished) return;
+            const now = Date.now();
             const diff = startTime - now;
             if (diff <= 0) {
+                isFinished = true;
+                if (interval) clearInterval(interval);
                 setCountdownText('');
+                toast.success('Examination scheduled start time reached! Refreshing status...', { duration: 5000, icon: '🚀' });
+                fetchActiveQuiz();
                 return;
             }
 
@@ -59,9 +72,11 @@ const LiveQuiz = () => {
         };
 
         updateCountdown();
-        const interval = setInterval(updateCountdown, 1000);
-        return () => clearInterval(interval);
-    }, [activeQuiz]);
+        interval = setInterval(updateCountdown, 1000);
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [activeQuiz?.scheduledStartTime, fetchActiveQuiz]);
 
     useEffect(() => {
         fetchActiveQuiz();
@@ -77,13 +92,13 @@ const LiveQuiz = () => {
                 localStorage.removeItem('quizParticipant');
             }
         }
-    }, [id]);
+    }, [id, fetchActiveQuiz]);
 
     useEffect(() => {
         if (participant && activeQuiz && !isCompleted) {
             fetchCurrentQuestion();
         }
-    }, [participant, activeQuiz]);
+    }, [participant, activeQuiz, isCompleted, fetchCurrentQuestion]);
 
     // Timer effect
     useEffect(() => {
@@ -199,7 +214,7 @@ const LiveQuiz = () => {
         };
     }, [isCompleted, viewMode, activeQuiz]);
 
-    const fetchActiveQuiz = async () => {
+    const fetchActiveQuiz = useCallback(async () => {
         try {
             const res = await axios.get(`${API_URL}/quiz/${id}`);
             if (res.data.success) {
@@ -210,7 +225,7 @@ const LiveQuiz = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
     const handleJoin = async (e) => {
         e.preventDefault();
@@ -242,7 +257,7 @@ const LiveQuiz = () => {
         }
     };
 
-    const fetchCurrentQuestion = async (targetIdx) => {
+    const fetchCurrentQuestion = useCallback(async (targetIdx) => {
         if (!participant || !activeQuiz) return;
         
         try {
@@ -286,7 +301,7 @@ const LiveQuiz = () => {
             }
             console.error('Error fetching question:', err);
         }
-    };
+    }, [participant, activeQuiz]);
 
     const handleSubmitAnswer = async (isSkip = false) => {
         if (!isSkip && !selectedOption) return toast.error('Please select an option');
