@@ -20,6 +20,7 @@ const LiveQuiz = () => {
     const [participant, setParticipant] = useState(null);
     const [violations, setViolations] = useState(0);
     const [fullscreenExits, setFullscreenExits] = useState(0);
+    const [rightClickViolations, setRightClickViolations] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [questionIds, setQuestionIds] = useState([]);
     
@@ -75,6 +76,7 @@ const LiveQuiz = () => {
                 setTotalQuestions(res.data.totalQuestions);
                 if (res.data.tabSwitches !== undefined) setViolations(res.data.tabSwitches);
                 if (res.data.fullscreenExits !== undefined) setFullscreenExits(res.data.fullscreenExits);
+                if (res.data.rightClickViolations !== undefined) setRightClickViolations(res.data.rightClickViolations);
                 
                 const qId = res.data.data?._id;
                 const existingAns = (res.data.answers || []).find(a => (a.questionId && a.questionId.toString()) === (qId && qId.toString()));
@@ -214,10 +216,17 @@ const LiveQuiz = () => {
             }
         };
 
-        const handleContextMenu = (e) => {
+        const handleContextMenu = async (e) => {
             e.preventDefault();
-            recordViolation();
-            toast.error('Right-click is disabled during the quiz.');
+            if (participant && !isCompleted && activeQuiz?.isActive) {
+                setRightClickViolations(prev => prev + 1);
+                toast.error('Right-click is disabled! Warning recorded.', { duration: 5000 });
+                try {
+                    await axios.post(`${API_URL}/quiz/${id}/participant/${participant._id}/violation/rightclick`);
+                } catch (err) {
+                    console.error('Failed to record right-click violation', err);
+                }
+            }
         };
 
         const handleKeyDown = (e) => {
@@ -396,13 +405,18 @@ const LiveQuiz = () => {
                             <UserIcon className="w-4 h-4 mr-1.5 text-gray-500" />
                             <span className="text-xs font-bold text-gray-800 tracking-wide">{participant.name}</span>
                             {violations > 0 && (
-                                <span title="Tab Switch Warnings" className="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide">
+                                <span title="Tab Switch Warnings" className="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide inline-flex items-center shadow-2xs">
                                     Tab Switch: {violations}
                                 </span>
                             )}
                             {fullscreenExits > 0 && (
-                                <span title="Fullscreen Exit Warnings" className="text-[10px] bg-red-100 text-red-800 border border-red-300 px-2 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide">
+                                <span title="Fullscreen Exit Warnings" className="text-[10px] bg-red-100 text-red-800 border border-red-300 px-2.5 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide inline-flex items-center shadow-2xs">
                                     Fullscreen Exits: {fullscreenExits}
+                                </span>
+                            )}
+                            {rightClickViolations > 0 && (
+                                <span title="Right-Click Warnings" className="text-[10px] bg-purple-100 text-purple-800 border border-purple-300 px-2.5 py-0.5 rounded-full font-bold ml-2 uppercase tracking-wide inline-flex items-center shadow-2xs">
+                                    Right-Clicks: {rightClickViolations}
                                 </span>
                             )}
                         </div>
@@ -863,7 +877,7 @@ const LiveQuiz = () => {
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">Fullscreen Required</h2>
                         <p className="text-gray-600 mb-8 text-base sm:text-lg font-medium leading-relaxed">
                             You have exited fullscreen mode. Your exam is temporarily blurred and locked to ensure security.
-                            {(violations > 0 || fullscreenExits > 0) && (
+                            {(violations > 0 || fullscreenExits > 0 || rightClickViolations > 0) && (
                                 <div className="mt-6 flex flex-wrap gap-3 justify-center">
                                     {violations > 0 && (
                                         <span className="bg-amber-100 text-amber-800 font-bold px-4 py-2 rounded-xl text-sm border border-amber-300 shadow-2xs">
@@ -873,6 +887,11 @@ const LiveQuiz = () => {
                                     {fullscreenExits > 0 && (
                                         <span className="bg-red-100 text-red-800 font-bold px-4 py-2 rounded-xl text-sm border border-red-300 shadow-2xs">
                                             Fullscreen Exits: {fullscreenExits}
+                                        </span>
+                                    )}
+                                    {rightClickViolations > 0 && (
+                                        <span className="bg-purple-100 text-purple-800 font-bold px-4 py-2 rounded-xl text-sm border border-purple-300 shadow-2xs">
+                                            Right-Clicks: {rightClickViolations}
                                         </span>
                                     )}
                                 </div>
@@ -954,6 +973,34 @@ const LiveQuiz = () => {
                                 <div className="w-3.5 h-3.5 rounded-lg bg-blue-600 border border-blue-600 mr-2.5 flex-shrink-0 shadow-2xs"></div> Active Question
                             </div>
                         </div>
+
+                        {(violations > 0 || fullscreenExits > 0 || rightClickViolations > 0) && (
+                            <div className="mt-6 pt-4 border-t border-gray-100 animate-scale-in">
+                                <h4 className="text-xs font-black text-red-700 uppercase tracking-wider mb-3 flex items-center font-sans tracking-tight">
+                                    <ExclamationTriangleIcon className="w-4 h-4 mr-1.5 text-red-600 inline-block flex-shrink-0 animate-pulse" /> Security Logs
+                                </h4>
+                                <div className="space-y-2">
+                                    {violations > 0 && (
+                                        <div className="flex items-center justify-between text-xs bg-amber-50 text-amber-900 px-3 py-2 rounded-xl border border-amber-200 shadow-2xs font-medium tracking-tight">
+                                            <span>Tab Switches</span>
+                                            <span className="bg-amber-200 text-amber-950 font-black px-2 py-0.5 rounded-lg">{violations}</span>
+                                        </div>
+                                    )}
+                                    {fullscreenExits > 0 && (
+                                        <div className="flex items-center justify-between text-xs bg-red-50 text-red-900 px-3 py-2 rounded-xl border border-red-200 shadow-2xs font-medium tracking-tight">
+                                            <span>Fullscreen Exits</span>
+                                            <span className="bg-red-200 text-red-950 font-black px-2 py-0.5 rounded-lg">{fullscreenExits}</span>
+                                        </div>
+                                    )}
+                                    {rightClickViolations > 0 && (
+                                        <div className="flex items-center justify-between text-xs bg-purple-50 text-purple-900 px-3 py-2 rounded-xl border border-purple-200 shadow-2xs font-medium tracking-tight">
+                                            <span>Right-Clicks</span>
+                                            <span className="bg-purple-200 text-purple-950 font-black px-2 py-0.5 rounded-lg">{rightClickViolations}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
