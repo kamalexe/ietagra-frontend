@@ -136,19 +136,26 @@ const QuizManager = () => {
     const exportToExcel = () => {
         if (!scoreboardData || scoreboardData.length === 0) return toast.error('No data to export');
 
-        const formattedData = scoreboardData.map((p, index) => ({
-            Rank: index + 1,
-            Name: p.name,
-            Email: p.email || 'N/A',
-            'Roll No / ID': p.rollNo || 'N/A',
-            'Father Name': p.fatherName || 'N/A',
-            'Class': p.studentClass || 'N/A',
-            Score: `${p.score} / ${totalScoreboardQuestions}`,
-            'Time Taken': formatDuration(p.durationSeconds),
-            'Warnings (Tab Switches)': p.tabSwitches,
-            Status: p.completed ? 'Completed' : `In Progress (Q${p.currentQuestionIndex})`,
-            'Joined At': formatDate(p.joinedAt)
-        }));
+        const formattedData = scoreboardData.map((p, index) => {
+            const totalWarnings = (p.tabSwitches || 0) + (p.fullscreenExits || 0) + (p.rightClickViolations || 0) + (p.copyPasteViolations || 0);
+            return {
+                Rank: index + 1,
+                Name: p.name,
+                Email: p.email || 'N/A',
+                'Roll No / ID': p.rollNo || 'N/A',
+                'Father Name': p.fatherName || 'N/A',
+                'Class': p.studentClass || 'N/A',
+                Score: `${p.score} / ${totalScoreboardQuestions}`,
+                'Time Taken': formatDuration(p.durationSeconds),
+                'Total Warnings': totalWarnings,
+                'Tab Switches': p.tabSwitches || 0,
+                'Fullscreen Exits': p.fullscreenExits || 0,
+                'Right Clicks': p.rightClickViolations || 0,
+                'Copy Paste': p.copyPasteViolations || 0,
+                Status: p.completed ? 'Completed' : `In Progress (Q${p.currentQuestionIndex})`,
+                'Joined At': formatDate(p.joinedAt)
+            };
+        });
 
         const worksheet = xlsx.utils.json_to_sheet(formattedData);
         const workbook = xlsx.utils.book_new();
@@ -902,13 +909,19 @@ const QuizManager = () => {
                                                 {formatDuration(participant.durationSeconds)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                {participant.tabSwitches > 0 ? (
-                                                    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200 font-mono uppercase tracking-wider">
-                                                        {participant.tabSwitches} Warning{participant.tabSwitches > 1 ? 's' : ''}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-xs bg-green-50 text-green-700 font-bold px-2.5 py-1 rounded-full border border-green-200 uppercase tracking-wider">Clean</span>
-                                                )}
+                                                {(() => {
+                                                    const totalWarnings = (participant.tabSwitches || 0) + (participant.fullscreenExits || 0) + (participant.rightClickViolations || 0) + (participant.copyPasteViolations || 0);
+                                                    return totalWarnings > 0 ? (
+                                                        <span 
+                                                            className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200 font-mono uppercase tracking-wider cursor-help"
+                                                            title={`Tabs: ${participant.tabSwitches || 0} | Fullscreen: ${participant.fullscreenExits || 0} | Right-Clicks: ${participant.rightClickViolations || 0} | Copy/Paste: ${participant.copyPasteViolations || 0}`}
+                                                        >
+                                                            {totalWarnings} Warning{totalWarnings > 1 ? 's' : ''}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-xs bg-green-50 text-green-700 font-bold px-2.5 py-1 rounded-full border border-green-200 uppercase tracking-wider">Clean</span>
+                                                    );
+                                                })()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-xs font-bold text-gray-700 font-mono">
                                                 {participant.completed ? '100%' : `Q ${participant.currentQuestionIndex + 1}`}
